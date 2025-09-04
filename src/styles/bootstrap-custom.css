@@ -1,0 +1,135 @@
+/* Bootstrap 4 커스텀 설정 */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import './variables.css';
+
+/* Bootstrap 변수 오버라이드 */
+:root {
+  --bs-primary: var(--primary-color);
+  --bs-secondary: var(--secondary-color);
+}
+
+/* Bootstrap 컴포넌트 커스터마이징 */
+
+/* Navbar 커스텀 */
+.navbar {
+  box-shadow: var(--box-shadow);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+  font-weight: 500;
+  color: var(--text-primary) !important;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--primary-color) !important;
+}
+
+/* Card 커스텀 */
+.card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-header {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  border-bottom: none;
+}
+
+/* Button 커스텀 */
+.btn {
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: #4a7ba7;
+  border-color: #4a7ba7;
+  box-shadow: 0 0 0 0.2rem rgba(94, 148, 202, 0.25);
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Badge 커스텀 */
+.badge-primary {
+  background-color: var(--primary-color);
+}
+
+/* Modal 커스텀 */
+.modal-content {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+  background-color: var(--secondary-color);
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  background-color: var(--secondary-color);
+}
+
+/* Form 커스텀 */
+.form-control {
+  border-radius: var(--border-radius);
+  border: 1px solid #ddd;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(94, 148, 202, 0.25);
+}
+
+/* Alert 커스텀 */
+.alert {
+  border: none;
+  border-radius: var(--border-radius);
+}
+
+/* 반응형 유틸리티 */
+@media (max-width: 767.98px) {
+  .navbar-nav {
+    text-align: center;
+    padding-top: 1rem;
+  }
+  
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn-group .btn {
+    margin-bottom: 0.5rem;
+  }
+}

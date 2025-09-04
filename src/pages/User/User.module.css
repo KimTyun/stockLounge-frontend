@@ -1,0 +1,403 @@
+.user {
+  min-height: 100vh;
+  padding: 2rem 0;
+  background-color: #f8f9fa;
+}
+
+.userHeader {
+  margin-bottom: 2rem;
+}
+
+.userHeader h2 {
+  color: #5E94CA;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.userTabs {
+  border-bottom: 2px solid #dee2e6;
+  justify-content: center;
+}
+
+.tabLink {
+  color: #666 !important;
+  font-weight: 500;
+  border: none !important;
+  background: none !important;
+  padding: 1rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.tabLink.active {
+  color: #5E94CA !important;
+  border-bottom: 3px solid #5E94CA !important;
+  background: none !important;
+}
+
+.tabLink:hover {
+  color: #5E94CA !important;
+  border: none !important;
+}
+
+.userContent {
+  margin-top: 2rem;
+}
+
+.contentCard {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 12px;
+}
+
+/* 프로필 섹션 */
+.profileSection {
+  padding: 2rem;
+}
+
+.profileImageSection {
+  margin-bottom: 1rem;
+}
+
+.profileImage {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 4px solid #5E94CA;
+  margin-bottom: 1rem;
+}
+
+.changePhotoBtn {
+  border-color: #5E94CA;
+  color: #5E94CA;
+}
+
+.changePhotoBtn:hover {
+  background-color: #5E94CA;
+  border-color: #5E94CA;
+}
+
+.profileInfo {
+  padding-left: 1rem;
+}
+
+.nickname {
+  color: #5E94CA;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detailItem strong {
+  min-width: 80px;
+  color: #333;
+}
+
+.accountBadge {
+  margin-left: 0.5rem;
+  margin-right: 0.25rem;
+}
+
+.pointCard {
+  background: linear-gradient(135deg, #5E94CA, #7BA7D1);
+  color: white;
+  border: none;
+  margin-top: 1rem;
+}
+
+.totalPoints, .currentPoints {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* 수정 탭 */
+.editNote {
+  color: #666;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.formGroup label {
+  min-width: 120px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* 교환 탭 */
+.coinExchangeBanner {
+  background: linear-gradient(135deg, #5E94CA, #7BA7D1);
+  color: white;
+  border: none;
+  margin-bottom: 2rem;
+}
+
+.coinExchangeBanner .card-body {
+  padding: 2rem;
+}
+
+.coinExchangeBanner h3 {
+  margin-bottom: 1rem;
+}
+
+.coinExchangeBanner p {
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.exchangeBtn {
+  background-color: white;
+  color: #5E94CA;
+  border: none;
+  font-weight: bold;
+  padding: 0.75rem 2rem;
+}
+
+.exchangeBtn:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  color: #5E94CA;
+}
+
+.exchangeBtn:disabled {
+  background-color: rgba(255,255,255,0.5);
+  color: rgba(94,148,202,0.5);
+}
+
+.sectionTitle {
+  color: #5E94CA;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.exchangeCard {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+}
+
+.exchangeCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.exchangeImage {
+  height: 120px;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+}
+
+.exchangeImage img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.itemName {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.itemDescription {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.pointsRequired {
+  color: #5E94CA;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.exchangeItemBtn {
+  background-color: #5E94CA;
+  border-color: #5E94CA;
+  font-weight: 500;
+}
+
+.exchangeItemBtn:hover:not(:disabled) {
+  background-color: #4a7ba7;
+  border-color: #4a7ba7;
+}
+
+.exchangeItemBtn:disabled {
+  background-color: #ccc;
+  border-color: #ccc;
+}
+
+/* 내역 탭 */
+.historyBody {
+  padding: 0;
+}
+
+.historyTable {
+  margin: 0;
+}
+
+.historyTable thead th {
+  background-color: #f8f9fa;
+  border-top: none;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  color: #495057;
+  padding: 1rem;
+}
+
+.historyTable tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #eee;
+}
+
+.typeBadge {
+  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.gainPoints {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.lossPoints {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.historyDate {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 반응형 */
+@media (max-width: 991.98px) {
+  .profileInfo {
+    padding-left: 0;
+    margin-top: 1rem;
+  }
+  
+  .coinExchangeBanner .row {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .user {
+    padding: 1rem 0;
+  }
+  
+  .userHeader h2 {
+    font-size: 1.75rem;
+  }
+  
+  .userTabs {
+    flex-direction: column;
+  }
+  
+  .tabLink {
+    text-align: center;
+    padding: 0.75rem 1rem;
+  }
+  
+  .profileSection {
+    padding: 1.5rem;
+  }
+  
+  .profileImage {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .userDetails {
+    gap: 0.75rem;
+  }
+  
+  .detailItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .formGroup {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .coinExchangeBanner .card-body {
+    padding: 1.5rem;
+  }
+  
+  .exchangeBtn {
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .historyTable {
+    font-size: 0.85rem;
+  }
+  
+  .historyTable thead th,
+  .historyTable tbody td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .profileSection {
+    padding: 1rem;
+  }
+  
+  .profileImage {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .totalPoints, .currentPoints {
+    font-size: 1.5rem;
+  }
+  
+  .coinExchangeBanner h3 {
+    font-size: 1.25rem;
+  }
+  
+  .exchangeImage {
+    height: 100px;
+  }
+  
+  .exchangeImage img {
+    width: 60px;
+    height: 60px;
+  }
+}

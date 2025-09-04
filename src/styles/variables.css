@@ -1,0 +1,27 @@
+:root {
+  /* 메인 컬러 */
+  --primary-color: #5E94CA;
+  --secondary-color: #F7FAFC;
+  
+  /* 텍스트 컬러 */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  
+  /* 상태 컬러 */
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+  
+  /* 소셜 로그인 컬러 */
+  --google-color: #4285F4;
+  --kakao-color: #FAD900;
+  --terms-color: #4D7399;
+  
+  /* 레이아웃 */
+  --header-height: 70px;
+  --border-radius: 8px;
+  --box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --box-shadow-hover: 0 4px 16px rgba(0,0,0,0.15);
+}

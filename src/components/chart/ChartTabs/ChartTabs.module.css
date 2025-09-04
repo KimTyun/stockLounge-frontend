@@ -1,0 +1,322 @@
+.chartTabs {
+  margin-top: 1rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.tabs {
+  border-bottom: 2px solid #5E94CA;
+}
+
+.tabs .nav-link {
+  color: #6c757d;
+  font-weight: 600;
+  border: none;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tabs .nav-link:hover {
+  border-color: transparent;
+  color: #5E94CA;
+}
+
+.tabs .nav-link.active {
+  color: #5E94CA;
+  background-color: transparent;
+  border-bottom-color: #5E94CA;
+}
+
+.tabContent {
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
+
+/* 개요 탭 */
+.priceSection {
+  text-align: center;
+  padding: 1rem;
+  border-right: 1px solid #e9ecef;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.change {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.positive {
+  color: #28a745;
+  background-color: #d4edda;
+}
+
+.negative {
+  color: #dc3545;
+  background-color: #f8d7da;
+}
+
+.changeValue {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* 기술적 분석 탭 */
+.indicatorList,
+.signalList {
+  margin-bottom: 1.5rem;
+}
+
+.indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.indicator:last-child {
+  border-bottom: none;
+}
+
+.indicatorValue {
+  font-weight: 600;
+  color: #5E94CA;
+}
+
+.signal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.signal:last-child {
+  border-bottom: none;
+}
+
+.trendIndicator {
+  text-align: center;
+  padding: 1rem;
+  border: 2px solid #28a745;
+  border-radius: 8px;
+  background-color: #f8fff9;
+}
+
+.trendBadge {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+/* 뉴스 탭 */
+.newsList {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.newsItem {
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.newsItem:hover {
+  border-color: #5E94CA;
+  box-shadow: 0 2px 8px rgba(94, 148, 202, 0.1);
+}
+
+.newsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.newsHeader h6 {
+  margin-bottom: 0;
+  color: #2c3e50;
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.newsSummary {
+  color: #6c757d;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.newsFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.newsSource {
+  font-weight: 600;
+  color: #5E94CA;
+}
+
+.newsTime {
+  color: #6c757d;
+}
+
+/* 전망 탭 */
+.analysisCard {
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  text-align: center;
+  height: 100%;
+  background-color: #f8f9fa;
+}
+
+.analysisCard h6 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.confidence {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.timeframe {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.targets {
+  text-align: left;
+}
+
+.targets strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.target {
+  display: inline-block;
+  background-color: #5E94CA;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .price {
+    font-size: 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .change {
+    font-size: 0.9rem;
+  }
+  
+  .priceSection {
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .newsHeader {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .newsHeader h6 {
+    margin-right: 0;
+  }
+  
+  .analysisCard {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs .nav-link {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .price {
+    font-size: 1.25rem;
+  }
+  
+  .tabContent {
+    margin-top: 0.5rem;
+  }
+  
+  .indicator,
+  .signal {
+    padding: 0.5rem 0;
+  }
+  
+  .newsItem {
+    padding: 0.75rem;
+  }
+  
+  .analysisCard {
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,186 @@
+.board {
+  min-height: 100vh;
+}
+
+.chartSection {
+  padding: 2rem 0;
+  background-color: #F7FAFC;
+}
+
+.boardSection {
+  padding: 2rem 0;
+  background-color: white;
+}
+
+.boardCard {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 12px;
+}
+
+.boardHeader {
+  background-color: #5E94CA;
+  color: white;
+  border-bottom: none;
+  padding: 1.5rem;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerContent h3 {
+  margin: 0;
+  font-weight: bold;
+}
+
+.writeButton {
+  background-color: white;
+  color: #5E94CA;
+  border: none;
+  font-weight: bold;
+  padding: 0.5rem 1.5rem;
+}
+
+.writeButton:hover {
+  background-color: #f8f9fa;
+  color: #5E94CA;
+}
+
+.boardBody {
+  padding: 0;
+}
+
+.postTable {
+  margin: 0;
+}
+
+.postTable thead th {
+  background-color: #f8f9fa;
+  border-top: none;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  color: #495057;
+  padding: 1rem;
+}
+
+.postTable tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #eee;
+}
+
+.noticeRow {
+  background-color: #fff9f9;
+}
+
+.noticeRow:hover {
+  background-color: #fff5f5;
+}
+
+.postRow:hover {
+  background-color: #f8f9fa;
+}
+
+.titleCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.noticeBadge {
+  background-color: #dc3545;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.postTitle {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  flex: 1;
+}
+
+.postTitle:hover {
+  color: #5E94CA;
+  text-decoration: none;
+}
+
+.commentCount {
+  color: #e74c3c;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.author {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.views, .likes {
+  color: #666;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.date {
+  color: #999;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.paginationWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.pagination {
+  margin: 0;
+}
+
+.pagination .page-link {
+  color: #5E94CA;
+  border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #5E94CA;
+  border-color: #5E94CA;
+}
+
+.pagination .page-link:hover {
+  color: #4a7ba7;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+/* 반응형 */
+@media (max-width: 767.98px) {
+  .headerContent {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .postTable {
+    font-size: 0.85rem;
+  }
+  
+  .postTable thead th,
+  .postTable tbody td {
+    padding: 0.5rem;
+  }
+  
+  .views, .likes, .date {
+    display: none;
+  }
+  
+  .titleCell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
