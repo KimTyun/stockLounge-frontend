@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Container, Row, Col, Card, Nav, Button, Image, Badge, Table } from 'react-bootstrap';
-import styles from './User.module.css';
+import styles from '../../styles/pages/User.module.css';
 
 const User = () => {
   const [activeTab, setActiveTab] = useState('info');

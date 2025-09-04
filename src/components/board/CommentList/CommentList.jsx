@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Dropdown, Badge } from 'react-bootstrap';
 import CommentForm from '../CommentForm';
-import styles from './CommentList.module.css';
+import styles from '../../../styles/components/board/CommentList.module.css';
 
 const CommentList = ({ postId }) => {
   const [comments, setComments] = useState([]);

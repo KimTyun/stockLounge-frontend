@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import styles from './CommentForm.module.css';
+import styles from '../../../styles/components/board/CommentForm.module.css';
 
 const CommentForm = ({ postId, parentId = null, onCommentAdded, onCancel }) => {
   const [content, setContent] = useState('');

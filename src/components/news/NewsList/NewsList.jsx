@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ListGroup, Badge } from 'react-bootstrap';
-import styles from './NewsList.module.css';
+import styles from '../../../styles/components/news/NewsList.module.css';
 
 const NewsList = ({ newsData, type = 'crypto' }) => {
   const [selectedNews, setSelectedNews] = useState(null);

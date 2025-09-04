@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Button, Badge, Dropdown } from 'react-bootst
 import { useParams, useNavigate } from 'react-router-dom';
 import CommentList from '../CommentList';
 import CommentForm from '../CommentForm';
-import styles from './PostDetail.module.css';
+import styles from '../../../styles/pages/Board_fixed.module.css';
 
 const PostDetail = () => {
   const { id } = useParams();

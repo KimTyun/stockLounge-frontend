@@ -1,7 +1,7 @@
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import CandleChart from '../../components/chart/CandleChart';
 import PostCard from '../../components/board/PostCard';
-import styles from './Home.module.css';
+import styles from '../../styles/pages/Home.module.css';
 
 const Home = () => {
   const popularPosts = [

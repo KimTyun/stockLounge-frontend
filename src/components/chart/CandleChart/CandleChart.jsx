@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Row, Col, ButtonGroup, Button } from 'react-bootstrap';
-import styles from './CandleChart.module.css';
+import styles from '../../../styles/components/chart/CandleChart.module.css';
 
 const CandleChart = () => {
   const [selectedCoin, setSelectedCoin] = useState('BTC');

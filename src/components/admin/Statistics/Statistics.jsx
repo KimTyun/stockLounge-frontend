@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Row, Col, Card, Table, Form } from 'react-bootstrap';
-import styles from '../admin-common.module.css';
+import styles from '../../../styles/components/admin/admin-common.module.css';
 
 const Statistics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('week');

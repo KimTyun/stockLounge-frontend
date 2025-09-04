@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Badge, Button, Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import styles from './PostList.module.css';
+import styles from '../../../styles/components/board/PostList.module.css';
 
 const PostList = ({ category = 'all' }) => {
   const [posts, setPosts] = useState([]);

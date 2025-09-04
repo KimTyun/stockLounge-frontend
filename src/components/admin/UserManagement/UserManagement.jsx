@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal, Alert } from 'react-bootstrap';
-import styles from '../admin-common.module.css';
+import styles from '../../../styles/components/admin/admin-common.module.css';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');

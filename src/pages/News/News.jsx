@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Container, Row, Col, Card, Nav, Button } from 'react-bootstrap'
-import styles from './News.module.css'
+import styles from '../../styles/pages/News.module.css'
 
 const News = () => {
    const [activeTab, setActiveTab] = useState('crypto')
