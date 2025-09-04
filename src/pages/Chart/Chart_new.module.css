@@ -1,0 +1,66 @@
+.chart {
+   padding: 2rem 0;
+   min-height: calc(100vh - 200px);
+}
+
+.header {
+   text-align: center;
+   margin-bottom: 2rem;
+   padding-bottom: 1rem;
+   border-bottom: 2px solid #5e94ca;
+}
+
+.header h2 {
+   color: #2c3e50;
+   font-weight: 700;
+   margin-bottom: 0.5rem;
+}
+
+.chartSection {
+   display: flex;
+   flex-direction: column;
+   gap: 1rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 992px) {
+   .chart {
+      padding: 1rem 0;
+   }
+
+   .header {
+      margin-bottom: 1.5rem;
+   }
+
+   .header h2 {
+      font-size: 1.5rem;
+   }
+}
+
+@media (max-width: 768px) {
+   .chart {
+      padding: 0.5rem 0;
+   }
+
+   .header {
+      margin-bottom: 1rem;
+   }
+
+   .header h2 {
+      font-size: 1.25rem;
+   }
+
+   .chartSection {
+      gap: 0.75rem;
+   }
+}
+
+@media (max-width: 480px) {
+   .header h2 {
+      font-size: 1.1rem;
+   }
+
+   .chartSection {
+      gap: 0.5rem;
+   }
+}
