@@ -14,7 +14,7 @@
 
 .boardCard {
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-radius: 12px;
 }
 
@@ -119,8 +119,7 @@
   font-size: 0.9rem;
 }
 
-.views,
-.likes {
+.views, .likes {
   color: #666;
   font-size: 0.9rem;
   text-align: center;
@@ -165,22 +164,20 @@
     gap: 1rem;
     text-align: center;
   }
-
+  
   .postTable {
     font-size: 0.85rem;
   }
-
+  
   .postTable thead th,
   .postTable tbody td {
     padding: 0.5rem;
   }
-
-  .views,
-  .likes,
-  .date {
+  
+  .views, .likes, .date {
     display: none;
   }
-
+  
   .titleCell {
     flex-direction: column;
     align-items: flex-start;

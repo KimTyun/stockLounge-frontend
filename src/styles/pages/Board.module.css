@@ -3,7 +3,6 @@
   min-height: calc(100vh - 200px);
 }
 
-
 .header {
   text-align: center;
   margin-bottom: 2rem;
@@ -52,15 +51,15 @@
   .board {
     padding: 1rem 0;
   }
-
+  
   .header {
     margin-bottom: 1.5rem;
   }
-
+  
   .header h2 {
     font-size: 1.5rem;
   }
-
+  
   .categoryTabs .nav-link {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
@@ -71,11 +70,11 @@
   .board {
     padding: 0.5rem 0;
   }
-
+  
   .header h2 {
     font-size: 1.25rem;
   }
-
+  
   .categoryTabs .nav-link {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;

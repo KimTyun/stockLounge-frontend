@@ -1,0 +1,622 @@
+/* 게시판 전체 컨테이너 */
+.board {
+  padding: 1rem;
+  min-height: calc(100vh - 100px);
+  background-color: #f8f9fa;
+}
+
+/* 섹션1: 차트 영역 */
+.chartSection {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.coinTitle {
+  color: #2c3e50;
+  font-weight: 700;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.priceInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.change {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.positive {
+  color: #dc3545;
+}
+
+.negative {
+  color: #28a745;
+}
+
+/* 차트 시간 탭 */
+.timeframeTabs {
+  margin-bottom: 1rem;
+  border: none;
+}
+
+.timeframeTabs .nav-link {
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  margin-right: 0.5rem;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+.timeframeTabs .nav-link:hover {
+  color: #5e94ca;
+  background-color: #e3f2fd;
+}
+
+.timeframeTabs .nav-link.active {
+  color: white;
+  background-color: #5e94ca;
+  border-color: #5e94ca;
+}
+
+.chartContainer {
+  height: 400px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 섹션2: 게시판 영역 */
+.boardSection {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.boardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #5e94ca;
+}
+
+.boardTitle {
+  color: #2c3e50;
+  font-weight: 700;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.writeButton {
+  background-color: #5e94ca;
+  border-color: #5e94ca;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+}
+
+.writeButton:hover {
+  background-color: #4a7ba7;
+  border-color: #4a7ba7;
+}
+
+/* 공지사항 영역 */
+.noticeSection {
+  margin-bottom: 1.5rem;
+}
+
+.noticeItem {
+  background-color: #fff8e1 !important;
+  border-left: 4px solid #ff9800 !important;
+}
+
+.noticeBadge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* 게시글 목록 */
+.postList {
+  border-top: 1px solid #e9ecef;
+}
+
+.postItem {
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  background-color: white;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.postItem:hover {
+  background-color: #f8f9fa;
+}
+
+.postContent {
+  width: 100%;
+}
+
+.postMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.author {
+  font-weight: 600;
+  color: #495057;
+}
+
+.date {
+  color: #6c757d;
+}
+
+.postTitle {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.commentCount {
+  color: #5e94ca;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.postStats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.postStats span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* 사이드바 */
+.sidebar {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  height: fit-content;
+  position: sticky;
+  top: 1rem;
+}
+
+.sidebarTitle {
+  color: #2c3e50;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  border-bottom: 2px solid #5e94ca;
+  padding-bottom: 0.5rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 992px) {
+  .sidebar {
+    margin-top: 2rem;
+    position: static;
+  }
+  
+  .chartHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .priceInfo {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .board {
+    padding: 0.5rem;
+  }
+  
+  .chartSection,
+  .boardSection,
+  .sidebar {
+    padding: 1rem;
+  }
+  
+  .timeframeTabs .nav-link {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .boardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .postItem {
+    padding: 0.75rem;
+  }
+  
+  .postTitle {
+    font-size: 1rem;
+  }
+}
+
+/* PostEditor 스타일 추가 */
+.postEditor {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.editorContainer {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+  overflow: hidden;
+}
+
+.editorHeader {
+  background: linear-gradient(135deg, #5e94ca 0%, #4a7ba7 100%);
+  color: white;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerLeft h3 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.headerRight {
+  display: flex;
+  gap: 10px;
+}
+
+.headerRight .btn {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.headerRight .btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.editorContent {
+  padding: 30px;
+}
+
+.formSection {
+  margin-bottom: 30px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.formSection:last-of-type {
+  border-bottom: none;
+}
+
+.formLabel {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.titleInput, .categorySelect, .tagInput {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.titleInput:focus, .categorySelect:focus, .tagInput:focus {
+  border-color: #5e94ca;
+  box-shadow: 0 0 0 0.2rem rgba(94, 148, 202, 0.25);
+}
+
+.editorArea {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.editorArea:focus-within {
+  border-color: #5e94ca;
+  box-shadow: 0 0 0 0.2rem rgba(94, 148, 202, 0.25);
+}
+
+.formatToolbar {
+  background-color: #f8f9fa;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.toolbarGroup {
+  display: flex;
+  gap: 5px;
+}
+
+.toolbarBtn {
+  background: none;
+  border: 1px solid #dee2e6;
+  color: #6c757d;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.toolbarBtn:hover {
+  background-color: #e9ecef;
+  color: #495057;
+  border-color: #adb5bd;
+}
+
+.toolbarBtn:active {
+  background-color: #5e94ca;
+  color: white;
+  border-color: #5e94ca;
+}
+
+.contentTextarea {
+  border: none;
+  border-radius: 0;
+  resize: vertical;
+  min-height: 500px;
+  padding: 20px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.contentTextarea:focus {
+  box-shadow: none;
+  border: none;
+}
+
+.previewArea {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  min-height: 500px;
+  background-color: white;
+}
+
+.previewContent {
+  padding: 20px;
+  font-family: 'Noto Sans KR', sans-serif;
+  line-height: 1.6;
+}
+
+.previewContent h3 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.previewContent h4 {
+  color: #34495e;
+  font-weight: 500;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.previewContent p {
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.previewContent ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.previewContent li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.noticeCheck {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.buttonArea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 25px;
+  margin-top: 25px;
+  border-top: 2px solid #e9ecef;
+}
+
+.leftButtons, .rightButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.guideSection {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 25px;
+  margin-top: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.guideSection h5 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.guideBox {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  height: 100%;
+}
+
+.guideBox h6 {
+  color: #5e94ca;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.guideBox ul {
+  margin-bottom: 0;
+  padding-left: 1.2rem;
+}
+
+.guideBox li {
+  margin-bottom: 8px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.guideBox code {
+  background-color: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  color: #d63384;
+}
+
+/* PostEditor 반응형 스타일 */
+@media (max-width: 768px) {
+  .editorHeader {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .headerRight {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .editorContent {
+    padding: 20px;
+  }
+  
+  .formatToolbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .toolbarGroup {
+    gap: 3px;
+  }
+  
+  .toolbarBtn {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .buttonArea {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .leftButtons, .rightButtons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .guideBox {
+    margin-bottom: 15px;
+  }
+}
+
+/* 차트 탭 스타일 추가 */
+.chartTabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.chartTab {
+  background: none;
+  border: 1px solid #dee2e6;
+  color: #6c757d;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.chartTab:hover {
+  color: #5e94ca;
+  background-color: #e3f2fd;
+}
+
+.chartTab.active {
+  color: white;
+  background-color: #5e94ca;
+  border-color: #5e94ca;
+}
+
+.chartTitleArea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chartTitleArea h2 {
+  color: #2c3e50;
+  font-weight: 700;
+  margin: 0;
+  font-size: 1.5rem;
+}

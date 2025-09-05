@@ -1,0 +1,53 @@
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 0.75rem 0;
+}
+
+.brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #5E94CA !important;
+  text-decoration: none;
+}
+
+.authButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.loginBtn {
+  border-color: #5E94CA;
+  color: #5E94CA;
+}
+
+.loginBtn:hover {
+  background-color: #5E94CA;
+  border-color: #5E94CA;
+}
+
+.registerBtn {
+  margin-left: 0.5rem;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profileImage {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.nickname {
+  font-weight: 500;
+  color: #333;
+}
+
+.notificationIcon {
+  font-size: 1.2rem;
+  cursor: pointer;
+}

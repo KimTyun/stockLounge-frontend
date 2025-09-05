@@ -1,0 +1,49 @@
+.footer {
+  background-color: #f8f9fa;
+  padding: 2rem 0 1rem;
+  margin-top: auto;
+  border-top: 1px solid #dee2e6;
+}
+
+.brand h5 {
+  color: #5E94CA;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.brand p {
+  color: #666;
+  margin: 0;
+}
+
+.links {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.links a {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.links a:hover {
+  color: #5E94CA;
+  text-decoration: none;
+}
+
+.copyright {
+  color: #999;
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+@media (max-width: 767.98px) {
+  .links {
+    justify-content: flex-start;
+    margin-top: 1rem;
+  }
+}
