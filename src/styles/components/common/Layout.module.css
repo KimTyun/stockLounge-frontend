@@ -6,6 +6,7 @@
 
 .main {
   flex: 1;
-  padding-top: 80px; /* Header 고정 높이만큼 여백 */
+  padding-top: 80px;
+  /* Header 고정 높이만큼 여백 */
   min-height: calc(100vh - 80px);
 }
