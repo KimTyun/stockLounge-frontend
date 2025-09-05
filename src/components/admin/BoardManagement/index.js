@@ -1,1 +1,1 @@
-export { default } from './BoardManagement';
+export { default } from './BoardManagement'

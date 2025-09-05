@@ -1,1 +1,1 @@
-export { default } from './SiteManagement';
+export { default } from './SiteManagement'
