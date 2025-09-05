@@ -183,43 +183,45 @@ const PostList = ({ category = 'all' }) => {
          </div>
 
          <div className={styles.posts}>
-            {posts.map((post) => (
-               <ul key={post.id} className={`${styles.postCard} ${post.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(post.id)}>
-                  <li>
-                     <div className={styles.postHeader}>
-                        {' '}
-                        <div className={styles.postMeta}>
-                           {post.isPinned && (
-                              <Badge bg="danger" className="me-2">
-                                 <i className="fas fa-thumbtack me-1"></i>공지
-                              </Badge>
-                           )}
-                           <p>{post.author.nickname}</p>
-                           <p>{getLevelBadge(post.author.level)}</p>
+            <ul>
+               {posts.map((post) => (
+                  <li key={post.id} className={`${styles.postCard} ${post.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(post.id)}>
+                     <div>
+                        <div className={styles.postHeader}>
+                           {' '}
+                           <div className={styles.postMeta}>
+                              {post.isPinned && (
+                                 <Badge bg="danger" className="me-2">
+                                    <i className="fas fa-thumbtack me-1"></i>공지
+                                 </Badge>
+                              )}
+                              <p>{post.author.nickname}</p>
+                              <p>{getLevelBadge(post.author.level)}</p>
+                           </div>
+                           <div className={styles.postTime}>{formatTimeAgo(post.createdAt)}</div>
                         </div>
-                        <div className={styles.postTime}>{formatTimeAgo(post.createdAt)}</div>
-                     </div>
 
-                     <div className={styles.boardTitle}>
-                        <h5 className={styles.postTitle}>{post.title}</h5>
-                        <p className={styles.stat}>{`[${post.comments}]`}</p>
-                     </div>
+                        <div className={styles.boardTitle}>
+                           <h5 className={styles.postTitle}>{post.title}</h5>
+                           <p className={styles.stat}>{`[${post.comments}]`}</p>
+                        </div>
 
-                     <div className={styles.postFooter}>
-                        <div className={styles.postStats}>
-                           <span className={styles.stat}>
-                              <i className="fas fa-eye me-1"></i>
-                              {post.views.toLocaleString()}
-                           </span>
-                           <span className={styles.stat}>
-                              <i className="fas fa-heart me-1"></i>
-                              {post.likes}
-                           </span>
+                        <div className={styles.postFooter}>
+                           <div className={styles.postStats}>
+                              <span className={styles.stat}>
+                                 <i className="fas fa-eye me-1"></i>
+                                 {post.views.toLocaleString()}
+                              </span>
+                              <span className={styles.stat}>
+                                 <i className="fas fa-heart me-1"></i>
+                                 {post.likes}
+                              </span>
+                           </div>
                         </div>
                      </div>
                   </li>
-               </ul>
-            ))}
+               ))}
+            </ul>
          </div>
 
          {totalPages > 1 && (

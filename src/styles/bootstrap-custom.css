@@ -85,7 +85,7 @@
 .modal-content {
   border: none;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
@@ -122,13 +122,13 @@
     text-align: center;
     padding-top: 1rem;
   }
-  
+
   .btn-group {
     display: flex;
     flex-direction: column;
     width: 100%;
   }
-  
+
   .btn-group .btn {
     margin-bottom: 0.5rem;
   }
