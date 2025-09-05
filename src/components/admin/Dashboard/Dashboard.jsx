@@ -1,39 +1,44 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Row, Col, Card, Table, Badge, Button } from 'react-bootstrap'
 import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const Dashboard = () => {
-   // 대시보드 통계 데이터 (실제로는 API에서 가져올 예정)
-   const dashboardStats = {
-      totalUsers: 5420,
-      totalPosts: 8764,
-      totalComments: 23451,
-      todayVisitors: 1247,
-      todayPosts: 89,
-      userGrowth: 12.5,
-      postGrowth: -2.3,
-      commentGrowth: 15.7,
-      visitorGrowth: 8.2,
-      postGrowthToday: 23.4,
+   // 대시보드 데이터 관리
+   const [dashboardData, setDashboardData] = useState({
+      dashboardStats: {},
+      recentUsers: [],
+      recentPosts: [],
+      adminAlerts: {},
+   })
+   const [loading, setLoading] = useState(true)
+   const [error, setError] = useState(null)
+
+   //처음 렌더링하면 API호출
+   useEffect(() => {
+      const fetchDashboardData = async () => {
+         try {
+            const response = await axios.get('', {
+               withCredentials: true,
+            })
+            setDashboardData(response.data)
+            setLoading(false)
+         } catch (error) {
+            console.error('API 호출 실패: ', error)
+            setError(err)
+            setLoading(false)
+         }
+      }
+      fetchDashboardData()
+   }, [])
+
+   if (loading) {
+      return <div>데이터를 불러오는 중입니다…</div>
+   }
+   if (error) {
+      return <div>데이터를 불러오는 데 실패했습니다.: {error.message}</div>
    }
 
-   // 최근 회원가입 (실제로는 API에서 가져올 예정)
-   const recentUsers = [
-      { id: 1, nickname: '크립토투자자', email: 'crypto@example.com', joinDate: '2025-09-04 14:30', status: 'active' },
-      { id: 2, nickname: '비트코인매니아', email: 'bitcoin@example.com', joinDate: '2025-09-04 13:15', status: 'active' },
-      { id: 3, nickname: '이더리움홀더', email: 'ethereum@example.com', joinDate: '2025-09-04 12:45', status: 'pending' },
-      { id: 4, nickname: '알트코인러버', email: 'altcoin@example.com', joinDate: '2025-09-04 11:30', status: 'active' },
-      { id: 5, nickname: '트레이딩킹', email: 'trading@example.com', joinDate: '2025-09-04 10:20', status: 'active' },
-   ]
-
-   // 최근 게시글 (실제로는 API에서 가져올 예정)
-   const recentPosts = [
-      { id: 1, title: '비트코인 급등, 이번엔 진짜일까?', author: '크립토분석가', views: 1247, comments: 23, created: '2025-09-04 15:30' },
-      { id: 2, title: '이더리움 2.0 업데이트 완료 소식', author: '블록체인전문가', views: 892, comments: 15, created: '2025-09-04 14:45' },
-      { id: 3, title: '알트코인 시즌이 올까? 주요 지표 분석', author: '투자전략가', views: 1056, comments: 31, created: '2025-09-04 13:20' },
-      { id: 4, title: 'DeFi 프로토콜 해킹 사건 분석', author: '보안전문가', views: 743, comments: 18, created: '2025-09-04 12:15' },
-      { id: 5, title: 'NFT 시장 동향과 향후 전망', author: 'NFT컬렉터', views: 625, comments: 12, created: '2025-09-04 11:40' },
-   ]
+   const { dashboardStats, recentUsers, recentPosts, adminAlerts } = dashboardData
 
    const formatNumber = (num) => {
       return num.toLocaleString()
