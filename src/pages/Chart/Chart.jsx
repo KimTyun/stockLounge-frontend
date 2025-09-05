@@ -3,7 +3,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import CandleChart from '../../components/chart/CandleChart';
 import CoinList from '../../components/chart/CoinList';
 import ChartTabs from '../../components/chart/ChartTabs';
-import styles from './Chart.module.css';
+import styles from '../../styles/pages/Chart.module.css';
 
 const Chart = () => {
   const [selectedCoinData, setSelectedCoinData] = useState({

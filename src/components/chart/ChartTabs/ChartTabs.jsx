@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, Tab, Card, Badge, Row, Col } from 'react-bootstrap';
-import styles from './ChartTabs.module.css';
+import styles from '../../../styles/components/chart/ChartTabs.module.css';
 
 const ChartTabs = ({ selectedCoin, onCoinSelect }) => {
   const [activeTab, setActiveTab] = useState('overview');

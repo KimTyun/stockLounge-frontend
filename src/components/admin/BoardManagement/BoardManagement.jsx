@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal } from 'react-bootstrap'
-import styles from '../admin-common.module.css'
+import React, { useState } from 'react';
+import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal } from 'react-bootstrap';
+import styles from '../../../styles/components/admin/admin-common.module.css';
 
 const BoardManagement = () => {
    const [searchTerm, setSearchTerm] = useState('')

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import LoginModal from '../../auth/LoginModal';
-import styles from './Header.module.css';
+import styles from '../../../styles/components/common/Header.module.css';
 
 const Header = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);

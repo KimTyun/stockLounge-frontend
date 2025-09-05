@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, Badge } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
-import styles from './PostEditor.module.css';
+import styles from '../../../styles/pages/Board_fixed.module.css';
 
 const PostEditor = () => {
   const navigate = useNavigate();

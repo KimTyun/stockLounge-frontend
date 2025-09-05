@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Badge, Form, InputGroup, Dropdown } from 'react-bootstrap';
-import styles from './CoinList.module.css';
+import styles from '../../../styles/components/chart/CoinList.module.css';
 
 const CoinList = ({ onCoinSelect, selectedCoin }) => {
   const [coins, setCoins] = useState([]);

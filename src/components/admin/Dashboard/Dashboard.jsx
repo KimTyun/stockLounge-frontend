@@ -1,6 +1,6 @@
-import React from 'react'
-import { Row, Col, Card, Table, Badge, Button } from 'react-bootstrap'
-import styles from '../admin-common.module.css'
+import React from 'react';
+import { Row, Col, Card, Table, Badge, Button } from 'react-bootstrap';
+import styles from '../../../styles/components/admin/admin-common.module.css';
 
 const Dashboard = () => {
    // 대시보드 통계 데이터 (실제로는 API에서 가져올 예정)

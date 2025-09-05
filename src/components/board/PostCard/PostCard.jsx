@@ -1,5 +1,5 @@
 import { Card, Badge } from 'react-bootstrap';
-import styles from './PostCard.module.css';
+import styles from '../../../styles/components/board/PostCard.module.css';
 
 const PostCard = ({ post }) => {
   return (

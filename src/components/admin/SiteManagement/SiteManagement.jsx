@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { Row, Col, Card, Form, Button, Alert, Table } from 'react-bootstrap'
-import styles from '../admin-common.module.css'
+import React, { useState } from 'react';
+import { Row, Col, Card, Form, Button, Alert, Table } from 'react-bootstrap';
+import styles from '../../../styles/components/admin/admin-common.module.css';
 
 const SiteManagement = () => {
    const [settings, setSettings] = useState({

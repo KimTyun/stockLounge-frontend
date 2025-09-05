@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Nav, Tab } from 'react-bootstrap';
 import PostList from '../../components/board/PostList';
-import styles from './Board.module.css';
+import styles from '../../styles/pages/Board_fixed.module.css';
 
 const Board = () => {
   const [activeCategory, setActiveCategory] = useState('all');

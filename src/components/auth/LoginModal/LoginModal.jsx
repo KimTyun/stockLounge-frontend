@@ -1,6 +1,6 @@
 import { Modal, Button } from 'react-bootstrap';
 import SocialLogin from '../SocialLogin';
-import styles from './LoginModal.module.css';
+import styles from '../../../styles/components/auth/LoginModal.module.css';
 
 const LoginModal = ({ show, onHide, onLogin }) => {
   return (

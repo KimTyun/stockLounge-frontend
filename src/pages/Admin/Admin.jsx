@@ -5,7 +5,7 @@ import UserManagement from '../../components/admin/UserManagement';
 import BoardManagement from '../../components/admin/BoardManagement';
 import SiteManagement from '../../components/admin/SiteManagement';
 import Statistics from '../../components/admin/Statistics';
-import styles from './Admin.module.css';
+import styles from '../../styles/pages/Admin.module.css';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
