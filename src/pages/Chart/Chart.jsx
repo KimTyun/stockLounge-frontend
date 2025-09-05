@@ -53,78 +53,71 @@ const Chart = () => {
       <Container fluid className={styles.chartContainer}>
          {/* 1. 메인 차트 세션 */}
          <Row className="mb-4">
-            <Col md={9}>
+            <Col md={8}>
                <Row>
-                  <Card className="mb-3">
-                     <Card.Body>
-                        <CandleChart coin={selectedCoin} period={period} />
-                     </Card.Body>
-                  </Card>
+                  <CandleChart coin={selectedCoin} period={period} />
                </Row>
                {/* 2. TOP2 코인 차트 세션 */}
                <Row className="mb-4">
                   {TOP2.map((coin) => (
                      <Col md={6} key={coin.id}>
-                        <Card className="mb-3">
-                           <Card.Body>
-                              {/* 기간 버튼은 메인 차트와 연동 */}
-                              <CandleChart coin={coin} period={period} small />
-                           </Card.Body>
-                        </Card>
+                        {/* 기간 버튼은 메인 차트와 연동 */}
+                        <CandleChart coin={coin} period={period} small />
                      </Col>
                   ))}
                </Row>
             </Col>
             {/* 4. 우측 사이드바: 뉴스/게시글 */}
-            <Col md={3}>
-               <Card className="mb-3">
-                  <Card.Header>최신 뉴스</Card.Header>
-                  <Card.Body>
-                     {/* TODO: 네이버 뉴스 API 연동 */}
-                     <ul>
-                        <li>뉴스 1</li>
-                        <li>뉴스 2</li>
-                        <li>뉴스 3</li>
-                        <li>뉴스 4</li>
-                        <li>뉴스 5</li>
-                        <li>뉴스 6</li>
-                        <li>뉴스 7</li>
-                        <li>뉴스 8</li>
-                        <li>뉴스 9</li>
-                        <li>뉴스 10</li>
-                     </ul>
-                  </Card.Body>
-               </Card>
-               <Card>
-                  <Card.Header>인기 게시글</Card.Header>
-                  <Card.Body>
-                     {/* TODO: 인기 게시글 연동 */}
-                     <ul>
-                        <li>게시글 1</li>
-                        <li>게시글 2</li>
-                        <li>게시글 3</li>
-                        <li>게시글 4</li>
-                        <li>게시글 5</li>
-                        <li>게시글 6</li>
-                        <li>게시글 7</li>
-                        <li>게시글 8</li>
-                        <li>게시글 9</li>
-                        <li>게시글 10</li>
-                     </ul>
-                  </Card.Body>
-               </Card>
+            <Col md={4}>
+               <Row>
+                  <Col md={12} xs={6}>
+                     <Card className="mb-3">
+                        <Card.Header>최신 뉴스</Card.Header>
+                        <Card.Body>
+                           {/* TODO: 네이버 뉴스 API 연동 */}
+                           <ul>
+                              <li>뉴스 1</li>
+                              <li>뉴스 2</li>
+                              <li>뉴스 3</li>
+                              <li>뉴스 4</li>
+                              <li>뉴스 5</li>
+                              <li>뉴스 6</li>
+                              <li>뉴스 7</li>
+                              <li>뉴스 8</li>
+                              <li>뉴스 9</li>
+                              <li>뉴스 10</li>
+                           </ul>
+                        </Card.Body>
+                     </Card>
+                  </Col>
+                  <Col md={12} xs={6}>
+                     <Card>
+                        <Card.Header>인기 게시글</Card.Header>
+                        <Card.Body>
+                           {/* TODO: 인기 게시글 연동 */}
+                           <ul>
+                              <li>게시글 1</li>
+                              <li>게시글 2</li>
+                              <li>게시글 3</li>
+                              <li>게시글 4</li>
+                              <li>게시글 5</li>
+                              <li>게시글 6</li>
+                              <li>게시글 7</li>
+                              <li>게시글 8</li>
+                              <li>게시글 9</li>
+                              <li>게시글 10</li>
+                           </ul>
+                        </Card.Body>
+                     </Card>
+                  </Col>
+               </Row>
             </Col>
          </Row>
 
          {/* 3. 코인 리스트 세션 */}
          <Row>
             <Col md={12}>
-               <Card>
-                  <Card.Header>코인 리스트</Card.Header>
-                  <Card.Body>
-                     <CoinList onCoinSelect={handleCoinSelect} selectedCoin={selectedCoin.id} />
-                  </Card.Body>
-               </Card>
+               <CoinList onCoinSelect={handleCoinSelect} selectedCoin={selectedCoin.id} />
             </Col>
          </Row>
       </Container>

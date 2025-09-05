@@ -23,7 +23,7 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
 
       try {
          // API 호출 시뮬레이션
-         await new Promise((resolve) => setTimeout(resolve, 1000))
+         await new Promise((resolve) => setTimeout(resolve, 10))
 
          const mockCoins = [
             {
@@ -253,14 +253,8 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
    return (
       <Card className={styles.coinList}>
          <Card.Header className={styles.header}>
-            <h5>암호화폐 시세</h5>
+            <h5>디지털 자산</h5>
             <div className={styles.controls}>
-               <InputGroup className={styles.searchGroup}>
-                  <Form.Control type="text" placeholder="코인 검색..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={styles.searchInput} />
-                  <InputGroup.Text>
-                     <i className="fas fa-search"></i>
-                  </InputGroup.Text>
-               </InputGroup>
                <Dropdown>
                   <Dropdown.Toggle variant="outline-secondary" size="sm">
                      <i className="fas fa-filter me-2"></i>
@@ -311,17 +305,10 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
                            <td className={styles.rank}>{coin.rank}</td>
                            <td className={styles.coinInfo}>
                               <div className={styles.coinName}>
-                                 <img
-                                    src={coin.image}
-                                    alt={coin.name}
-                                    className={styles.coinImage}
-                                    // onError={(e) => {
-                                    //   e.target.src = 'https://via.placeholder.com/24x24/5E94CA/ffffff?text=' + coin.symbol[0];
-                                    // }}
-                                 />
                                  <div>
-                                    <div className={styles.name}>{coin.name}</div>
-                                    <div className={styles.symbol}>{coin.symbol}</div>
+                                    <div className={styles.name}>
+                                       <span>{`${coin.name} (${coin.symbol})`}</span>
+                                    </div>
                                  </div>
                               </div>
                            </td>
