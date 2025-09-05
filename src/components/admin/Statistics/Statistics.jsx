@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Row, Col, Card, Table, Form } from 'react-bootstrap';
-import styles from '../../../styles/components/admin/admin-common.module.css';
+import React, { useState } from 'react'
+import { Row, Col, Card, Table, Form } from 'react-bootstrap'
+import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const Statistics = () => {
    const [selectedPeriod, setSelectedPeriod] = useState('week')
@@ -121,7 +121,7 @@ const Statistics = () => {
          {/* 상세 통계 */}
          <Row>
             {/* 인기 게시글 */}
-            <Col lg={6} className="mb-4">
+            <Col lg={12} className="mb-4">
                <Card className={styles.contentCard}>
                   <div className={styles.cardHeader}>
                      <h4 className={styles.cardTitle}>
@@ -164,7 +164,7 @@ const Statistics = () => {
             </Col>
 
             {/* 활성 사용자 */}
-            <Col lg={6} className="mb-4">
+            <Col lg={12} className="mb-4">
                <Card className={styles.contentCard}>
                   <div className={styles.cardHeader}>
                      <h4 className={styles.cardTitle}>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal } from 'react-bootstrap';
-import styles from '../../../styles/components/admin/admin-common.module.css';
+import React, { useState } from 'react'
+import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal } from 'react-bootstrap'
+import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const BoardManagement = () => {
    const [searchTerm, setSearchTerm] = useState('')
@@ -181,7 +181,7 @@ const BoardManagement = () => {
    })
 
    const PostDetailModal = () => (
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+      <Modal show={showModal} onHide={() => setShowModal(false)} dialogClassName={styles.customModal}>
          <Modal.Header closeButton>
             <Modal.Title>게시글 상세 정보</Modal.Title>
          </Modal.Header>

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Row, Col, Card, Table, Badge, Button } from 'react-bootstrap';
-import styles from '../../../styles/components/admin/admin-common.module.css';
+import React from 'react'
+import { Row, Col, Card, Table, Badge, Button } from 'react-bootstrap'
+import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const Dashboard = () => {
    // 대시보드 통계 데이터 (실제로는 API에서 가져올 예정)
@@ -40,7 +40,7 @@ const Dashboard = () => {
    }
 
    const renderStatCard = (title, value, change, icon, colorClass) => (
-      <Col lg={6} md={2} className="mb-4">
+      <Col lg={4} md={2} className="mb-4">
          <Card className={styles.dashboardCard}>
             <Card.Body className="text-center">
                <div className={`${styles.cardIcon} ${styles[colorClass]}`}>
@@ -170,7 +170,7 @@ const Dashboard = () => {
 
          {/* 최근 활동 테이블들 */}
          <Row>
-            <Col lg={6} className="mb-4">
+            <Col lg={12} className="mb-4">
                <Card className={styles.contentCard}>
                   <div className={styles.cardHeader}>
                      <h4 className={styles.cardTitle}>
@@ -205,7 +205,7 @@ const Dashboard = () => {
                </Card>
             </Col>
 
-            <Col lg={6} className="mb-4">
+            <Col lg={12} className="mb-4">
                <Card className={styles.contentCard}>
                   <div className={styles.cardHeader}>
                      <h4 className={styles.cardTitle}>

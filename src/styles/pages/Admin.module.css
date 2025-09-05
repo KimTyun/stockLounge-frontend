@@ -189,6 +189,14 @@
    margin: 0;
 }
 
+.adminTable th,
+.adminTable td {
+   padding: 12px;
+   white-space: nowrap; /* 셀 내용이 한 줄에 표시되도록 설정 */
+   text-align: center;
+   width: 200px !important;
+}
+
 .adminTable thead th {
    background-color: #f8f9fa;
    border-top: none;
