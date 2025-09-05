@@ -1,111 +1,119 @@
+.small * {
+   font-size: 5px !important;
+}
+
 .chartCard {
-  border: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 12px;
-  overflow: hidden;
+   border: none;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+   border-radius: 12px;
+   overflow: hidden;
 }
 
 .chartHeader {
-  background-color: #5E94CA;
-  color: white;
-  border-bottom: none;
-  padding: 1rem 1.5rem;
+   background-color: #5e94ca;
+   color: white;
+   border-bottom: none;
+   padding: 1rem 1.5rem;
 }
 
 .coinTabs .btn {
-  border-color: white;
-  color: white;
-  background-color: transparent;
+   border-color: white;
+   color: white;
+   background-color: transparent;
 }
 
 .coinTabs .btn.btn-primary {
-  background-color: white;
-  color: #5E94CA;
-  border-color: white;
+   background-color: white;
+   color: #5e94ca;
+   border-color: white;
 }
 
 .coinTabs .btn:hover {
-  background-color: rgba(255,255,255,0.1);
-  border-color: white;
-  color: white;
+   background-color: rgba(255, 255, 255, 0.1);
+   border-color: white;
+   color: white;
 }
 
 .timeframeTabs .btn {
-  border-color: white;
-  color: white;
-  background-color: transparent;
-  font-size: 0.8rem;
+   border-color: white;
+   color: white;
+   background-color: transparent;
+   font-size: 0.8rem;
 }
 
 .timeframeTabs .btn.btn-primary {
-  background-color: white;
-  color: #5E94CA;
-  border-color: white;
+   background-color: white;
+   color: #5e94ca;
+   border-color: white;
 }
 
 .timeframeTabs .btn:hover {
-  background-color: rgba(255,255,255,0.1);
-  border-color: white;
-  color: white;
+   background-color: rgba(255, 255, 255, 0.1);
+   border-color: white;
+   color: white;
 }
 
 .chartBody {
-  padding: 1.5rem;
+   padding: 1.5rem;
 }
 
 .priceInfo {
-  margin-bottom: 1.5rem;
+   margin-bottom: 1.5rem;
 }
 
 .coinName {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 0.5rem;
+   font-size: 1.5rem;
+   font-weight: bold;
+   color: #333;
+   margin-bottom: 0.5rem;
 }
 
 .priceData {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+   display: flex;
+   align-items: center;
+   gap: 1rem;
 }
 
 .currentPrice {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #333;
+   font-size: 2rem;
+   font-weight: bold;
+   color: #333;
 }
 
 .priceChange {
-  font-size: 1.2rem;
-  font-weight: bold;
+   font-size: 1.2rem;
+   font-weight: bold;
 }
 
 .priceChange.positive {
-  color: #e74c3c;
+   color: #e74c3c;
 }
 
 .priceChange.negative {
-  color: #3498db;
+   color: #3498db;
 }
 
 .chartContainer {
-  height: 400px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  position: relative;
+   height: 400px;
+   background-color: #f8f9fa;
+   border-radius: 8px;
+   position: relative;
+}
+
+.chartContainer.small {
+   height: 200px;
 }
 
 .mockChart {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  color: #666;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   height: 100%;
+   color: #666;
 }
 
 .chartPlaceholder {
-  font-size: 2rem;
-  margin-top: 1rem;
+   font-size: 2rem;
+   margin-top: 1rem;
 }
