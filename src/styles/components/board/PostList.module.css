@@ -1,5 +1,11 @@
 .postList {
   padding: 1rem 0;
+  width: 100%;
+  max-width: none;
+}
+
+.boardContainer {
+  padding: 0;
 }
 
 .loading {
@@ -15,11 +21,10 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #5E94CA;
+  border-bottom: 2px solid #5e94ca;
 }
 
 .headerLeft h4 {
-  margin-bottom: 0.5rem;
   color: #2c3e50;
 }
 
@@ -28,8 +33,8 @@
 }
 
 .writeButton {
-  background-color: #5E94CA;
-  border-color: #5E94CA;
+  background-color: #5e94ca;
+  border-color: #5e94ca;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   transition: all 0.2s ease;
@@ -42,21 +47,19 @@
 }
 
 .posts {
-  margin-bottom: 2rem;
+  width: 100%;
 }
 
 .postCard {
-  margin-bottom: 1rem;
-  border: 1px solid #e9ecef;
+  border: 1px solid #757575;
   border-radius: 8px;
-  transition: all 0.2s ease;
   cursor: pointer;
+  width: 100%;
 }
 
 .postCard:hover {
-  border-color: #5E94CA;
+  border-color: #5e94ca;
   box-shadow: 0 4px 12px rgba(94, 148, 202, 0.15);
-  transform: translateY(-2px);
 }
 
 .pinned {
@@ -82,14 +85,19 @@
 }
 
 .postTitle {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+  margin-right: 0.4rem;
   color: #2c3e50;
   font-weight: 600;
   line-height: 1.4;
 }
 
+.boardTitle p {
+  font-size: 1.1rem;
+}
+
 .postCard:hover .postTitle {
-  color: #5E94CA;
+  color: #5e94ca;
 }
 
 .postContent {
@@ -103,25 +111,10 @@
   text-overflow: ellipsis;
 }
 
-.postTags {
-  margin-bottom: 1rem;
-}
 
-.tag {
-  display: inline-block;
-  background-color: #f8f9fa;
-  color: #5E94CA;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.25rem;
-  border: 1px solid #e9ecef;
-  transition: all 0.2s ease;
-}
 
 .tag:hover {
-  background-color: #5E94CA;
+  background-color: #5e94ca;
   color: white;
 }
 
@@ -138,14 +131,6 @@
   align-items: center;
 }
 
-.authorImage {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 0.5rem;
-  border: 2px solid #e9ecef;
-}
 
 .authorName {
   font-weight: 600;
@@ -159,15 +144,15 @@
   gap: 1rem;
 }
 
-.stat {
-  font-size: 0.875rem;
-  color: #6c757d;
+.boardTitle {
   display: flex;
-  align-items: center;
 }
 
-.stat i {
-  font-size: 0.8rem;
+.stat {
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
 }
 
 .pagination {
@@ -183,28 +168,27 @@
     gap: 1rem;
     align-items: flex-start;
   }
-  
+
   .writeButton {
     width: 100%;
     justify-content: center;
   }
-  
+
   .postFooter {
     flex-direction: column;
     gap: 0.75rem;
     align-items: flex-start;
   }
-  
+
   .postStats {
     gap: 0.75rem;
   }
-  
+
   .authorInfo {
     width: 100%;
   }
-  
+
   .postStats {
-    width: 100%;
     justify-content: flex-end;
   }
 }
@@ -213,42 +197,36 @@
   .postList {
     padding: 0.5rem 0;
   }
-  
+
   .header {
     margin-bottom: 1rem;
   }
-  
+
   .headerLeft h4 {
     font-size: 1.25rem;
   }
-  
-  .postCard {
-    margin-bottom: 0.75rem;
-  }
-  
-  .postTitle {
-    font-size: 1.1rem;
-  }
-  
+
+
+
   .postContent {
     font-size: 0.9rem;
   }
-  
+
   .postHeader {
     flex-direction: column;
     gap: 0.5rem;
     align-items: flex-start;
   }
-  
+
   .tag {
     font-size: 0.75rem;
     padding: 0.2rem 0.4rem;
   }
-  
+
   .stat {
     font-size: 0.8rem;
   }
-  
+
   .authorImage {
     width: 28px;
     height: 28px;
