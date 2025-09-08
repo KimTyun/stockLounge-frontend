@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col, Card, Table, Badge, Button } from 'react-bootstrap'
 import styles from '../../../styles/components/admin/admin-common.module.css'
+import axios from 'axios'
 
 const Dashboard = () => {
    // 대시보드 데이터 관리
@@ -24,7 +25,7 @@ const Dashboard = () => {
             setLoading(false)
          } catch (error) {
             console.error('API 호출 실패: ', error)
-            setError(err)
+            setError(error)
             setLoading(false)
          }
       }
