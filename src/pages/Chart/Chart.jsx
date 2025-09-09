@@ -5,6 +5,7 @@ import CoinList from '../../components/chart/CoinList'
 import styles from '../../styles/pages/Chart.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCryptoNewsThunk } from '../../features/newsSlice'
+import he from 'he'
 
 // 임시 데이터: 실제로는 API 연동 예정
 const DEFAULT_COIN = {
@@ -88,8 +89,10 @@ const Chart = () => {
                            <ul>
                               {news &&
                                  news?.items.map((e, i) => (
-                                    <li key={i} className={styles.sidebarList}>
-                                       <a href={e.link}>{e.title}</a>
+                                    <li key={e.link} className={styles.sidebarList}>
+                                       <a href={e.link} target="_blank" rel="noopener noreferrer">
+                                          {he.decode(e.title)}
+                                       </a>
                                     </li>
                                  ))}
                            </ul>
