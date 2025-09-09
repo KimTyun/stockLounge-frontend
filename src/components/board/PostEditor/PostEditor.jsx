@@ -130,33 +130,6 @@ const PostEditor = () => {
       }
    }
 
-   // 임시저장
-   const handleSaveDraft = () => {
-      localStorage.setItem('postDraft', JSON.stringify(formData))
-      setSuccess('임시저장되었습니다.')
-      setTimeout(() => setSuccess(''), 3000)
-   }
-
-   // 임시저장 불러오기
-   const handleLoadDraft = () => {
-      const draft = localStorage.getItem('postDraft')
-      if (draft) {
-         const draftData = JSON.parse(draft)
-         setFormData(draftData)
-         setWordCount(draftData.content.length)
-         setSuccess('임시저장된 글을 불러왔습니다.')
-         setTimeout(() => setSuccess(''), 3000)
-      } else {
-         setError('임시저장된 글이 없습니다.')
-         setTimeout(() => setError(''), 3000)
-      }
-   }
-
-   // 미리보기 모드 토글
-   const togglePreview = () => {
-      setPreviewMode(!previewMode)
-   }
-
    // 마크다운을 HTML로 변환 (간단한 버전)
    const markdownToHtml = (markdown) => {
       return markdown
@@ -178,18 +151,7 @@ const PostEditor = () => {
                <Col lg={10} xl={8} className="mx-auto">
                   <Card className={styles.editorCard}>
                      <Card.Header className={styles.editorHeader}>
-                        <h3>
-                           <i className={`fas fa-${isEditMode ? 'edit' : 'pen'} me-2`}></i>
-                           {isEditMode ? '게시글 수정' : '새 게시글 작성'}
-                        </h3>
-                        <div className={styles.headerActions}>
-                           <Button variant="outline-secondary" size="sm" onClick={handleLoadDraft} className="me-2">
-                              임시저장 불러오기
-                           </Button>
-                           <Button variant="outline-primary" size="sm" onClick={togglePreview}>
-                              {previewMode ? '편집모드' : '미리보기'}
-                           </Button>
-                        </div>
+                        <h3>{isEditMode ? `${(<i className={`fas fa-${isEditMode ? 'edit' : 'pen'} me-2`}></i>)}게시글 수정` : ''}</h3>
                      </Card.Header>
 
                      <Card.Body>
@@ -275,13 +237,6 @@ const PostEditor = () => {
 
                            {/* 버튼 영역 */}
                            <div className={styles.buttonArea}>
-                              <div className={styles.leftButtons}>
-                                 <Button variant="outline-secondary" onClick={handleSaveDraft} disabled={isLoading}>
-                                    <i className="fas fa-save me-2"></i>
-                                    임시저장
-                                 </Button>
-                              </div>
-
                               <div className={styles.rightButtons}>
                                  <Button variant="secondary" onClick={() => navigate('/board')} disabled={isLoading} className="me-2">
                                     취소
@@ -302,45 +257,6 @@ const PostEditor = () => {
                               </div>
                            </div>
                         </Form>
-                     </Card.Body>
-                  </Card>
-
-                  {/* 작성 가이드 */}
-                  <Card className={styles.guideCard}>
-                     <Card.Header>
-                        <h5>
-                           <i className="fas fa-info-circle me-2"></i>작성 가이드
-                        </h5>
-                     </Card.Header>
-                     <Card.Body>
-                        <Row>
-                           <Col md={6}>
-                              <h6>📝 글쓰기 팁</h6>
-                              <ul className="mb-3">
-                                 <li>명확하고 구체적인 제목을 작성하세요</li>
-                                 <li>단락을 나누어 읽기 쉽게 구성하세요</li>
-                                 <li>관련 태그를 적절히 활용하세요</li>
-                                 <li>개인정보나 부적절한 내용은 피하세요</li>
-                              </ul>
-                           </Col>
-                           <Col md={6}>
-                              <h6>📋 마크다운 문법</h6>
-                              <ul className="mb-3">
-                                 <li>
-                                    <code>## 제목</code> - 제목
-                                 </li>
-                                 <li>
-                                    <code>**굵은글씨**</code> - <strong>굵은글씨</strong>
-                                 </li>
-                                 <li>
-                                    <code>*기울임*</code> - <em>기울임</em>
-                                 </li>
-                                 <li>
-                                    <code>- 목록</code> - 목록 만들기
-                                 </li>
-                              </ul>
-                           </Col>
-                        </Row>
                      </Card.Body>
                   </Card>
                </Col>

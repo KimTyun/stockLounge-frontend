@@ -5,14 +5,17 @@ import PostList from '../../components/board/PostList'
 import styles from '../../styles/pages/Board_fixed.module.css'
 
 const Board = () => {
-   const [activeCategory, setActiveCategory] = useState('all')
+   const [activeCategory, setActiveCategory] = useState('common')
 
    const categories = [
-      { key: 'all', label: '전체' },
-      { key: 'free', label: '자유게시판' },
-      { key: 'crypto', label: '코인분석' },
+      { key: 'common', label: '일반토론' },
+      { key: 'bitcoin', label: '비트코인' },
+      { key: 'ethereum', label: '이더리움' },
+      { key: 'ripple', label: '리플' },
+      { key: 'nft', label: 'NFT' },
+      { key: 'defi', label: 'DeFi' },
       { key: 'news', label: '뉴스' },
-      { key: 'qna', label: '질문답변' },
+      { key: 'analysis', label: '분석' },
    ]
 
    return (
