@@ -155,7 +155,7 @@ const PostTab = ({ postPage, commentPage, posts, comments }) => {
                   <Pagination.Prev onClick={handleCommentPage(activeCommentPage - 1)} />
                   {commentPageItems}
                   <Pagination.Next onClick={handleCommentPage(activeCommentPage + 1)} />
-                  <Pagination.Last onClick={handleCommentPage(postPage)} />
+                  <Pagination.Last onClick={handleCommentPage(commentPage)} />
                </Pagination>
             </Card.Body>
          </Card>
