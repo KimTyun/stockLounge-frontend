@@ -10,7 +10,7 @@ const PostEditor = () => {
 
    const [formData, setFormData] = useState({
       title: '',
-      category: 'general',
+      category: 'free',
       content: '',
       tags: '',
       isNotice: false,
@@ -24,7 +24,7 @@ const PostEditor = () => {
 
    // 카테고리 옵션
    const categories = [
-      { value: 'general', label: '일반토론' },
+      { value: 'free', label: '자유토론' },
       { value: 'bitcoin', label: '비트코인' },
       { value: 'ethereum', label: '이더리움' },
       { value: 'ripple', label: '리플' },
