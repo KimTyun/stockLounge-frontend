@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Badge, Button, Pagination } from 'react-bootstrap'
+import { Card, Badge, Button, Pagination, Collapse } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import styles from '../../../styles/components/board/PostList.module.css'
+import PostEditor from '../PostEditor/PostEditor'
 
 const PostList = ({ category = 'all' }) => {
    const [posts, setPosts] = useState([])
@@ -10,6 +11,7 @@ const PostList = ({ category = 'all' }) => {
    const [totalPages, setTotalPages] = useState(1)
    const postsPerPage = 10
    const navigate = useNavigate()
+   const [write, setWrite] = useState(false) // 글쓰기 아코디언 형식
 
    useEffect(() => {
       loadPosts()
@@ -110,7 +112,7 @@ const PostList = ({ category = 'all' }) => {
    }
 
    const handleWritePost = () => {
-      navigate('/board/write')
+      setWrite(!write)
    }
 
    const formatTimeAgo = (dateString) => {
@@ -177,10 +179,26 @@ const PostList = ({ category = 'all' }) => {
                <p className="text-muted">암호화폐 관련 정보와 의견을 나누는 공간입니다</p>
             </div>
             <Button variant="primary" onClick={handleWritePost} className={styles.writeButton}>
-               <i className="fas fa-pen me-2"></i>
-               글쓰기
+               <i className={`fas fa-${write ? 'times' : 'pen'} me-2`}></i>
+               {write ? '닫기' : '글쓰기'}
             </Button>
          </div>
+
+         <Collapse in={write}>
+            <div className="mb-4">
+               <Card>
+                  <Card.Header className="d-flex justify-content-between align-items-center">
+                     <h5 className="mb-0">새 게시글 작성</h5>
+                     <Button variant="outline-secondary" size="sm" onClick={() => setWrite(false)}>
+                        <i className="fas fa-times"></i>
+                     </Button>
+                  </Card.Header>
+                  <Card.Body>
+                     <PostEditor />
+                  </Card.Body>
+               </Card>
+            </div>
+         </Collapse>
 
          <div className={styles.posts}>
             <ul>
@@ -188,7 +206,6 @@ const PostList = ({ category = 'all' }) => {
                   <li key={post.id} className={`${styles.postCard} ${post.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(post.id)}>
                      <div>
                         <div className={styles.postHeader}>
-                           {' '}
                            <div className={styles.postMeta}>
                               {post.isPinned && (
                                  <Badge bg="danger" className="me-2">
