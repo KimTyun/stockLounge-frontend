@@ -12,7 +12,7 @@ export const getBoardThunk = createAsyncThunk('board/list', async (__dirname, { 
 })
 
 // 게시글 등록
-export const writeBoardThunk = createAsyncThunk('board/write', async (_, { rejectWithValue }) => {
+export const writeBoardThunk = createAsyncThunk('board/write', async (boardData, { rejectWithValue }) => {
    try {
       const response = await writeBoard(boardData)
       return response.data.board
