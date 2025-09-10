@@ -105,13 +105,6 @@ const PostDetail = ({ postId, onBackToList }) => {
       )
    }
 
-   if (loading) {
-      return <div>로딩중</div>
-   }
-   if (!post) {
-      return <div>게시글 없음</div>
-   }
-
    return (
       <div className={styles.postDetail}>
          <Container>
