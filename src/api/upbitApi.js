@@ -23,10 +23,29 @@ export const getTickerAll = async (n = 15) => {
    return response.data.sort((a, b) => Number(b.trade_price) - Number(a.trade_price)).slice(0, n)
 }
 
+// 코인 이름 가져옴(upbit에서 다른 호출에서는 코인 한글 이름을 안줘서 가져와야함)
 export const getMarketAll = async () => {
    const response = await upbitApi.get('market/all', {
       params: {
          is_details: false,
+      },
+   })
+   return response.data
+}
+
+/**
+ *
+ * @param {string} time
+ * @param {json} params
+ * @returns data
+ * time : days/ weeks/ months 등..
+ * params : {market(거래쌍), count(가져올 개수)}
+ */
+export const getCandles = async (time = 'days', params) => {
+   const response = await upbitApi.get(`candles/${time}`, {
+      params: {
+         ...params,
+         converting_price_unit: 'KRW',
       },
    })
    return response.data

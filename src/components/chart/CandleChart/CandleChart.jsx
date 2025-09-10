@@ -1,30 +1,38 @@
-import { useState, useEffect } from 'react'
-import { Card, Row, Col, ButtonGroup, Button } from 'react-bootstrap'
+import { useEffect } from 'react'
+import { Card } from 'react-bootstrap'
 import styles from '../../../styles/components/chart/CandleChart.module.css'
+import { useDispatch, useSelector } from 'react-redux'
+import { getcandlesThunk } from '../../../features/coinSlice'
 
-const CandleChart = ({ period, coin, small }) => {
-   const [selectedCoin, setSelectedCoin] = useState('BTC')
+const CandleChart = ({ period = 'days', coin, small }) => {
+   const dispatch = useDispatch()
+   const { data, loading } = useSelector((s) => s.coin)
+   const coinData = data[coin.id]
 
-   // 임시 차트 데이터 (실제로는 Upbit API에서 가져올 예정)
-   const mockPrice = selectedCoin === 'BTC' ? '₩65,500,000' : selectedCoin === 'ETH' ? '₩2,850,000' : '₩650'
-   const mockChange = selectedCoin === 'BTC' ? '+2.34%' : selectedCoin === 'ETH' ? '+1.87%' : '+5.21%'
+   useEffect(() => {
+      dispatch(getcandlesThunk({ time: period, params: { market: coin.id, count: small ? 50 : 100 } }))
+         .unwrap()
+         .then((result) => {
+            // console.log('차트 데이터', result)
+         })
+   }, [dispatch, coin, small, period])
 
    return (
       <Card className={`${styles.chartCard} ${small && styles.small} mb-3`}>
          <Card.Body className={styles.chartBody}>
             <div className={styles.priceInfo}>
-               <h3 className={styles.coinName}>{coin.name}</h3>
                <div className={styles.priceData}>
-                  <span className={styles.currentPrice}>{mockPrice}</span>
-                  <span className={`${styles.priceChange} ${styles.positive}`}>{mockChange}</span>
+                  <span className={styles.currentPrice}>000,000</span>
+                  <span className={`${styles.priceChange} ${styles.positive}`}>+0.00%</span>
                </div>
             </div>
 
             <div className={`${styles.chartContainer} ${small && styles.small}`}>
                {/* 실제 차트는 Chart.js나 TradingView 위젯으로 구현 예정 */}
                <div className={styles.mockChart}>
+                  {loading && <p>차트 로딩중...</p>}
                   <p>차트 영역 (구현 예정)</p>
-                  <div className={styles.chartPlaceholder}>📈 {selectedCoin} 차트</div>
+                  <div className={styles.chartPlaceholder}>📈 {coin.id} 차트</div>
                </div>
             </div>
          </Card.Body>

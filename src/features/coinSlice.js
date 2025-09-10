@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getMarketAll, getTickerAll } from '../api/upbitApi'
+import { getCandles, getMarketAll, getTickerAll } from '../api/upbitApi'
 
 export const getMarketAllThunk = createAsyncThunk('coin/getMarketAll', async (_, { rejectWithValue }) => {
    try {
@@ -19,6 +19,19 @@ export const getTickerAllThunk = createAsyncThunk('coin/getTickkerAll', async (n
    }
 })
 
+/**
+ * data : time - days/ weeks/ months 등..
+ * params - {market(거래쌍), count(가져올 개수)}
+ */
+export const getcandlesThunk = createAsyncThunk('coin/getcandles', async (data, { rejectWithValue }) => {
+   try {
+      const response = await getCandles(data.time, data.params)
+      return response
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
 const coinSlice = createSlice({
    name: 'coin',
    initialState: {
@@ -27,7 +40,7 @@ const coinSlice = createSlice({
       //코인 데이터 리스트
       coins: [],
       //차트에 사용할 캔들 데이터
-      data: null,
+      data: {},
       loading: false,
       error: null,
    },
@@ -60,6 +73,20 @@ const coinSlice = createSlice({
             s.error = null
          })
          .addCase(getTickerAllThunk.rejected, (s, a) => {
+            s.loading = false
+            s.error = a.payload?.message || '서버 문제로 코인 리스트를 불러오지 못했습니다.'
+         })
+
+         .addCase(getcandlesThunk.pending, (s) => {
+            s.loading = true
+            s.error = null
+         })
+         .addCase(getcandlesThunk.fulfilled, (s, a) => {
+            s.loading = false
+            s.data = { ...s.data, [a.payload[0].market]: a.payload }
+            s.error = null
+         })
+         .addCase(getcandlesThunk.rejected, (s, a) => {
             s.loading = false
             s.error = a.payload?.message || '서버 문제로 코인 리스트를 불러오지 못했습니다.'
          })

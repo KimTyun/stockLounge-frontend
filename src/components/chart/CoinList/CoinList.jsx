@@ -87,24 +87,14 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
       }
    }
 
-   const formatPrice = (price) => {
-      if (price >= 1) {
-         return `$${price.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-         })}`
+   const formatVolume = (volume, price) => {
+      const volumePrice = Number(volume) * Number(price)
+      if (volumePrice >= 1e9) {
+         return `${(volumePrice / 1e9).toFixed(2)}B`
+      } else if (volumePrice >= 1e6) {
+         return `${(volumePrice / 1e6).toFixed(2)}M`
       } else {
-         return `$${price.toFixed(6)}`
-      }
-   }
-
-   const formatVolume = (volume) => {
-      if (volume >= 1e9) {
-         return `$${(volume / 1e9).toFixed(2)}B`
-      } else if (volume >= 1e6) {
-         return `$${(volume / 1e6).toFixed(2)}M`
-      } else {
-         return `$${volume.toLocaleString()}`
+         return `${volumePrice.toLocaleString()}`
       }
    }
 
@@ -187,7 +177,7 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
                                  </div>
                               </div>
                            </td>
-                           <td className={styles.price}>{formatPrice(coin.price)}</td>
+                           <td className={styles.price}>{coin.price.toLocaleString()}원</td>
                            <td className={styles.change}>
                               <Badge bg={coin.change24h >= 0 ? 'success' : 'danger'} className={styles.changeBadge}>
                                  {coin.change24h >= 0 ? '+' : ''}
@@ -195,7 +185,7 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
                               </Badge>
                            </td>
 
-                           <td className={styles.volume}>{formatVolume(coin.volume24h)}</td>
+                           <td className={styles.volume}>{formatVolume(coin.volume24h, coin.price)}</td>
                         </tr>
                      ))}
                   </tbody>
