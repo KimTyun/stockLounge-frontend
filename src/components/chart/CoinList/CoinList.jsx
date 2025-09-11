@@ -1,192 +1,73 @@
 import React, { useState, useEffect } from 'react'
 import { Card, Table, Badge, Form, InputGroup, Dropdown } from 'react-bootstrap'
 import styles from '../../../styles/components/chart/CoinList.module.css'
+import { useSelector } from 'react-redux'
 
 const CoinList = ({ onCoinSelect, selectedCoin }) => {
-   const [coins, setCoins] = useState([])
+   const { coinList, coins, loading, error } = useSelector((s) => s.coin)
    const [filteredCoins, setFilteredCoins] = useState([])
-   const [loading, setLoading] = useState(true)
-   const [searchTerm, setSearchTerm] = useState('')
    const [sortBy, setSortBy] = useState('marketCap')
    const [sortOrder, setSortOrder] = useState('desc')
 
    useEffect(() => {
-      loadCoins()
-   }, [])
+      const filterAndSortCoins = () => {
+         if (coinList.length === 0) return
 
-   useEffect(() => {
-      filterAndSortCoins()
-   }, [coins, searchTerm, sortBy, sortOrder])
+         let filtered = coins
+            .map((coin, index) => {
+               const coinInfo = coinList.find((e) => e.pair === coin.market)
+               return {
+                  id: coin.market,
+                  symbol: coin.market.split('-')[1],
+                  name: coinInfo ? coinInfo.name : 'Unknown',
+                  price: coin.trade_price,
+                  change24h: coin.signed_change_rate,
+                  volume24h: coin.acc_trade_volume_24h,
+                  rank: index + 1,
+               }
+            })
+            .reverse()
 
-   const loadCoins = async () => {
-      setLoading(true)
+         filtered.sort((a, b) => {
+            let aValue, bValue
 
-      try {
-         // API 호출 시뮬레이션
-         await new Promise((resolve) => setTimeout(resolve, 10))
+            switch (sortBy) {
+               case 'name':
+                  aValue = a.name.toLowerCase()
+                  bValue = b.name.toLowerCase()
+                  break
+               case 'price':
+                  aValue = a.price
+                  bValue = b.price
+                  break
+               case 'change24h':
+                  aValue = a.change24h
+                  bValue = b.change24h
+                  break
+               case 'marketCap':
+                  aValue = a.marketCap
+                  bValue = b.marketCap
+                  break
+               case 'volume24h':
+                  aValue = a.volume24h
+                  bValue = b.volume24h
+                  break
+               default:
+                  aValue = a.rank
+                  bValue = b.rank
+            }
 
-         const mockCoins = [
-            {
-               id: 'bitcoin',
-               symbol: 'BTC',
-               name: 'Bitcoin',
-               image: '/assets/images/coins/btc.png',
-               price: 43250.5,
-               change24h: 2.45,
-               marketCap: 845200000000,
-               volume24h: 28500000000,
-               rank: 1,
-            },
-            {
-               id: 'ethereum',
-               symbol: 'ETH',
-               name: 'Ethereum',
-               image: '/assets/images/coins/eth.png',
-               price: 2680.75,
-               change24h: 3.12,
-               marketCap: 322100000000,
-               volume24h: 15200000000,
-               rank: 2,
-            },
-            {
-               id: 'binancecoin',
-               symbol: 'BNB',
-               name: 'BNB',
-               image: '/assets/images/coins/bnb.png',
-               price: 315.42,
-               change24h: -1.25,
-               marketCap: 47500000000,
-               volume24h: 890000000,
-               rank: 3,
-            },
-            {
-               id: 'solana',
-               symbol: 'SOL',
-               name: 'Solana',
-               image: '/assets/images/coins/sol.png',
-               price: 145.68,
-               change24h: 5.89,
-               marketCap: 33200000000,
-               volume24h: 2100000000,
-               rank: 4,
-            },
-            {
-               id: 'ripple',
-               symbol: 'XRP',
-               name: 'XRP',
-               image: '/assets/images/coins/xrp.png',
-               price: 0.5234,
-               change24h: -0.78,
-               marketCap: 29800000000,
-               volume24h: 1250000000,
-               rank: 5,
-            },
-            {
-               id: 'cardano',
-               symbol: 'ADA',
-               name: 'Cardano',
-               image: '/assets/images/coins/ada.png',
-               price: 0.4523,
-               change24h: 1.89,
-               marketCap: 15900000000,
-               volume24h: 520000000,
-               rank: 6,
-            },
-            {
-               id: 'dogecoin',
-               symbol: 'DOGE',
-               name: 'Dogecoin',
-               image: '/assets/images/coins/doge.png',
-               price: 0.0875,
-               change24h: 4.23,
-               marketCap: 12500000000,
-               volume24h: 890000000,
-               rank: 7,
-            },
-            {
-               id: 'polygon',
-               symbol: 'MATIC',
-               name: 'Polygon',
-               image: '/assets/images/coins/matic.png',
-               price: 0.8912,
-               change24h: -2.15,
-               marketCap: 8200000000,
-               volume24h: 340000000,
-               rank: 8,
-            },
-            {
-               id: 'avalanche',
-               symbol: 'AVAX',
-               name: 'Avalanche',
-               image: '/assets/images/coins/avax.png',
-               price: 28.45,
-               change24h: 3.67,
-               marketCap: 11400000000,
-               volume24h: 480000000,
-               rank: 9,
-            },
-            {
-               id: 'chainlink',
-               symbol: 'LINK',
-               name: 'Chainlink',
-               image: '/assets/images/coins/link.png',
-               price: 14.32,
-               change24h: -1.45,
-               marketCap: 8900000000,
-               volume24h: 320000000,
-               rank: 10,
-            },
-         ]
+            if (sortOrder === 'asc') {
+               return aValue > bValue ? 1 : -1
+            } else {
+               return aValue < bValue ? 1 : -1
+            }
+         })
 
-         setCoins(mockCoins)
-      } catch (error) {
-         console.error('코인 데이터 로드 실패:', error)
-      } finally {
-         setLoading(false)
+         setFilteredCoins(filtered)
       }
-   }
-
-   const filterAndSortCoins = () => {
-      let filtered = coins.filter((coin) => coin.name.toLowerCase().includes(searchTerm.toLowerCase()) || coin.symbol.toLowerCase().includes(searchTerm.toLowerCase()))
-
-      filtered.sort((a, b) => {
-         let aValue, bValue
-
-         switch (sortBy) {
-            case 'name':
-               aValue = a.name.toLowerCase()
-               bValue = b.name.toLowerCase()
-               break
-            case 'price':
-               aValue = a.price
-               bValue = b.price
-               break
-            case 'change24h':
-               aValue = a.change24h
-               bValue = b.change24h
-               break
-            case 'marketCap':
-               aValue = a.marketCap
-               bValue = b.marketCap
-               break
-            case 'volume24h':
-               aValue = a.volume24h
-               bValue = b.volume24h
-               break
-            default:
-               aValue = a.rank
-               bValue = b.rank
-         }
-
-         if (sortOrder === 'asc') {
-            return aValue > bValue ? 1 : -1
-         } else {
-            return aValue < bValue ? 1 : -1
-         }
-      })
-
-      setFilteredCoins(filtered)
-   }
+      filterAndSortCoins()
+   }, [coins, sortBy, sortOrder, coinList])
 
    const handleSort = (field) => {
       if (sortBy === field) {
@@ -197,36 +78,14 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
       }
    }
 
-   const formatPrice = (price) => {
-      if (price >= 1) {
-         return `$${price.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-         })}`
+   const formatVolume = (volume, price) => {
+      const volumePrice = Number(volume) * Number(price)
+      if (volumePrice >= 1e9) {
+         return `${(volumePrice / 1e9).toFixed(2)}B`
+      } else if (volumePrice >= 1e6) {
+         return `${(volumePrice / 1e6).toFixed(2)}M`
       } else {
-         return `$${price.toFixed(6)}`
-      }
-   }
-
-   const formatMarketCap = (marketCap) => {
-      if (marketCap >= 1e12) {
-         return `$${(marketCap / 1e12).toFixed(2)}T`
-      } else if (marketCap >= 1e9) {
-         return `$${(marketCap / 1e9).toFixed(2)}B`
-      } else if (marketCap >= 1e6) {
-         return `$${(marketCap / 1e6).toFixed(2)}M`
-      } else {
-         return `$${marketCap.toLocaleString()}`
-      }
-   }
-
-   const formatVolume = (volume) => {
-      if (volume >= 1e9) {
-         return `$${(volume / 1e9).toFixed(2)}B`
-      } else if (volume >= 1e6) {
-         return `$${(volume / 1e6).toFixed(2)}M`
-      } else {
-         return `$${volume.toLocaleString()}`
+         return `${volumePrice.toLocaleString()}`
       }
    }
 
@@ -244,6 +103,21 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
                      <span className="visually-hidden">Loading...</span>
                   </div>
                   <p className="mt-2">코인 데이터를 불러오는 중...</p>
+               </div>
+            </Card.Body>
+         </Card>
+      )
+   }
+
+   if (error) {
+      return (
+         <Card className={styles.coinList}>
+            <Card.Body>
+               <div className={styles.loading}>
+                  <div className="spinner-border text-primary" role="status">
+                     <span className="visually-hidden">fail</span>
+                  </div>
+                  <p className="mt-2">코인 데이터를 불러오지 못하였습니다.</p>
                </div>
             </Card.Body>
          </Card>
@@ -282,17 +156,14 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
                            <i className={`${getSortIcon('name')} ms-1`}></i>
                         </th>
                         <th className={styles.sortableHeader} onClick={() => handleSort('price')}>
-                           가격
+                           호가
                            <i className={`${getSortIcon('price')} ms-1`}></i>
                         </th>
                         <th className={styles.sortableHeader} onClick={() => handleSort('change24h')}>
                            24h 변동
                            <i className={`${getSortIcon('change24h')} ms-1`}></i>
                         </th>
-                        <th className={styles.sortableHeader} onClick={() => handleSort('marketCap')}>
-                           시가총액
-                           <i className={`${getSortIcon('marketCap')} ms-1`}></i>
-                        </th>
+
                         <th className={styles.sortableHeader} onClick={() => handleSort('volume24h')}>
                            24h 거래량
                            <i className={`${getSortIcon('volume24h')} ms-1`}></i>
@@ -312,15 +183,15 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
                                  </div>
                               </div>
                            </td>
-                           <td className={styles.price}>{formatPrice(coin.price)}</td>
+                           <td className={styles.price}>{coin.price.toLocaleString()}원</td>
                            <td className={styles.change}>
                               <Badge bg={coin.change24h >= 0 ? 'success' : 'danger'} className={styles.changeBadge}>
                                  {coin.change24h >= 0 ? '+' : ''}
-                                 {coin.change24h.toFixed(2)}%
+                                 {(coin.change24h * 100).toFixed(2)}%
                               </Badge>
                            </td>
-                           <td className={styles.marketCap}>{formatMarketCap(coin.marketCap)}</td>
-                           <td className={styles.volume}>{formatVolume(coin.volume24h)}</td>
+
+                           <td className={styles.volume}>{formatVolume(coin.volume24h, coin.price)}</td>
                         </tr>
                      ))}
                   </tbody>
