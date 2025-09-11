@@ -238,7 +238,7 @@ const PostList = ({ category = 'all' }) => {
                                     alt={post.author.nickname}
                                     className={styles.authorImage}
                                     onError={(e) => {
-                                       e.target.src = '/assets/images/default-profile.png'
+                                       e.target.src = './vite.svg'
                                     }}
                                  />
                                  <div className={styles.authorName}>
