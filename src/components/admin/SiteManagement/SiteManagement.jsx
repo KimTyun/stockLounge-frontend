@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Row, Col, Card, Form, Button, Alert, Table } from 'react-bootstrap';
-import styles from '../../../styles/components/admin/admin-common.module.css';
+import React, { useState } from 'react'
+import { Row, Col, Card, Form, Button, Alert, Table } from 'react-bootstrap'
+import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const SiteManagement = () => {
    const [settings, setSettings] = useState({
       siteName: 'StockRounge',
-      siteDescription: '코인 커뮤니티 플랫폼',
+      siteDescription: '코인차트 커뮤니티 플랫폼',
       maintenanceMode: false,
       allowRegistration: true,
       requireEmailVerification: true,
@@ -19,9 +19,22 @@ const SiteManagement = () => {
       enableNotifications: true,
    })
 
-   const [banWords, setBanWords] = useState(['스캠', '사기', '도박', '불법', '해킹'])
+   const [banWords, setBanWords] = useState([
+      { word: '스캠', date: '2025-09-04' },
+      { word: '사기', date: '2025-09-04' },
+      { word: '도박', date: '2025-09-04' },
+      { word: '불법', date: '2025-09-04' },
+      { word: '해킹', date: '2025-09-04' },
+   ])
+
+   const [reward, setReward] = useState([
+      { id: 1, name: '스타벅스 아메리카노', points: 1500, stock: 50 },
+      { id: 2, name: 'CU 5천원 상품권', points: 5000, stock: 30 },
+      { id: 3, name: 'BHC 후라이드치킨', points: 20000, stock: 15 },
+   ])
 
    const [newBanWord, setNewBanWord] = useState('')
+   const [newReward, setNewReward] = useState({ name: '', points: 0, stock: 0 })
    const [showAlert, setShowAlert] = useState(false)
    const [alertMessage, setAlertMessage] = useState('')
    const [alertType, setAlertType] = useState('success')
@@ -42,8 +55,12 @@ const SiteManagement = () => {
    }
 
    const handleAddBanWord = () => {
-      if (newBanWord.trim() && !banWords.includes(newBanWord.trim())) {
-         setBanWords([...banWords, newBanWord.trim()])
+      const newBanObject = {
+         word: newBanWord.trim(),
+         date: new Date().toLocaleDateString('ko-KR'),
+      }
+      if (newBanWord.trim() && !banWords.some((item) => item.word === newBanWord.trim())) {
+         setBanWords([...banWords, newBanObject])
          setNewBanWord('')
          setAlertMessage('금지어가 추가되었습니다.')
          setAlertType('success')
@@ -52,9 +69,32 @@ const SiteManagement = () => {
       }
    }
 
-   const handleRemoveBanWord = (word) => {
-      setBanWords(banWords.filter((w) => w !== word))
+   const handleRemoveBanWord = (wordToRemove) => {
+      setBanWords(banWords.filter((item) => item.word !== wordToRemove))
       setAlertMessage('금지어가 삭제되었습니다.')
+      setAlertType('info')
+      setShowAlert(true)
+      setTimeout(() => setShowAlert(false), 3000)
+   }
+
+   const handleAddReward = () => {
+      if (newReward.name && newReward.points > 0 && newReward.stock >= 0) {
+         const addReward = {
+            id: Date.now(),
+            ...newReward,
+         }
+         setReward([...reward, addReward])
+         setNewReward({ name: '', points: 0, stock: 0 })
+         setAlertMessage('새로운 상품이 추가되었습니다.')
+         setAlertType('success')
+         setShowAlert(true)
+         setTimeout(() => setShowAlert(false), 3000)
+      }
+   }
+
+   const handleDeleteReward = (idToRemove) => {
+      setReward(reward.filter((item) => item.id !== idToRemove))
+      setAlertMessage('상품이 삭제되었습니다.')
       setAlertType('info')
       setShowAlert(true)
       setTimeout(() => setShowAlert(false), 3000)
@@ -224,14 +264,14 @@ const SiteManagement = () => {
                      </tr>
                   </thead>
                   <tbody>
-                     {banWords.map((word, index) => (
+                     {banWords.map((item, index) => (
                         <tr key={index}>
                            <td>
-                              <strong>{word}</strong>
+                              <strong>{item.word}</strong>
                            </td>
-                           <td>2025-09-04</td>
+                           <td>{item.date}</td>
                            <td>
-                              <Button variant="outline-danger" size="sm" onClick={() => handleRemoveBanWord(word)}>
+                              <Button variant="outline-danger" size="sm" onClick={() => handleRemoveBanWord(item.word)}>
                                  <i className="fas fa-trash"></i> 삭제
                               </Button>
                            </td>
@@ -244,6 +284,85 @@ const SiteManagement = () => {
                   <div className="text-center py-4">
                      <i className="fas fa-ban fa-3x text-muted mb-3"></i>
                      <p className="text-muted">등록된 금지어가 없습니다.</p>
+                  </div>
+               )}
+            </Card.Body>
+         </Card>
+
+         {/* 포인트 교환 관리 */}
+
+         <Card className={styles.contentCard}>
+            <div className={styles.cardHeader}>
+               <h4 className={styles.cardTitle}>
+                  <i className="fas fa-gift me-2"></i>
+                  리워드 관리
+               </h4>
+            </div>
+            <Card.Body>
+               <Form
+                  className="mb-4"
+                  onSubmit={(e) => {
+                     e.preventDefault()
+                     handleAddReward()
+                  }}
+               >
+                  <Row className="align-item end">
+                     <Col md={5} className="mb-2 mb-md-0">
+                        <Form.Label>상품명</Form.Label>
+                        <Form.Control Type="text" placeholder="상품명 입력" value={newReward.name} onChange={(e) => setNewReward((prev) => ({ ...prev, name: e.target.value }))} />
+                     </Col>
+                     <Col md={3} className="mb-2 mb-md-0">
+                        <Form.Label>필요 포인트</Form.Label>
+                        <Form.Control type="number" placeholder="포인트" value={newReward.points} onChange={(e) => setNewReward((prev) => ({ ...prev, points: parseInt(e.target.value) }))} min="0" />
+                     </Col>
+                     <Col md={3} className="mb-2 mb-md-0">
+                        <Form.Label>재고</Form.Label>
+                        <Form.Control type="number" placeholder="재고" value={newReward.stock} onChange={(e) => setNewReward((prev) => ({ ...prev, stock: parseInt(e.target.value) }))} min="0" />
+                     </Col>
+                     <Col md={2}>
+                        <Button variant="primary" type="submit" className="w-100">
+                           상품 추가
+                        </Button>
+                     </Col>
+                  </Row>
+               </Form>
+               <div className="mb-3">
+                  <strong>등록된 교환 상품({reward.length}개)</strong>
+               </div>
+
+               <Table responsive className={styles.adminTable}>
+                  <thead>
+                     <tr>
+                        <th>ID</th>
+                        <th>상품명</th>
+                        <th>필요 포인트</th>
+                        <th>재고 수량</th>
+                        <th>관리</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {reward.map((item, index) => (
+                        <tr key={item.id}>
+                           <td>{index + 1}</td>
+                           <td>
+                              <strong>{item.name}</strong>
+                           </td>
+                           <td>{item.points}</td>
+                           <td>{item.stock}</td>
+                           <td>
+                              <Button variant="outline-danger" size="sm" onClick={() => handleDeleteReward(item.id)}>
+                                 <i className="fas fa-trash"></i>삭제
+                              </Button>
+                           </td>
+                        </tr>
+                     ))}
+                  </tbody>
+               </Table>
+
+               {reward.length === 0 && (
+                  <div className="text-center py-4">
+                     <i className="fas fa-gift fa-3x text-muted mb-3"></i>
+                     <p className="text-muted">등록된 상품이 없습니다.</p>
                   </div>
                )}
             </Card.Body>

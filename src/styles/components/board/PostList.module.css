@@ -3,10 +3,6 @@
   width: 100%;
 }
 
-.boardContainer {
-  padding: 0;
-}
-
 .loading {
   min-height: 400px;
   display: flex;
@@ -20,10 +16,11 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #5e94ca;
+  border-bottom: 2px solid #5E94CA;
 }
 
 .headerLeft h4 {
+  margin-bottom: 0.5rem;
   color: #2c3e50;
 }
 
@@ -32,8 +29,8 @@
 }
 
 .writeButton {
-  background-color: #5e94ca;
-  border-color: #5e94ca;
+  background-color: #5E94CA;
+  border-color: #5E94CA;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   transition: all 0.2s ease;
@@ -46,23 +43,143 @@
 }
 
 .posts {
-  width: 100%;
+  margin-bottom: 2rem;
 }
 
-.postCard {
-  padding: 0 5%;
-  border: 1px solid #757575;
+/* 테이블 뷰 (1000px 이상) */
+.tableView {
+  display: block;
+}
+
+.cardView {
+  display: none;
+}
+
+.postTable {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.listHead {
+  display: flex;
+  font-weight: 600;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.listHead>div {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #495057;
+}
+
+.titleColumn {
+  flex: 1;
+  min-width: 0;
+}
+
+.authorColumn {
+  width: 18%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewsColumn,
+.likesColumn {
+  width: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dateColumn {
+  width: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.postRow {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-top: none;
   cursor: pointer;
-  width: 100%;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.postRow:hover {
+  border-color: #5E94CA;
+  box-shadow: 0 2px 8px rgba(94, 148, 202, 0.15);
+  background-color: #f8f9ff;
+}
+
+.postRow.pinned {
+  border-left: 4px solid #dc3545;
+  background-color: #fff8f8;
+}
+
+.postRow .titleColumn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.postTitle {
+  color: #2c3e50;
+  font-weight: 600;
+  line-height: 1.4;
+  font-size: 1rem;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 0.5rem;
+}
+
+.postRow:hover .postTitle {
+  color: #5E94CA;
+}
+
+.commentCount {
+  color: #5E94CA;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.authorName {
+  font-weight: 500;
+  color: #495057;
+}
+
+/* 카드 뷰 (1000px 이하) */
+.postCard {
+  margin-bottom: 1rem;
+  border: 1px solid #318ae4;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .postCard:hover {
-  border-color: #5e94ca;
+  border-color: #5E94CA;
   box-shadow: 0 4px 12px rgba(94, 148, 202, 0.15);
+  transform: translateY(-2px);
 }
 
-.pinned {
+.postCard.pinned {
   border-left: 4px solid #dc3545;
+  border-right: 4px solid #dc3545;
   background-color: #fff8f8;
 }
 
@@ -76,6 +193,7 @@
 .postMeta {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .postTime {
@@ -83,27 +201,29 @@
   color: #6c757d;
 }
 
-.postTitle {
+.postCard .postTitle {
+  margin-bottom: 0.75rem;
   color: #2c3e50;
   font-weight: 600;
   line-height: 1.4;
-}
-
-.boardTitle p {
-  font-size: 1.1rem;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: initial;
 }
 
 .postCard:hover .postTitle {
-  color: #5e94ca;
+  color: #5E94CA;
 }
 
-
-
-
-
-.tag:hover {
-  background-color: #5e94ca;
-  color: white;
+.postContent {
+  color: #495057;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .postFooter {
@@ -119,12 +239,13 @@
   align-items: center;
 }
 
-
-.authorName {
-  font-weight: 600;
-  color: #495057;
-  display: flex;
-  align-items: center;
+.authorImage {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.5rem;
+  border: 2px solid #e9ecef;
 }
 
 .postStats {
@@ -132,15 +253,16 @@
   gap: 1rem;
 }
 
-.boardTitle {
-  display: flex;
-}
-
 .stat {
   font-size: 0.875rem;
-  font-weight: 500;
+  color: #6c757d;
   display: flex;
   align-items: center;
+  font-weight: 500;
+}
+
+.stat i {
+  font-size: 0.8rem;
 }
 
 .pagination {
@@ -149,7 +271,19 @@
   margin-top: 2rem;
 }
 
-/* 반응형 디자인 */
+@media (max-width: 1000px) {
+
+  /* 1000px 이하에서는 카드 뷰로 전환 */
+  .tableView {
+    display: none;
+  }
+
+  .cardView {
+    display: block;
+  }
+
+}
+
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
@@ -170,14 +304,12 @@
 
   .postStats {
     gap: 0.75rem;
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .authorInfo {
     width: 100%;
-  }
-
-  .postStats {
-    justify-content: flex-end;
   }
 }
 
@@ -186,22 +318,30 @@
     padding: 0.5rem 0;
   }
 
+  .header {
+    margin-bottom: 1rem;
+  }
 
   .headerLeft h4 {
     font-size: 1.25rem;
   }
 
+  .postCard {
+    margin-bottom: 0.75rem;
+  }
 
+  .postCard .postTitle {
+    font-size: 1.1rem;
+  }
+
+  .postContent {
+    font-size: 0.9rem;
+  }
 
   .postHeader {
     flex-direction: column;
     gap: 0.5rem;
     align-items: flex-start;
-  }
-
-  .tag {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.4rem;
   }
 
   .stat {
