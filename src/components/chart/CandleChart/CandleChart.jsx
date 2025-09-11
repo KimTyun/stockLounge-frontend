@@ -57,7 +57,7 @@ const CandleChart = ({ period = 'days', coin, small = false }) => {
          <Card.Body className={styles.chartBody}>
             <div className={styles.priceInfo}>
                <div className={styles.priceData}>
-                  <span className={styles.currentPrice}>{coin.price.toLocaleString()}</span>
+                  <span className={styles.currentPrice}>{coin.price?.toLocaleString()}</span>
                   <span className={`${styles.priceChange} ${coin.change24h > 0 ? styles.positive : styles.negative}`}>
                      {coin.change24h >= 0 ? '+' : ''}
                      {(coin.change24h * 100).toFixed(2)}%
