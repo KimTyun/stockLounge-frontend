@@ -1,6 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { getCandles, getMarketAll, getTickerAll } from '../api/upbitApi'
 
+/**
+ * upbit의 코인 목록 가져오기
+ */
 export const getMarketAllThunk = createAsyncThunk('coin/getMarketAll', async (_, { rejectWithValue }) => {
    try {
       const response = await getMarketAll()
@@ -10,6 +13,10 @@ export const getMarketAllThunk = createAsyncThunk('coin/getMarketAll', async (_,
    }
 })
 
+/**
+ * 코인 정보 가져오기
+ * n : 가져올 개수, 기본 15개
+ */
 export const getTickerAllThunk = createAsyncThunk('coin/getTickkerAll', async (n, { rejectWithValue }) => {
    try {
       const response = await getTickerAll(n)
@@ -20,8 +27,9 @@ export const getTickerAllThunk = createAsyncThunk('coin/getTickkerAll', async (n
 })
 
 /**
+ * 코인 캔들차트데이터 가져오기
  * data : time - days/ weeks/ months 등..
- * params - {market(거래쌍), count(가져올 개수)}
+ * params : {market(거래쌍), count(가져올 개수)}
  */
 export const getcandlesThunk = createAsyncThunk('coin/getcandles', async (data, { rejectWithValue }) => {
    try {
@@ -45,50 +53,51 @@ const coinSlice = createSlice({
       error: null,
    },
    reducers: {},
-   extraReducers: (b) => {
-      b.addCase(getMarketAllThunk.pending, (s) => {
-         s.loading = true
-         s.error = null
-      })
-         .addCase(getMarketAllThunk.fulfilled, (s, a) => {
-            s.loading = false
-            s.coinList = a.payload.map((e) => ({
+   extraReducers: (builder) => {
+      builder
+         .addCase(getMarketAllThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(getMarketAllThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.coinList = action.payload.map((e) => ({
                pair: e.market,
                name: e.korean_name,
             }))
-            s.error = null
+            state.error = null
          })
-         .addCase(getMarketAllThunk.rejected, (s, a) => {
-            s.loading = false
-            s.error = a.payload?.message || '서버 문제로 코인 리스트를 불러오지 못했습니다.'
-         })
-
-         .addCase(getTickerAllThunk.pending, (s) => {
-            s.loading = true
-            s.error = null
-         })
-         .addCase(getTickerAllThunk.fulfilled, (s, a) => {
-            s.loading = false
-            s.coins = a.payload
-            s.error = null
-         })
-         .addCase(getTickerAllThunk.rejected, (s, a) => {
-            s.loading = false
-            s.error = a.payload?.message || '서버 문제로 코인 리스트를 불러오지 못했습니다.'
+         .addCase(getMarketAllThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload?.message || '서버 문제로 코인 리스트를 불러오지 못했습니다.'
          })
 
-         .addCase(getcandlesThunk.pending, (s) => {
-            s.loading = true
-            s.error = null
+         .addCase(getTickerAllThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
          })
-         .addCase(getcandlesThunk.fulfilled, (s, a) => {
-            s.loading = false
-            s.data = { ...s.data, [a.payload[0].market]: a.payload }
-            s.error = null
+         .addCase(getTickerAllThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.coins = action.payload
+            state.error = null
          })
-         .addCase(getcandlesThunk.rejected, (s, a) => {
-            s.loading = false
-            s.error = a.payload?.message || '서버 문제로 코인 리스트를 불러오지 못했습니다.'
+         .addCase(getTickerAllThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload?.message || '서버 문제로 코인 리스트를 불러오지 못했습니다.'
+         })
+
+         .addCase(getcandlesThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(getcandlesThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.data = { ...state.data, [action.payload[0].market]: action.payload }
+            state.error = null
+         })
+         .addCase(getcandlesThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload?.message || '서버 문제로 코인 리스트를 불러오지 못했습니다.'
          })
    },
 })

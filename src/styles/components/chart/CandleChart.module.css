@@ -1,5 +1,5 @@
-.small * {
-   font-size: 5px !important;
+.small span {
+   font-size: 0.8rem;
 }
 
 .chartCard {

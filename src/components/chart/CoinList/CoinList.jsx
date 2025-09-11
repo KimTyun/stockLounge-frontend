@@ -1,82 +1,70 @@
 import React, { useState, useEffect } from 'react'
 import { Card, Table, Badge, Form, InputGroup, Dropdown } from 'react-bootstrap'
 import styles from '../../../styles/components/chart/CoinList.module.css'
-import { useDispatch, useSelector } from 'react-redux'
-import { getMarketAllThunk, getTickerAllThunk } from '../../../features/coinSlice'
+import { useSelector } from 'react-redux'
 
 const CoinList = ({ onCoinSelect, selectedCoin }) => {
-   const dispatch = useDispatch()
    const { coinList, coins, loading, error } = useSelector((s) => s.coin)
    const [filteredCoins, setFilteredCoins] = useState([])
-   const [searchTerm, setSearchTerm] = useState('')
    const [sortBy, setSortBy] = useState('marketCap')
    const [sortOrder, setSortOrder] = useState('desc')
 
    useEffect(() => {
-      if (coins.length === 0 || coinList.length === 0) {
-         dispatch(getTickerAllThunk())
-         dispatch(getMarketAllThunk())
-         return
+      const filterAndSortCoins = () => {
+         if (coinList.length === 0) return
+
+         let filtered = coins
+            .map((coin, index) => ({
+               id: coin.market,
+               symbol: coin.market.split('-')[1],
+               name: coinList.find((e) => e.pair === coin.market).name,
+               price: coin.trade_price,
+               change24h: coin.signed_change_rate,
+               volume24h: coin.acc_trade_volume_24h,
+               rank: index + 1,
+            }))
+            .reverse()
+
+         filtered.sort((a, b) => {
+            let aValue, bValue
+
+            switch (sortBy) {
+               case 'name':
+                  aValue = a.name.toLowerCase()
+                  bValue = b.name.toLowerCase()
+                  break
+               case 'price':
+                  aValue = a.price
+                  bValue = b.price
+                  break
+               case 'change24h':
+                  aValue = a.change24h
+                  bValue = b.change24h
+                  break
+               case 'marketCap':
+                  aValue = a.marketCap
+                  bValue = b.marketCap
+                  break
+               case 'volume24h':
+                  aValue = a.volume24h
+                  bValue = b.volume24h
+                  break
+               default:
+                  aValue = a.rank
+                  bValue = b.rank
+            }
+
+            if (sortOrder === 'asc') {
+               return aValue > bValue ? 1 : -1
+            } else {
+               return aValue < bValue ? 1 : -1
+            }
+         })
+
+         setFilteredCoins(filtered)
       }
-   }, [coins, dispatch, coinList])
-
-   useEffect(() => {
       filterAndSortCoins()
-   }, [coins, searchTerm, sortBy, sortOrder])
-
-   const filterAndSortCoins = () => {
-      if (coinList.length === 0) return
-
-      let filtered = coins
-         .map((coin, index) => ({
-            id: coin.market,
-            symbol: coin.market.split('-')[1],
-            name: coinList.find((e) => e.pair === coin.market).name,
-            price: coin.trade_price,
-            change24h: coin.signed_change_rate,
-            volume24h: coin.acc_trade_volume_24h,
-            rank: index + 1,
-         }))
-         .filter((coin) => coin.name.toLowerCase().includes(searchTerm.toLowerCase()) || coin.symbol.toLowerCase().includes(searchTerm.toLowerCase()))
-
-      filtered.sort((a, b) => {
-         let aValue, bValue
-
-         switch (sortBy) {
-            case 'name':
-               aValue = a.name.toLowerCase()
-               bValue = b.name.toLowerCase()
-               break
-            case 'price':
-               aValue = a.price
-               bValue = b.price
-               break
-            case 'change24h':
-               aValue = a.change24h
-               bValue = b.change24h
-               break
-            case 'marketCap':
-               aValue = a.marketCap
-               bValue = b.marketCap
-               break
-            case 'volume24h':
-               aValue = a.volume24h
-               bValue = b.volume24h
-               break
-            default:
-               aValue = a.rank
-               bValue = b.rank
-         }
-
-         if (sortOrder === 'asc') {
-            return aValue > bValue ? 1 : -1
-         } else {
-            return aValue < bValue ? 1 : -1
-         }
-      })
-
-      setFilteredCoins(filtered)
-   }
+   }, [coins, sortBy, sortOrder, coinList])
 
    const handleSort = (field) => {
       if (sortBy === field) {
@@ -118,6 +106,21 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
       )
    }
 
+   if (error) {
+      return (
+         <Card className={styles.coinList}>
+            <Card.Body>
+               <div className={styles.loading}>
+                  <div className="spinner-border text-primary" role="status">
+                     <span className="visually-hidden">fail</span>
+                  </div>
+                  <p className="mt-2">코인 데이터를 불러오지 못하였습니다.</p>
+               </div>
+            </Card.Body>
+         </Card>
+      )
+   }
+
    return (
       <Card className={styles.coinList}>
          <Card.Header className={styles.header}>
@@ -150,7 +153,7 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
                            <i className={`${getSortIcon('name')} ms-1`}></i>
                         </th>
                         <th className={styles.sortableHeader} onClick={() => handleSort('price')}>
-                           가격
+                           호가
                            <i className={`${getSortIcon('price')} ms-1`}></i>
                         </th>
                         <th className={styles.sortableHeader} onClick={() => handleSort('change24h')}>

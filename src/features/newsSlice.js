@@ -1,6 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { getCryptoNews, getEconomyNews } from '../api/naverApi'
 
+/**
+ * 코인 뉴스 가져오기
+ * length : 가져올 개수
+ */
 export const getCryptoNewsThunk = createAsyncThunk('news/getCryptoNews', async (length, { rejectWithValue }) => {
    try {
       const response = await getCryptoNews(length)
@@ -10,6 +14,10 @@ export const getCryptoNewsThunk = createAsyncThunk('news/getCryptoNews', async (
    }
 })
 
+/**
+ * 경제 뉴스 가져오기
+ * length : 가져올 개수
+ */
 export const getEconomyNewsThunk = createAsyncThunk('news/getEconomyNews', async (length, { rejectWithValue }) => {
    try {
       const response = await getEconomyNews(length)
@@ -27,33 +35,34 @@ const newsSlice = createSlice({
       error: null,
    },
    reducers: {},
-   extraReducers: (b) => {
-      b.addCase(getCryptoNewsThunk.pending, (s) => {
-         s.loading = true
-         s.error = null
-      })
-         .addCase(getCryptoNewsThunk.fulfilled, (s, a) => {
-            s.loading = false
-            s.news = a.payload.data
-            s.error = null
+   extraReducers: (builder) => {
+      builder
+         .addCase(getCryptoNewsThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
          })
-         .addCase(getCryptoNewsThunk.rejected, (s, a) => {
-            s.loading = false
-            s.error = a.payload?.message || '서버문제로 뉴스를 가져오지 못했습니다.'
+         .addCase(getCryptoNewsThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.news = action.payload.data
+            state.error = null
+         })
+         .addCase(getCryptoNewsThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload?.message || '서버 문제로 뉴스를 가져오지 못했습니다.'
          })
 
-         .addCase(getEconomyNewsThunk.pending, (s) => {
-            s.loading = true
-            s.error = null
+         .addCase(getEconomyNewsThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
          })
-         .addCase(getEconomyNewsThunk.fulfilled, (s, a) => {
-            s.loading = false
-            s.news = a.payload.data
-            s.error = null
+         .addCase(getEconomyNewsThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.news = action.payload.data
+            state.error = null
          })
-         .addCase(getEconomyNewsThunk.rejected, (s, a) => {
-            s.loading = false
-            s.error = a.payload?.message || '서버문제로 뉴스를 가져오지 못했습니다.'
+         .addCase(getEconomyNewsThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload?.message || '서버 문제로 뉴스를 가져오지 못했습니다.'
          })
    },
 })

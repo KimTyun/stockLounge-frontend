@@ -33,7 +33,7 @@ const Chart = () => {
       const fetchData = async () => {
          if (coins.length === 0 || coinList.length === 0) {
             const conlist = await dispatch(getMarketAllThunk()).unwrap()
-            const result = await dispatch(getTickerAllThunk()).unwrap()
+            const result = await dispatch(getTickerAllThunk(30)).unwrap()
 
             const mapped = result.map((coin, index) => ({
                id: coin.market,

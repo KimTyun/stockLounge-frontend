@@ -1,20 +1,55 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Card } from 'react-bootstrap'
 import styles from '../../../styles/components/chart/CandleChart.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { getcandlesThunk } from '../../../features/coinSlice'
+import Chart from 'react-apexcharts'
 
-const CandleChart = ({ period = 'days', coin, small }) => {
+/**
+ * 컴포넌트 사용시 coin props 필수
+ * period : days, weeks, months, years,
+ * coin : {id: market데이터(KRW-BTC), symbol: 코인 심볼(BTC), name: 코인 한글이름(비트코인), price : signed_change_rate, change24h: acc_trade_volume_24h}
+ */
+const CandleChart = ({ period = 'days', coin, small = false }) => {
    const dispatch = useDispatch()
    const { data, loading } = useSelector((s) => s.coin)
-   const coinData = data[coin.id]
+   const coinData = useMemo(() => {
+      if (!data[coin.id]) return null
+
+      return data[coin.id]
+         .slice()
+         .reverse()
+         .map((item) => ({
+            x: new Date(item.candle_date_time_kst),
+            y: [
+               item.opening_price, // Open
+               item.high_price, // High
+               item.low_price, // Low
+               item.trade_price, // Close
+            ],
+         }))
+   }, [coin, data])
+   const options = {
+      chart: {
+         type: 'candlestick',
+         height: 500,
+      },
+      title: {
+         text: `${coin.symbol}`,
+         align: 'left',
+      },
+      xaxis: {
+         type: 'datetime',
+      },
+      yaxis: {
+         tooltip: {
+            enabled: true,
+         },
+      },
+   }
 
    useEffect(() => {
-      dispatch(getcandlesThunk({ time: period, params: { market: coin.id, count: small ? 50 : 100 } }))
-         .unwrap()
-         .then((result) => {
-            // console.log('차트 데이터', result)
-         })
+      dispatch(getcandlesThunk({ time: period, params: { market: coin.id, count: 60 } }))
    }, [dispatch, coin, small, period])
 
    return (
@@ -22,18 +57,17 @@ const CandleChart = ({ period = 'days', coin, small }) => {
          <Card.Body className={styles.chartBody}>
             <div className={styles.priceInfo}>
                <div className={styles.priceData}>
-                  <span className={styles.currentPrice}>000,000</span>
-                  <span className={`${styles.priceChange} ${styles.positive}`}>+0.00%</span>
+                  <span className={styles.currentPrice}>{coin.price.toLocaleString()}</span>
+                  <span className={`${styles.priceChange} ${coin.change24h > 0 ? styles.positive : styles.negative}`}>
+                     {coin.change24h >= 0 ? '+' : ''}
+                     {(coin.change24h * 100).toFixed(2)}%
+                  </span>
                </div>
             </div>
 
             <div className={`${styles.chartContainer} ${small && styles.small}`}>
-               {/* 실제 차트는 Chart.js나 TradingView 위젯으로 구현 예정 */}
-               <div className={styles.mockChart}>
-                  {loading && <p>차트 로딩중...</p>}
-                  <p>차트 영역 (구현 예정)</p>
-                  <div className={styles.chartPlaceholder}>📈 {coin.id} 차트</div>
-               </div>
+               {loading && <p>차트 로딩중...</p>}
+               {coinData && <Chart options={options} series={[{ data: coinData || [] }]} type="candlestick" height={small ? 200 : 380} width={'100%'} />}
             </div>
          </Card.Body>
       </Card>
