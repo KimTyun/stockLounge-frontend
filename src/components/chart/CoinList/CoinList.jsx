@@ -14,15 +14,18 @@ const CoinList = ({ onCoinSelect, selectedCoin }) => {
          if (coinList.length === 0) return
 
          let filtered = coins
-            .map((coin, index) => ({
-               id: coin.market,
-               symbol: coin.market.split('-')[1],
-               name: coinList.find((e) => e.pair === coin.market).name,
-               price: coin.trade_price,
-               change24h: coin.signed_change_rate,
-               volume24h: coin.acc_trade_volume_24h,
-               rank: index + 1,
-            }))
+            .map((coin, index) => {
+               const coinInfo = coinList.find((e) => e.pair === coin.market)
+               return {
+                  id: coin.market,
+                  symbol: coin.market.split('-')[1],
+                  name: coinInfo ? coinInfo.name : 'Unknown',
+                  price: coin.trade_price,
+                  change24h: coin.signed_change_rate,
+                  volume24h: coin.acc_trade_volume_24h,
+                  rank: index + 1,
+               }
+            })
             .reverse()
 
          filtered.sort((a, b) => {

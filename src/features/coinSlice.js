@@ -17,7 +17,7 @@ export const getMarketAllThunk = createAsyncThunk('coin/getMarketAll', async (_,
  * 코인 정보 가져오기
  * n : 가져올 개수, 기본 15개
  */
-export const getTickerAllThunk = createAsyncThunk('coin/getTickkerAll', async (n, { rejectWithValue }) => {
+export const getTickerAllThunk = createAsyncThunk('coin/getTickerAll', async (n, { rejectWithValue }) => {
    try {
       const response = await getTickerAll(n)
       return response
