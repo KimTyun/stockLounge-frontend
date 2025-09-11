@@ -4,7 +4,7 @@ import { getBoard, writeBoard } from '../api/boardApi'
 /**
  * 게시글 리스트 가져오기
  */
-export const getBoardThunk = createAsyncThunk('board/list', async (__dirname, { rejectWithValue }) => {
+export const getBoardThunk = createAsyncThunk('board/list', async (_, { rejectWithValue }) => {
    try {
       const response = await getBoard()
       return response
@@ -15,7 +15,7 @@ export const getBoardThunk = createAsyncThunk('board/list', async (__dirname, { 
 
 /**
  * 게시글 등록
- * boardData : {board_img, category, content, createdAt, id, like_count, report_count, title, updatedAt}
+ * boardData는 폼데이터 : {board_img, category, content, createdAt, id, like_count, report_count, title, updatedAt}
  */
 export const writeBoardThunk = createAsyncThunk('board/write', async (boardData, { rejectWithValue }) => {
    try {
@@ -56,7 +56,7 @@ const boardSlice = createSlice({
          })
          .addCase(writeBoardThunk.fulfilled, (state, action) => {
             state.loading = false
-            state.board = action.payload.data.board
+            state.board = action.payload.board
          })
          .addCase(writeBoardThunk.rejected, (state, action) => {
             state.loading = false

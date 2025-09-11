@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Container, Row, Col, Card, Form, Button, Alert, Badge } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
 import styles from '../../../styles/pages/Board_fixed.module.css'
@@ -8,6 +8,7 @@ import { writeBoardThunk } from '../../../features/boardSlice'
 const PostEditor = () => {
    const dispatch = useDispatch()
    const navigate = useNavigate()
+   const { loading, error } = useSelector((state) => state.board)
    const { id } = useParams() // 수정 모드일 때 게시글 ID
    const isEditMode = Boolean(id)
 
@@ -19,8 +20,6 @@ const PostEditor = () => {
 
    const [imgUrl, setImgUrl] = useState(null) // 이미지 미리보기 URL
    const [imgFile, setImgFile] = useState(null) // 이미지 파일
-   const [isLoading, setIsLoading] = useState(false)
-   const [error, setError] = useState('')
    const [success, setSuccess] = useState('')
    const [wordCount, setWordCount] = useState(0)
 
@@ -39,7 +38,6 @@ const PostEditor = () => {
    // 수정 모드일 때 기존 데이터 로드
    useEffect(() => {
       if (isEditMode) {
-         setIsLoading(true)
          // API 호출 시뮬레이션
          setTimeout(() => {
             const mockPost = {
@@ -72,7 +70,6 @@ const PostEditor = () => {
 
             setFormData(mockPost)
             setWordCount(mockPost.content.length)
-            setIsLoading(false)
          }, 1000)
       }
    }, [isEditMode])
@@ -103,13 +100,11 @@ const PostEditor = () => {
 
       // 파일 크기 체크 (5MB 제한)
       if (file.size > 5 * 1024 * 1024) {
-         setError('파일 크기는 5MB 이하만 업로드 가능합니다.')
          return
       }
 
       // 파일 타입 체크
       if (!file.type.startsWith('image/')) {
-         setError('이미지 파일만 업로드 가능합니다.')
          return
       }
 
@@ -121,42 +116,29 @@ const PostEditor = () => {
          setImgUrl(event.target.result)
       }
       reader.readAsDataURL(file)
-      console.log('파일은', file)
    }
 
    // 폼 제출 핸들러
    const handleSubmit = async (e) => {
       e.preventDefault()
-      setError('')
       setSuccess('')
 
       if (!formData.title.trim()) {
-         setError('제목을 입력해주세요.')
          return
       }
 
       if (!formData.content.trim()) {
-         setError('내용을 입력해주세요.')
          return
       }
-
-      setIsLoading(true)
 
       try {
          const data = new FormData()
          data.append('title', formData.title)
          data.append('category', formData.category)
          data.append('content', formData.content)
-
-         // 이미지 파일이 있을 경우 인코딩하여 추가
+         // 이미지 파일이 있을 경우 추가
          if (imgFile) {
-            const encodedFile = new File([imgFile], encodeURIComponent(imgFile.name), { type: imgFile.type })
-            data.append('file', encodedFile)
-         }
-
-         console.log('전송할 데이터:')
-         for (let [key, value] of data.entries()) {
-            console.log(key, value)
+            data.append('file', imgFile)
          }
 
          await dispatch(writeBoardThunk(data)).unwrap()
@@ -166,11 +148,20 @@ const PostEditor = () => {
          }, 1500)
          alert('게시글 등록 완료!')
       } catch (error) {
-         setError('게시글 등록 실패')
          console.error('게시글 등록 오류:', error)
-      } finally {
-         setIsLoading(false)
       }
+   }
+
+   if (loading) {
+      return null
+   }
+
+   if (error) {
+      return (
+         <Typography variant="body1" align="center" color="error">
+            에러 발생: {error}
+         </Typography>
+      )
    }
 
    return (
@@ -187,7 +178,6 @@ const PostEditor = () => {
                      </Card.Header>
 
                      <Card.Body>
-                        {error && <Alert variant="danger">{error}</Alert>}
                         {success && <Alert variant="success">{success}</Alert>}
 
                         <Form onSubmit={handleSubmit}>
@@ -196,14 +186,14 @@ const PostEditor = () => {
                               <Col md={8}>
                                  <Form.Group>
                                     <Form.Label>제목 *</Form.Label>
-                                    <Form.Control type="text" name="title" value={formData.title} onChange={handleChange} placeholder="제목을 입력하세요" disabled={isLoading} maxLength={100} />
+                                    <Form.Control type="text" name="title" value={formData.title} onChange={handleChange} placeholder="제목을 입력하세요" maxLength={100} />
                                     <Form.Text className="text-muted">{formData.title.length}/100</Form.Text>
                                  </Form.Group>
                               </Col>
                               <Col md={4}>
                                  <Form.Group>
                                     <Form.Label>카테고리</Form.Label>
-                                    <Form.Select name="category" value={formData.category} onChange={handleChange} disabled={isLoading}>
+                                    <Form.Select name="category" value={formData.category} onChange={handleChange}>
                                        {categories.map((cat) => (
                                           <option key={cat.value} value={cat.value}>
                                              {cat.label}
@@ -217,7 +207,7 @@ const PostEditor = () => {
                            {/* 이미지 업로드 */}
                            <Form.Group className="mb-3">
                               <Form.Label>이미지 첨부</Form.Label>
-                              <Form.Control type="file" accept="image/*" onChange={handleImageChange} disabled={isLoading} />
+                              <Form.Control type="file" accept="image/*" onChange={handleImageChange} />
                               <Form.Text className="text-muted">이미지 파일만 업로드 가능합니다. (최대 5MB)</Form.Text>
                            </Form.Group>
 
@@ -258,37 +248,23 @@ const PostEditor = () => {
                                     {wordCount.toLocaleString()}자
                                  </Badge>
                               </Form.Label>
-                              <Form.Control
-                                 as="textarea"
-                                 rows={20}
-                                 name="content"
-                                 value={formData.content}
-                                 onChange={handleChange}
-                                 placeholder="내용을 입력하세요. 마크다운 문법을 지원합니다. 예시: ## 제목 ### 소제목 **굵은글씨** *기울임* - 목록 아이템"
-                                 disabled={isLoading}
-                                 className={styles.contentTextarea}
-                              />
+                              <Form.Control as="textarea" rows={20} name="content" value={formData.content} onChange={handleChange} placeholder="내용을 입력하세요. 마크다운 문법을 지원합니다. 예시: ## 제목 ### 소제목 **굵은글씨** *기울임* - 목록 아이템" className={styles.contentTextarea} />
                               <Form.Text className="text-muted">마크다운 문법을 지원합니다. (## 제목, **굵은글씨**, *기울임*, - 목록)</Form.Text>
                            </Form.Group>
 
                            {/* 버튼 영역 */}
                            <div className={styles.buttonArea}>
                               <div className={styles.rightButtons}>
-                                 <Button variant="secondary" onClick={() => navigate('/board')} disabled={isLoading} className="me-2">
+                                 <Button variant="secondary" onClick={() => navigate('/board')} className="me-2">
                                     취소
                                  </Button>
-                                 <Button variant="primary" type="submit" disabled={isLoading}>
-                                    {isLoading ? (
-                                       <>
-                                          <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                                          {isEditMode ? '수정 중...' : '작성 중...'}
-                                       </>
-                                    ) : (
+                                 <Button variant="primary" type="submit">
+                                    {
                                        <>
                                           <i className={`fas fa-${isEditMode ? 'check' : 'paper-plane'} me-2`}></i>
                                           {isEditMode ? '수정완료' : '게시하기'}
                                        </>
-                                    )}
+                                    }
                                  </Button>
                               </div>
                            </div>
