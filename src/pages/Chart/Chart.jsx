@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getCryptoNewsThunk } from '../../features/newsSlice'
 import he from 'he'
 import { getMarketAllThunk, getTickerAllThunk } from '../../features/coinSlice'
+import DOMPurify from 'dompurify'
 
 // 임시 데이터: 실제로는 API 연동 예정
 
@@ -112,14 +113,21 @@ const Chart = () => {
                      <Card className="mb-3">
                         <Card.Header>최신 뉴스</Card.Header>
                         <Card.Body>
-                           {/* TODO: 네이버 뉴스 API 연동 */}
                            <ul>
                               {news &&
                                  news?.items.map((e) => (
                                     <li key={e.link} className={styles.sidebarList}>
-                                       <a href={e.link} target="_blank" rel="noopener noreferrer">
-                                          {he.decode(e.title)}
-                                       </a>
+                                       <a
+                                          href={e.link}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          dangerouslySetInnerHTML={{
+                                             __html: DOMPurify.sanitize(he.decode(e.title), {
+                                                ALLOWED_TAGS: ['b', 'i'],
+                                                ALLOWED_ATTR: [],
+                                             }),
+                                          }}
+                                       />
                                     </li>
                                  ))}
                            </ul>

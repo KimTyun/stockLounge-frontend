@@ -1,8 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Container, Row, Col, Card, Nav, Button } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
 import styles from '../../styles/pages/News.module.css'
+import NewsList from '../../components/news/NewsList'
+import { getCryptoNewsThunk, getEconomyNewsThunk } from '../../features/newsSlice'
 
 const News = () => {
+   const dispatch = useDispatch()
+   const { news, loading, error } = useSelector((s) => s.news)
    const [activeTab, setActiveTab] = useState('crypto')
 
    // 임시 뉴스 데이터
@@ -11,7 +16,8 @@ const News = () => {
          {
             id: 1,
             title: '비트코인, 65,000달러 돌파하며 사상 최고가 경신',
-            content: '비트코인이 65,000달러를 돌파하며 새로운 역사를 쓰고 있습니다. 기관 투자자들의 관심 증가와 ETF 승인 기대감이 상승 요인으로 작용했습니다.',
+            content:
+               '비트코인이 65,000달러를 돌파하며 새로운 역사를 쓰고 있습니다. 기관 투자자들의 관심 증가와 ETF 승인 기대감이 상승 요인으로 작용했습니비트코인이 65,000달러를 돌파하며 새로운 역사를 쓰고 있습니다. 기관 투자자들의 관심 증가와 ETF 승인 기대감이 상승 요인으로 작용했습니다비트코인이 65,000달러를 돌파하며 새로운 역사를 쓰고 있습니다. 기관 투자자들의 관심 증가와 ETF 승인 기대감이 상승 요인으로 작용했습니다비트코인이 65,000달러를 돌파하며 새로운 역사를 쓰고 있습니다. 기관 투자자들의 관심 증가와 ETF 승인 기대감이 상승 요인으로 작용했습니다다.',
             source: '코인데스크',
             time: '2025-09-04 14:30',
             image: '/api/placeholder/300/200',
@@ -103,7 +109,17 @@ const News = () => {
       ],
    }
 
-   const currentNews = newsData[activeTab]
+   useEffect(() => {
+      dispatch(getCryptoNewsThunk())
+   }, [dispatch])
+
+   useEffect(() => {
+      if (activeTab === 'crypto') {
+         dispatch(getCryptoNewsThunk())
+      } else {
+         dispatch(getEconomyNewsThunk())
+      }
+   }, [dispatch, activeTab])
 
    return (
       <div className={styles.news}>
@@ -129,44 +145,22 @@ const News = () => {
             </Row>
 
             <Row>
-               <Col>
-                  <div className={styles.newsContent}>
-                     {currentNews.map((article) => (
-                        <Card key={article.id} className={styles.newsCard}>
-                           <Row className="no-gutters">
-                              <Col md={3}>
-                                 <div className={styles.newsImage}>
-                                    <img
-                                       src={article.image}
-                                       alt={article.title}
-                                       onError={(e) => {
-                                          e.target.src =
-                                             'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y4ZjlmYSIvPgogIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4IiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Tm8gSW1hZ2U8L3RleHQ+Cjwvc3ZnPg=='
-                                       }}
-                                    />
-                                 </div>
-                              </Col>
-                              <Col md={9}>
-                                 <Card.Body className={styles.newsBody}>
-                                    <div className={styles.newsHeader}>
-                                       <h5 className={styles.newsTitle}>{article.title}</h5>
-                                       <div className={styles.newsMeta}>
-                                          <span className={styles.newsSource}>{article.source}</span>
-                                          <span className={styles.newsTime}>{article.time}</span>
-                                       </div>
-                                    </div>
-                                    <p className={styles.newsContent}>{article.content}</p>
-                                    <Button variant="outline-primary" size="sm" className={styles.readMoreBtn} onClick={() => window.open(article.link, '_blank')}>
-                                       원문 보기
-                                    </Button>
-                                 </Card.Body>
-                              </Col>
-                           </Row>
-                        </Card>
-                     ))}
-                  </div>
-               </Col>
+               {error ? (
+                  <p>{error}</p>
+               ) : (
+                  <Col>
+                     <div className={styles.newsContent}>{loading ? <p>뉴스 데이터를 불러오는 중입니다.</p> : news && <NewsList newsData={news} type={activeTab}></NewsList>}</div>
+                  </Col>
+               )}
             </Row>
+            <div className={styles.bottomButtons}>
+               <Button variant="primary" size="lg">
+                  더보기
+               </Button>
+               <Button variant="secondary" size="sm" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                  맨 위로
+               </Button>
+            </div>
          </Container>
       </div>
    )

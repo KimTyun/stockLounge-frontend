@@ -1,77 +1,51 @@
-.newsList {
-  max-height: 400px;
-  overflow-y: auto;
+.newsCard {
+   width: 100%;
 }
 
-.newsItem {
-  cursor: pointer;
-  border: none;
-  padding: 1rem;
-  transition: background-color 0.3s ease;
+.newsBody {
+   display: flex;
+   width: 100%;
 }
 
-.newsItem:hover {
-  background-color: #f8f9fa;
-}
-
-.newsContent {
-  width: 100%;
-}
-
-.newsTitle {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.newsMeta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.sourceBadge {
-  font-size: 0.7rem;
-  padding: 0.25rem 0.5rem;
+.newsHeader {
+   text-align: left;
 }
 
 .newsTime {
-  color: #666;
-  font-size: 0.8rem;
+   font-size: 0.8rem;
+}
+.newsTitle {
+   font-size: 1.2rem;
 }
 
-.newsSummary {
-  color: #666;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.newsDescription {
+   font-size: 1rem;
+   text-overflow: ellipsis;
+   overflow: hidden;
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 2;
+}
+.button {
+   display: flex;
+   justify-content: center;
+   align-items: center;
 }
 
 /* 반응형 */
 @media (max-width: 767.98px) {
-  .newsItem {
-    padding: 0.75rem;
-  }
-  
-  .newsTitle {
-    font-size: 0.9rem;
-    -webkit-line-clamp: 3;
-  }
-  
-  .newsMeta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
+   .newsItem {
+      padding: 0.75rem;
+   }
+
+   .newsTitle {
+      font-size: 0.9rem;
+      -webkit-line-clamp: 3;
+   }
+
+   .newsMeta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+   }
 }
