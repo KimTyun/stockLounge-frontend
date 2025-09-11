@@ -47,7 +47,7 @@ const boardSlice = createSlice({
          })
          .addCase(getBoardThunk.rejected, (state, action) => {
             state.loading = false
-            state.error = action.payload?.messsage || '서버 문제로 게시글을 가져오지 못했습니다.'
+            state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
          })
       builder
          .addCase(writeBoardThunk.pending, (state) => {
@@ -60,7 +60,7 @@ const boardSlice = createSlice({
          })
          .addCase(writeBoardThunk.rejected, (state, action) => {
             state.loading = false
-            state.error = action.payload?.messsage || '서버 문제로 게시글을 등록하지 못했습니다.'
+            state.error = action.payload?.message || '서버 문제로 게시글을 등록하지 못했습니다.'
          })
    },
 })

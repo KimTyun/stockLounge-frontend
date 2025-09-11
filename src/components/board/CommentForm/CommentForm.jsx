@@ -51,7 +51,8 @@ const CommentForm = ({ parentId = null, onCommentAdded, onCancel }) => {
 
          setContent('')
       } catch (error) {
-         setError('댓글 작성 중 오류가 발생했습니다.', error)
+         console.error(error)
+         setError('댓글 작성 중 오류가 발생했습니다.')
       } finally {
          setIsLoading(false)
       }
