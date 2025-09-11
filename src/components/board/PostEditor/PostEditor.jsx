@@ -198,14 +198,7 @@ const PostEditor = () => {
                                     name="content"
                                     value={formData.content}
                                     onChange={handleChange}
-                                    placeholder="내용을 입력하세요. 마크다운 문법을 지원합니다.
-
-예시:
-## 제목
-### 소제목
-**굵은글씨**
-*기울임*
-- 목록 아이템"
+                                    placeholder="내용을 입력하세요. 마크다운 문법을 지원합니다. 예시: ## 제목 ### 소제목 **굵은글씨** *기울임* - 목록 아이템"
                                     disabled={isLoading}
                                     className={styles.contentTextarea}
                                  />
