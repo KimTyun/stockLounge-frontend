@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import { Container, Row, Col, Card, Form, Button, Alert, Badge } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
 import styles from '../../../styles/pages/Board_fixed.module.css'
+import { writeBoardThunk } from '../../../features/boardSlice'
 
 const PostEditor = () => {
+   const dispatch = useDispatch()
    const navigate = useNavigate()
    const { id } = useParams() // 수정 모드일 때 게시글 ID
    const isEditMode = Boolean(id)
@@ -12,15 +15,14 @@ const PostEditor = () => {
       title: '',
       category: 'free',
       content: '',
-      tags: '',
-      isNotice: false,
    })
 
+   const [imgUrl, setImgUrl] = useState(null) // 이미지 미리보기 URL
+   const [imgFile, setImgFile] = useState(null) // 이미지 파일
    const [isLoading, setIsLoading] = useState(false)
    const [error, setError] = useState('')
    const [success, setSuccess] = useState('')
    const [wordCount, setWordCount] = useState(0)
-   const [previewMode, setPreviewMode] = useState(false)
 
    // 카테고리 옵션
    const categories = [
@@ -66,8 +68,6 @@ const PostEditor = () => {
 단기적으로는 긍정적이지만, 장기 투자 관점에서 신중한 접근이 필요합니다. 분할 매수를 통한 리스크 분산을 권장합니다.
 
 ※ 본 글은 투자 참고용이며, 투자 책임은 본인에게 있습니다.`,
-               tags: '비트코인,BTC,분석,투자',
-               isNotice: false,
             }
 
             setFormData(mockPost)
@@ -90,13 +90,46 @@ const PostEditor = () => {
       }
    }
 
+   // 이미지 파일 업로드 핸들러
+   const handleImageChange = (e) => {
+      const file = e.target.files[0] // 단일 파일만 선택
+
+      if (!file) {
+         // 파일이 선택되지 않은 경우 초기화
+         setImgFile(null)
+         setImgUrl(null)
+         return
+      }
+
+      // 파일 크기 체크 (5MB 제한)
+      if (file.size > 5 * 1024 * 1024) {
+         setError('파일 크기는 5MB 이하만 업로드 가능합니다.')
+         return
+      }
+
+      // 파일 타입 체크
+      if (!file.type.startsWith('image/')) {
+         setError('이미지 파일만 업로드 가능합니다.')
+         return
+      }
+
+      setImgFile(file)
+
+      // 미리보기 생성
+      const reader = new FileReader()
+      reader.onload = (event) => {
+         setImgUrl(event.target.result)
+      }
+      reader.readAsDataURL(file)
+      console.log('파일은', file)
+   }
+
    // 폼 제출 핸들러
    const handleSubmit = async (e) => {
       e.preventDefault()
       setError('')
       setSuccess('')
 
-      // 유효성 검사
       if (!formData.title.trim()) {
          setError('제목을 입력해주세요.')
          return
@@ -107,41 +140,37 @@ const PostEditor = () => {
          return
       }
 
-      if (formData.content.length < 10) {
-         setError('내용은 최소 10자 이상 입력해주세요.')
-         return
-      }
-
       setIsLoading(true)
 
       try {
-         // API 호출 시뮬레이션
-         await new Promise((resolve) => setTimeout(resolve, 2000))
+         const data = new FormData()
+         data.append('title', formData.title)
+         data.append('category', formData.category)
+         data.append('content', formData.content)
 
-         setSuccess(isEditMode ? '게시글이 수정되었습니다.' : '게시글이 작성되었습니다.')
+         // 이미지 파일이 있을 경우 인코딩하여 추가
+         if (imgFile) {
+            const encodedFile = new File([imgFile], encodeURIComponent(imgFile.name), { type: imgFile.type })
+            data.append('file', encodedFile)
+         }
 
+         console.log('전송할 데이터:')
+         for (let [key, value] of data.entries()) {
+            console.log(key, value)
+         }
+
+         await dispatch(writeBoardThunk(data)).unwrap()
+         setSuccess('게시글 등록 완료')
          setTimeout(() => {
             navigate('/board')
          }, 1500)
+         alert('게시글 등록 완료!')
       } catch (error) {
-         setError('오류가 발생했습니다. 다시 시도해주세요.')
+         setError('게시글 등록 실패')
+         console.error('게시글 등록 오류:', error)
       } finally {
          setIsLoading(false)
       }
-   }
-
-   // 마크다운을 HTML로 변환 (간단한 버전)
-   const markdownToHtml = (markdown) => {
-      return markdown
-         .replace(/^## (.*$)/gm, '<h3>$1</h3>')
-         .replace(/^### (.*$)/gm, '<h4>$1</h4>')
-         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-         .replace(/\*(.*?)\*/g, '<em>$1</em>')
-         .replace(/^- (.*$)/gm, '<li>$1</li>')
-         .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-         .replace(/\n\n/g, '</p><p>')
-         .replace(/^(?!<[uh]|<\/[pu]|<li|<\/li)(.+)$/gm, '<p>$1</p>')
-         .replace(/(<\/p>)?<p><\/p>(<p>)?/g, '')
    }
 
    return (
@@ -151,7 +180,10 @@ const PostEditor = () => {
                <Col lg={10} xl={8} className="mx-auto">
                   <Card className={styles.editorCard}>
                      <Card.Header className={styles.editorHeader}>
-                        <h3>{isEditMode ? `${(<i className={`fas fa-${isEditMode ? 'edit' : 'pen'} me-2`}></i>)}게시글 수정` : ''}</h3>
+                        <h3>
+                           <i className={`fas fa-${isEditMode ? 'edit' : 'pen'} me-2`}></i>
+                           {isEditMode ? '게시글 수정' : '새 게시글 작성'}
+                        </h3>
                      </Card.Header>
 
                      <Card.Body>
@@ -182,6 +214,42 @@ const PostEditor = () => {
                               </Col>
                            </Row>
 
+                           {/* 이미지 업로드 */}
+                           <Form.Group className="mb-3">
+                              <Form.Label>이미지 첨부</Form.Label>
+                              <Form.Control type="file" accept="image/*" onChange={handleImageChange} disabled={isLoading} />
+                              <Form.Text className="text-muted">이미지 파일만 업로드 가능합니다. (최대 5MB)</Form.Text>
+                           </Form.Group>
+
+                           {/* 이미지 미리보기 */}
+                           {imgUrl && (
+                              <div className="mb-3">
+                                 <h5>미리보기:</h5>
+                                 <div
+                                    style={{
+                                       width: '200px',
+                                       height: '200px',
+                                       border: '1px solid #ccc',
+                                       borderRadius: '8px',
+                                       overflow: 'hidden',
+                                       display: 'flex',
+                                       justifyContent: 'center',
+                                       alignItems: 'center',
+                                    }}
+                                 >
+                                    <img
+                                       src={imgUrl}
+                                       alt="미리보기"
+                                       style={{
+                                          width: '100%',
+                                          height: '100%',
+                                          objectFit: 'cover',
+                                       }}
+                                    />
+                                 </div>
+                              </div>
+                           )}
+
                            {/* 내용 */}
                            <Form.Group className="mb-3">
                               <Form.Label>
@@ -190,42 +258,17 @@ const PostEditor = () => {
                                     {wordCount.toLocaleString()}자
                                  </Badge>
                               </Form.Label>
-
-                              {!previewMode ? (
-                                 <Form.Control
-                                    as="textarea"
-                                    rows={20}
-                                    name="content"
-                                    value={formData.content}
-                                    onChange={handleChange}
-                                    placeholder="내용을 입력하세요. 마크다운 문법을 지원합니다. 예시: ## 제목 ### 소제목 **굵은글씨** *기울임* - 목록 아이템"
-                                    disabled={isLoading}
-                                    className={styles.contentTextarea}
-                                 />
-                              ) : (
-                                 <div className={styles.previewArea}>
-                                    <div
-                                       className={styles.previewContent}
-                                       dangerouslySetInnerHTML={{
-                                          __html: markdownToHtml(formData.content),
-                                       }}
-                                    />
-                                 </div>
-                              )}
-
+                              <Form.Control
+                                 as="textarea"
+                                 rows={20}
+                                 name="content"
+                                 value={formData.content}
+                                 onChange={handleChange}
+                                 placeholder="내용을 입력하세요. 마크다운 문법을 지원합니다. 예시: ## 제목 ### 소제목 **굵은글씨** *기울임* - 목록 아이템"
+                                 disabled={isLoading}
+                                 className={styles.contentTextarea}
+                              />
                               <Form.Text className="text-muted">마크다운 문법을 지원합니다. (## 제목, **굵은글씨**, *기울임*, - 목록)</Form.Text>
-                           </Form.Group>
-
-                           {/* 태그 */}
-                           <Form.Group className="mb-3">
-                              <Form.Label>태그</Form.Label>
-                              <Form.Control type="text" name="tags" value={formData.tags} onChange={handleChange} placeholder="태그를 쉼표로 구분해서 입력하세요 (예: 비트코인,투자,분석)" disabled={isLoading} />
-                              <Form.Text className="text-muted">최대 5개까지 입력 가능합니다.</Form.Text>
-                           </Form.Group>
-
-                           {/* 공지사항 설정 (관리자만) */}
-                           <Form.Group className="mb-4">
-                              <Form.Check type="checkbox" name="isNotice" checked={formData.isNotice} onChange={handleChange} label="공지사항으로 설정" disabled={isLoading} />
                            </Form.Group>
 
                            {/* 버튼 영역 */}

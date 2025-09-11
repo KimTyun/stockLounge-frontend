@@ -149,7 +149,7 @@ const CommentList = ({ postId }) => {
   };
 
   const handleReport = (commentId) => {
-    if (window.confirm('이 댓글을 신고하시겠습니까?')) {
+    if (window.confirm(commentId, '이 댓글을 신고하시겠습니까?')) {
       alert('신고가 접수되었습니다.');
     }
   };
