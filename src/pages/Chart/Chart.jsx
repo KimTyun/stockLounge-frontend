@@ -4,9 +4,10 @@ import CandleChart from '../../components/chart/CandleChart'
 import CoinList from '../../components/chart/CoinList'
 import styles from '../../styles/pages/Chart.module.css'
 import { useDispatch, useSelector } from 'react-redux'
-import { getCryptoNewsThunk } from '../../features/newsSlice'
+import { getNewsThunk } from '../../features/newsSlice'
 import he from 'he'
 import { getMarketAllThunk, getTickerAllThunk } from '../../features/coinSlice'
+import DOMPurify from 'dompurify'
 
 // 임시 데이터: 실제로는 API 연동 예정
 
@@ -26,7 +27,7 @@ const Chart = () => {
    }
 
    useEffect(() => {
-      dispatch(getCryptoNewsThunk())
+      dispatch(getNewsThunk({ length: 5, start: 1, query: '암호화폐' }))
    }, [dispatch])
 
    useEffect(() => {
@@ -59,7 +60,7 @@ const Chart = () => {
    return (
       <Container fluid className={styles.chartContainer}>
          <Row className="mb-4">
-            <Col md={8}>
+            <Col lg={8}>
                {/* 1. 메인 차트 세션 */}
                <Row>
                   <Row>
@@ -96,30 +97,37 @@ const Chart = () => {
                {/* 2. TOP2 코인 차트 세션 */}
                {coinData && (
                   <Row className="mb-4">
-                     <Col md={6}>
+                     <Col lg={6}>
                         <CandleChart coin={coinData[0]} period={period} small />
                      </Col>
-                     <Col md={6}>
+                     <Col lg={6}>
                         <CandleChart coin={coinData[1]} period={period} small />
                      </Col>
                   </Row>
                )}
             </Col>
             {/* 4. 우측 사이드바: 뉴스/게시글 */}
-            <Col md={4} xs={12}>
+            <Col lg={4} md={12}>
                <Row>
                   <Col md={12}>
                      <Card className="mb-3">
                         <Card.Header>최신 뉴스</Card.Header>
                         <Card.Body>
-                           {/* TODO: 네이버 뉴스 API 연동 */}
                            <ul>
                               {news &&
-                                 news?.items.map((e) => (
+                                 news['암호화폐']?.items.map((e) => (
                                     <li key={e.link} className={styles.sidebarList}>
-                                       <a href={e.link} target="_blank" rel="noopener noreferrer">
-                                          {he.decode(e.title)}
-                                       </a>
+                                       <a
+                                          href={e.link}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          dangerouslySetInnerHTML={{
+                                             __html: DOMPurify.sanitize(he.decode(e.title), {
+                                                ALLOWED_TAGS: ['b', 'i'],
+                                                ALLOWED_ATTR: [],
+                                             }),
+                                          }}
+                                       />
                                     </li>
                                  ))}
                            </ul>
