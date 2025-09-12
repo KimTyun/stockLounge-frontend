@@ -14,7 +14,7 @@ const NewsList = ({ newsData }) => {
    return (
       <>
          {newsData.items.map((article) => (
-            <Card key={`${article.originallink}+${article.title}+${Date.now()}`} className={`${styles.newsCard} mb-3`}>
+            <Card key={`${article.originallink}+${article.title}`} className={`${styles.newsCard} mb-3`}>
                <Row className="no-gutters">
                   <Col>
                      <Card.Body className={styles.newsBody}>

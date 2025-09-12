@@ -51,11 +51,15 @@ const News = () => {
                </Col>
             </Row>
 
-            <Row>
-               <Col>
-                  <div className={styles.newsContent}>{loading ? <p>뉴스 데이터를 불러오는 중입니다.</p> : news[query[activeTab]] && <NewsList newsData={news[query[activeTab]]}></NewsList>}</div>
-               </Col>
-            </Row>
+            {error ? (
+               <p>{error}</p>
+            ) : (
+               <Row>
+                  <Col>
+                     <div className={styles.newsContent}>{loading ? <p>뉴스 데이터를 불러오는 중입니다.</p> : news[query[activeTab]] && <NewsList newsData={news[query[activeTab]]}></NewsList>}</div>
+                  </Col>
+               </Row>
+            )}
             <div className={styles.bottomButtons}>
                <Button variant="primary" size="lg" className={styles.loadMoreBtn} onClick={handlePage}>
                   더보기
