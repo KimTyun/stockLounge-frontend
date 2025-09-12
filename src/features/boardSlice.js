@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getBoard, writeBoard, getBoardById } from '../api/boardApi'
+import { getBoard, writeBoard, getBoardById, deleteBoard } from '../api/boardApi'
 
 /**
  * 게시글 리스트 가져오기
@@ -33,6 +33,18 @@ export const getBoardByIdThunk = createAsyncThunk('board/fetchItemById', async (
    try {
       const response = await getBoardById(id)
       return response
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
+/**
+ * 게시글 삭제, id로 특정 게시글 구분
+ */
+export const deleteBoardThunk = createAsyncThunk('board/deleteBoard', async (id, { rejectWithValue }) => {
+   try {
+      await deleteBoard(id)
+      return id
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -89,6 +101,18 @@ const boardSlice = createSlice({
          .addCase(getBoardByIdThunk.rejected, (state, action) => {
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
+         })
+      builder
+         .addCase(deleteBoardThunk.pending, (state) => {
+            state.loadingDetail = true
+            state.error = null
+         })
+         .addCase(deleteBoardThunk.fulfilled, (state, action) => {
+            state.loadingDetail = false
+         })
+         .addCase(deleteBoardThunk.rejected, (state, action) => {
+            state.loadingDetail = false
+            state.error = action.payload?.message || '서버 문제로 게시글을 삭제하지 못했습니다.'
          })
    },
 })

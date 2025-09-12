@@ -38,3 +38,14 @@ export const getBoardById = async (id) => {
       throw error
    }
 }
+
+// 게시글 삭제
+export const deleteBoard = async (id) => {
+   try {
+      const response = await axiosApi.delete(`/board/${id}`)
+      return response
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}

@@ -5,7 +5,7 @@ import CommentList from '../CommentList'
 import CommentForm from '../CommentForm'
 import styles from '../../../styles/pages/Board_fixed.module.css'
 import { useDispatch, useSelector } from 'react-redux'
-import { getBoardByIdThunk } from '../../../features/boardSlice'
+import { deleteBoardThunk, getBoardByIdThunk } from '../../../features/boardSlice'
 
 const PostDetail = ({ boardId, onBackToList }) => {
    const navigate = useNavigate()
@@ -26,7 +26,9 @@ const PostDetail = ({ boardId, onBackToList }) => {
 
    const handleDelete = () => {
       if (window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-         console.log('게시글 삭제')
+         dispatch(deleteBoardThunk(boardId))
+         alert('삭제되었습니다.')
+         navigate('/board')
          onBackToList()
       }
    }
