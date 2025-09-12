@@ -26,7 +26,9 @@ export const writeBoardThunk = createAsyncThunk('board/write', async (boardData,
    }
 })
 
-// 특정 게시물 가져오기
+/**
+ * 특정 게시물 가져오기, id값으로 게시글 구분
+ */
 export const getBoardByIdThunk = createAsyncThunk('board/fetchItemById', async (id, { rejectWithValue }) => {
    try {
       const response = await getBoardById(id)
