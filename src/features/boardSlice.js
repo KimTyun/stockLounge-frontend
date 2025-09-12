@@ -76,7 +76,6 @@ const boardSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
          })
-      builder
          .addCase(writeBoardThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -89,7 +88,6 @@ const boardSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 게시글을 등록하지 못했습니다.'
          })
-      builder
          .addCase(getBoardByIdThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null
@@ -102,7 +100,6 @@ const boardSlice = createSlice({
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
          })
-      builder
          .addCase(deleteBoardThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null

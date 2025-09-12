@@ -226,8 +226,8 @@ const PostDetail = ({ boardId, onBackToList }) => {
                         </h5>
                      </Card.Header>
                      <Card.Body>
-                        <CommentForm boardId={board.id} />
-                        <CommentList boardId={board.id} />
+                        <CommentForm postId={board.id} />
+                        <CommentList postId={board.id} />
                      </Card.Body>
                   </Card>
 

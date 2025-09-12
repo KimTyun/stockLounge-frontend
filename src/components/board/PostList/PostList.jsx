@@ -17,10 +17,8 @@ const PostList = ({ category = 'free' }) => {
    const { boards, error, loading } = useSelector((state) => state.board)
 
    useEffect(() => {
-      if (!selectedPostId) {
-         dispatch(getBoardThunk())
-      }
-   }, [dispatch, selectedPostId])
+      dispatch(getBoardThunk())
+   }, [dispatch])
 
    const handlePostClick = (id) => {
       setSelectedPostId(id)
@@ -93,7 +91,12 @@ const PostList = ({ category = 'free' }) => {
                            </Button>
                         </Card.Header>
                         <Card.Body>
-                           <PostEditor />
+                           <PostEditor
+                              onSuccess={() => {
+                                 setWrite(false)
+                                 dispatch(getBoardThunk())
+                              }}
+                           />
                         </Card.Body>
                      </Card>
                   </div>
@@ -109,35 +112,37 @@ const PostList = ({ category = 'free' }) => {
                         <div className={styles.likesColumn}>추천수</div>
                         <div className={styles.dateColumn}>등록일</div>
                      </li>
-                     {boards && boards.length > 0
-                        ? boards.map((board) => (
-                             <li key={board.id} className={`${styles.postRow} ${board.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(board.id)}>
-                                <div className={styles.titleColumn}>
-                                   {board.isPinned && (
-                                      <Badge bg="danger" className="me-2">
-                                         <i className="fas fa-thumbtack me-1"></i>공지
-                                      </Badge>
-                                   )}
-                                   <span className={styles.postTitle}>{board.title}</span>
-                                   {(board.comment_count || 0) > 0 && <span className={styles.commentCount}>[{board.comment_count}]</span>}
-                                </div>
-                                <div className={styles.authorColumn}>
-                                   <span className={styles.authorName}>{board.user_id ? `사용자${board.user_id}` : '익명'}</span>
-                                   {/* author 정보가 없으므로 기본 레벨 표시 */}
-                                   {getLevelBadge('Bronze')}
-                                </div>
-                                <div className={styles.viewsColumn}>
-                                   <i className="fas fa-eye me-1"></i>
-                                   {(board.view_count || 0).toLocaleString()}
-                                </div>
-                                <div className={styles.likesColumn}>
-                                   <i className="fas fa-heart me-1"></i>
-                                   {board.like_count || 0}
-                                </div>
-                                <div className={styles.dateColumn}>{formatTimeAgo(board.createdAt)}</div>
-                             </li>
-                          ))
-                        : ''}
+                     {boards && boards.length > 0 ? (
+                        boards.map((board) => (
+                           <li key={board.id} className={`${styles.postRow} ${board.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(board.id)}>
+                              <div className={styles.titleColumn}>
+                                 {board.isPinned && (
+                                    <Badge bg="danger" className="me-2">
+                                       <i className="fas fa-thumbtack me-1"></i>공지
+                                    </Badge>
+                                 )}
+                                 <span className={styles.postTitle}>{board.title}</span>
+                                 {(board.comment_count || 0) > 0 && <span className={styles.commentCount}>[{board.comment_count}]</span>}
+                              </div>
+                              <div className={styles.authorColumn}>
+                                 <span className={styles.authorName}>{board.user_id ? `사용자${board.user_id}` : '익명'}</span>
+                                 {/* author 정보가 없으므로 기본 레벨 표시 */}
+                                 {getLevelBadge('Bronze')}
+                              </div>
+                              <div className={styles.viewsColumn}>
+                                 <i className="fas fa-eye me-1"></i>
+                                 {(board.view_count || 0).toLocaleString()}
+                              </div>
+                              <div className={styles.likesColumn}>
+                                 <i className="fas fa-heart me-1"></i>
+                                 {board.like_count || 0}
+                              </div>
+                              <div className={styles.dateColumn}>{formatTimeAgo(board.createdAt)}</div>
+                           </li>
+                        ))
+                     ) : (
+                        <div>게시글이 없습니다.</div>
+                     )}
                   </ul>
                </div>
 

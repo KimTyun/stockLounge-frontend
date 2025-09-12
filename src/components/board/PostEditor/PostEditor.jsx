@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Container, Row, Col, Card, Form, Button, Alert, Badge } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
 import styles from '../../../styles/pages/Board_fixed.module.css'
-import { writeBoardThunk } from '../../../features/boardSlice'
+import { getBoardThunk, writeBoardThunk } from '../../../features/boardSlice'
 
-const PostEditor = () => {
+const PostEditor = ({ onSuccess }) => {
    const dispatch = useDispatch()
    const navigate = useNavigate()
    const { loading, error } = useSelector((state) => state.board)
@@ -121,7 +121,6 @@ const PostEditor = () => {
    // 폼 제출 핸들러
    const handleSubmit = async (e) => {
       e.preventDefault()
-      setSuccess('')
 
       if (!formData.title.trim()) {
          return
@@ -141,12 +140,11 @@ const PostEditor = () => {
             data.append('file', imgFile)
          }
          await dispatch(writeBoardThunk(data)).unwrap()
-         setSuccess('게시글 등록 완료')
-         setTimeout(() => {
-            navigate('/board')
-            window.location.reload()
-         }, 1500)
          alert('게시글 등록 완료!')
+         if (onSuccess) {
+            onSuccess()
+         }
+         navigate('/board')
       } catch (error) {
          console.error('게시글 등록 오류:', error)
       }
