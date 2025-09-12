@@ -15,16 +15,12 @@ export const getBoard = async () => {
 // 게시글 등록하기
 export const writeBoard = async (boardData) => {
    try {
-      const isFormData = boardData instanceof FormData
-
-      const config = {}
-
-      if (!isFormData) {
-         config.headers = {
-            'Content-Type': 'application/json',
-         }
-      }
-      const response = await axiosApi.post('/board/write', boardData, config)
+      const response = await axiosApi.post('/board/write', boardData, {
+         // headers로 감싸서 폼데이터 형식으로 보냄
+         headers: {
+            'Content-Type': 'multipart/form-data',
+         },
+      })
       return response.data
    } catch (error) {
       if (env === 'development') console.error(error)

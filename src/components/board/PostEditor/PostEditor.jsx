@@ -140,7 +140,6 @@ const PostEditor = () => {
          if (imgFile) {
             data.append('file', imgFile)
          }
-
          await dispatch(writeBoardThunk(data)).unwrap()
          setSuccess('게시글 등록 완료')
          setTimeout(() => {
@@ -157,11 +156,7 @@ const PostEditor = () => {
    }
 
    if (error) {
-      return (
-         <Typography variant="body1" align="center" color="error">
-            에러 발생: {error}
-         </Typography>
-      )
+      return error
    }
 
    return (
