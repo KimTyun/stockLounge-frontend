@@ -5,16 +5,21 @@ import DOMPurify from 'dompurify'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
 
-const NewsList = ({ newsData, type = 'crypto' }) => {
+const NewsList = ({ newsData }) => {
+   const handleClick = (link) => {
+      return () => {
+         window.open(link, '_blank')
+      }
+   }
    return (
       <>
          {newsData.items.map((article) => (
-            <Card key={article.originallink} className={`${styles.newsCard} mb-3`}>
+            <Card key={`${article.originallink}+${article.title}+${Date.now()}`} className={`${styles.newsCard} mb-3`}>
                <Row className="no-gutters">
                   <Col>
                      <Card.Body className={styles.newsBody}>
                         <Row className={styles.newsBody}>
-                           <Col md={9}>
+                           <Col md={9} sm={12}>
                               <div className={styles.newsHeader}>
                                  <div className={styles.newsMeta}>
                                     <span className={styles.newsTime}>{dayjs(article.pubDate).locale('ko').format('YYYY년 MM월 DD일 HH:mm')}</span>
@@ -40,7 +45,7 @@ const NewsList = ({ newsData, type = 'crypto' }) => {
                               </div>
                            </Col>
                            <Col md={3} className={styles.button}>
-                              <Button variant="outline-primary" size="sm" className={styles.readMoreBtn}>
+                              <Button variant="outline-primary" size="sm" className={styles.readMoreBtn} onClick={handleClick(article.link)}>
                                  원문 보기
                               </Button>
                            </Col>

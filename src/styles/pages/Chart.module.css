@@ -23,12 +23,14 @@
 }
 
 .sidebarList {
-   text-overflow: ellipsis;
+   -webkit-box-orient: vertical;
    overflow: hidden;
-   white-space: nowrap;
-   max-width: 200px;
-   /* border-bottom: 1px solid gray; */
-   padding-bottom: 5px;
+   text-overflow: ellipsis;
+   -webkit-line-clamp: 2;
+   display: -webkit-box;
+   font-size: 1rem;
+   text-align: left;
+   margin-bottom: 10px;
 }
 
 /* 반응형 디자인 */
