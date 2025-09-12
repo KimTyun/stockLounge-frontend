@@ -144,6 +144,7 @@ const PostEditor = () => {
          setSuccess('게시글 등록 완료')
          setTimeout(() => {
             navigate('/board')
+            window.location.reload()
          }, 1500)
          alert('게시글 등록 완료!')
       } catch (error) {

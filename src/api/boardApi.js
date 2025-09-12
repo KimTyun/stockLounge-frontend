@@ -27,3 +27,14 @@ export const writeBoard = async (boardData) => {
       throw error
    }
 }
+
+// 특정 게시글 가져오기
+export const getBoardById = async (id) => {
+   try {
+      const response = await axiosApi.get(`/board/${id}`)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}

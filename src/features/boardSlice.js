@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getBoard, writeBoard } from '../api/boardApi'
+import { getBoard, writeBoard, getBoardById } from '../api/boardApi'
 
 /**
  * 게시글 리스트 가져오기
@@ -26,12 +26,25 @@ export const writeBoardThunk = createAsyncThunk('board/write', async (boardData,
    }
 })
 
+// 특정 게시물 가져오기
+export const getBoardByIdThunk = createAsyncThunk('board/fetchItemById', async (id, { rejectWithValue }) => {
+   try {
+      const response = await getBoardById(id)
+      return response
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
 const boardSlice = createSlice({
    name: 'boards',
    initialState: {
       board: null,
       boards: [],
       loading: false,
+      // 한 페이지에서 가져오다보니 로딩이 중첩되서 무한 로딩 발생
+      // 상세 페이지의 로딩을 따로 두어 관리
+      loadingDetail: false,
       error: null,
    },
    reducers: {},
@@ -43,7 +56,7 @@ const boardSlice = createSlice({
          })
          .addCase(getBoardThunk.fulfilled, (state, action) => {
             state.loading = false
-            state.boards = action.payload.data.boards
+            state.boards = action.payload.data
          })
          .addCase(getBoardThunk.rejected, (state, action) => {
             state.loading = false
@@ -56,11 +69,24 @@ const boardSlice = createSlice({
          })
          .addCase(writeBoardThunk.fulfilled, (state, action) => {
             state.loading = false
-            state.board = action.payload.board
+            state.board = action.payload.data
          })
          .addCase(writeBoardThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 게시글을 등록하지 못했습니다.'
+         })
+      builder
+         .addCase(getBoardByIdThunk.pending, (state) => {
+            state.loadingDetail = true
+            state.error = null
+         })
+         .addCase(getBoardByIdThunk.fulfilled, (state, action) => {
+            state.loadingDetail = false
+            state.board = action.payload.data
+         })
+         .addCase(getBoardByIdThunk.rejected, (state, action) => {
+            state.loadingDetail = false
+            state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
          })
    },
 })

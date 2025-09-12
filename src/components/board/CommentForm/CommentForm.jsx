@@ -11,7 +11,7 @@ const CommentForm = ({ parentId = null, onCommentAdded, onCancel }) => {
    const isLoggedIn = true
    const currentUser = {
       nickname: 'TestUser',
-      profileImage: '/assets/images/profile-default.png',
+      profileImage: '/vite.svg',
    }
 
    const handleSubmit = async (e) => {
