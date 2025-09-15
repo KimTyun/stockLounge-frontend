@@ -4,7 +4,8 @@
   background-color: #f8f9fa;
 }
 
-.loading, .notFound {
+.loading,
+.notFound {
   min-height: 50vh;
   display: flex;
   align-items: center;
@@ -12,10 +13,13 @@
 }
 
 /* 게시글 카드 */
-.postCard, .contentCard, .actionCard, .commentSection {
+.postCard,
+.contentCard,
+.actionCard,
+.commentSection {
   border: none;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 1.5rem;
 }
 
@@ -117,7 +121,8 @@
   margin-bottom: 1.5rem;
 }
 
-.postContent ul, .postContent ol {
+.postContent ul,
+.postContent ol {
   margin-bottom: 1.5rem;
   padding-left: 2rem;
 }
@@ -152,6 +157,8 @@
   border-radius: 8px;
   margin: 1rem 0;
 }
+
+
 
 .postContent code {
   background-color: #f8f9fa;
@@ -231,17 +238,17 @@
   .postDetail {
     padding: 1rem 0;
   }
-  
+
   .postTitle {
     font-size: 1.75rem;
   }
-  
+
   .authorInfo {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
   }
-  
+
   .postActions {
     margin-left: 0;
   }
@@ -251,55 +258,59 @@
   .postTitle {
     font-size: 1.5rem;
   }
-  
+
   .authorProfile {
     gap: 0.75rem;
   }
-  
+
   .authorImage {
     width: 40px;
     height: 40px;
   }
-  
+
   .postStats {
     gap: 1rem;
     font-size: 0.85rem;
   }
-  
+
   .actionButtons {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .actionButtons button {
     width: 100%;
   }
-  
+
   .postNavigation {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .postNavigation button {
     width: 100%;
   }
-  
+
   .postContent {
     font-size: 1rem;
   }
 }
 
 @media (max-width: 575.98px) {
-  .postCard, .contentCard, .actionCard, .commentSection {
+
+  .postCard,
+  .contentCard,
+  .actionCard,
+  .commentSection {
     margin-left: -0.5rem;
     margin-right: -0.5rem;
     border-radius: 0;
   }
-  
+
   .postTitle {
     font-size: 1.25rem;
   }
-  
+
   .postStats {
     flex-wrap: wrap;
     gap: 0.75rem;

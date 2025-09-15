@@ -30,6 +30,13 @@
   box-sizing: border-box;
 }
 
+/* 게시글 이미지 */
+.postImage {
+  width: 16rem;
+  margin: 0 auto;
+}
+
+
 /* 미리보기 영역 */
 .previewImg {
   width: 300px;
