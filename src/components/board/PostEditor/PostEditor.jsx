@@ -3,14 +3,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Container, Row, Col, Card, Form, Button, Alert, Badge } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
 import styles from '../../../styles/pages/Board_fixed.module.css'
-import { getBoardThunk, writeBoardThunk } from '../../../features/boardSlice'
+import { getBoardThunk, writeBoardThunk, updateBoardThunk, getBoardByIdThunk } from '../../../features/boardSlice'
 
-const PostEditor = ({ onSuccess }) => {
+const PostEditor = ({ onSuccess, editPostId }) => {
    const dispatch = useDispatch()
    const navigate = useNavigate()
-   const { loading, error } = useSelector((state) => state.board)
-   const { id } = useParams() // 수정 모드일 때 게시글 ID
-   const isEditMode = Boolean(id)
+   const { loading, error, board } = useSelector((state) => state.board)
+   const { id } = useParams()
+
+   const postId = editPostId || id
+   const isEditMode = Boolean(postId)
 
    const [formData, setFormData] = useState({
       title: '',
@@ -37,42 +39,28 @@ const PostEditor = ({ onSuccess }) => {
 
    // 수정 모드일 때 기존 데이터 로드
    useEffect(() => {
-      if (isEditMode) {
-         // API 호출 시뮬레이션
-         setTimeout(() => {
-            const mockPost = {
-               title: '비트코인 급등, 이번엔 진짜일까? 전문가 분석',
-               category: 'bitcoin',
-               content: `안녕하세요, 크립토 분석가입니다.
-
-최근 비트코인이 다시 한번 급등세를 보이고 있습니다. 이번 상승의 배경과 지속 가능성에 대해 분석해보겠습니다.
-
-## 📈 현재 상황
-비트코인은 지난 주 대비 15% 상승하며 $45,000을 돌파했습니다. 이는 여러 긍정적 요인들이 복합적으로 작용한 결과로 보입니다.
-
-## 🔍 상승 요인 분석
-- **기관 투자 증가:** 대형 자산운용사들의 비트코인 ETF 매수세 증가
-- **규제 명확화:** 주요국의 암호화폐 규제 프레임워크 정비
-- **기술적 개선:** 라이트닝 네트워크 확산으로 실용성 증대
-- **거시경제 요인:** 인플레이션 헷지 자산으로서의 재평가
-
-## ⚠️ 주의사항
-하지만 과도한 낙관은 금물입니다. 다음과 같은 리스크 요인들도 고려해야 합니다:
-- 높은 변동성은 여전히 존재
-- 규제 리스크 상존
-- 기술적 저항선 $50,000 돌파 여부
-
-## 💡 결론
-단기적으로는 긍정적이지만, 장기 투자 관점에서 신중한 접근이 필요합니다. 분할 매수를 통한 리스크 분산을 권장합니다.
-
-※ 본 글은 투자 참고용이며, 투자 책임은 본인에게 있습니다.`,
-            }
-
-            setFormData(mockPost)
-            setWordCount(mockPost.content.length)
-         }, 1000)
+      if (isEditMode && postId) {
+         // 게시글 데이터 가져오기
+         dispatch(getBoardByIdThunk(postId))
       }
-   }, [isEditMode])
+   }, [isEditMode, postId, dispatch])
+
+   // 게시글 데이터가 로드되면 폼 데이터 설정
+   useEffect(() => {
+      if (isEditMode && board) {
+         setFormData({
+            title: board.title || '',
+            category: board.category || 'free',
+            content: board.content || '',
+         })
+         setWordCount((board.content || '').length)
+
+         // 기존 이미지가 있다면 미리보기 설정
+         if (board.board_img) {
+            setImgUrl(`${import.meta.env.VITE_API_URI}/uploads/${board.board_img}`)
+         }
+      }
+   }, [isEditMode, board])
 
    // 폼 데이터 변경 핸들러
    const handleChange = (e) => {
@@ -89,10 +77,9 @@ const PostEditor = ({ onSuccess }) => {
 
    // 이미지 파일 업로드 핸들러
    const handleImageChange = (e) => {
-      const file = e.target.files[0] // 단일 파일만 선택
+      const file = e.target.files[0]
 
       if (!file) {
-         // 파일이 선택되지 않은 경우 초기화
          setImgFile(null)
          setImgUrl(null)
          return
@@ -100,11 +87,13 @@ const PostEditor = ({ onSuccess }) => {
 
       // 파일 크기 체크 (5MB 제한)
       if (file.size > 5 * 1024 * 1024) {
+         alert('파일 크기는 5MB 이하여야 합니다.')
          return
       }
 
       // 파일 타입 체크
       if (!file.type.startsWith('image/')) {
+         alert('이미지 파일만 업로드 가능합니다.')
          return
       }
 
@@ -123,10 +112,12 @@ const PostEditor = ({ onSuccess }) => {
       e.preventDefault()
 
       if (!formData.title.trim()) {
+         alert('제목을 입력해주세요.')
          return
       }
 
       if (!formData.content.trim()) {
+         alert('내용을 입력해주세요.')
          return
       }
 
@@ -135,27 +126,48 @@ const PostEditor = ({ onSuccess }) => {
          data.append('title', formData.title)
          data.append('category', formData.category)
          data.append('content', formData.content)
+
          // 이미지 파일이 있을 경우 추가
          if (imgFile) {
             data.append('file', imgFile)
          }
-         await dispatch(writeBoardThunk(data)).unwrap()
-         alert('게시글 등록 완료!')
+
+         if (isEditMode) {
+            // 수정 모드
+            await dispatch(updateBoardThunk({ id: postId, data })).unwrap()
+            alert('게시글 수정 완료!')
+         } else {
+            // 새 글 작성 모드
+            await dispatch(writeBoardThunk(data)).unwrap()
+            alert('게시글 등록 완료!')
+         }
+
          if (onSuccess) {
             onSuccess()
          }
-         navigate('/board')
+
+         if (!editPostId) {
+            navigate('/board')
+         }
       } catch (error) {
-         console.error('게시글 등록 오류:', error)
+         console.error('게시글 처리 오류:', error)
+         alert(`게시글 ${isEditMode ? '수정' : '등록'} 중 오류가 발생했습니다.`)
       }
    }
 
    if (loading) {
-      return null
+      return (
+         <div className="text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+               <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3">{isEditMode ? '게시글 정보를 불러오는 중...' : '처리 중...'}</p>
+         </div>
+      )
    }
 
    if (error) {
-      return error
+      return <Alert variant="danger">{error}</Alert>
    }
 
    return (
@@ -249,16 +261,33 @@ const PostEditor = ({ onSuccess }) => {
                            {/* 버튼 영역 */}
                            <div className={styles.buttonArea}>
                               <div className={styles.rightButtons}>
-                                 <Button variant="secondary" onClick={() => navigate('/board')} className="me-2">
+                                 <Button
+                                    variant="secondary"
+                                    onClick={() => {
+                                       if (editPostId && onSuccess) {
+                                          onSuccess()
+                                       } else {
+                                          navigate('/board')
+                                       }
+                                    }}
+                                    className="me-2"
+                                 >
                                     취소
                                  </Button>
-                                 <Button variant="primary" type="submit">
-                                    {
+                                 <Button variant="primary" type="submit" disabled={loading}>
+                                    {loading ? (
+                                       <>
+                                          <div className="spinner-border spinner-border-sm me-2" role="status">
+                                             <span className="visually-hidden">Loading...</span>
+                                          </div>
+                                          처리 중...
+                                       </>
+                                    ) : (
                                        <>
                                           <i className={`fas fa-${isEditMode ? 'check' : 'paper-plane'} me-2`}></i>
                                           {isEditMode ? '수정완료' : '게시하기'}
                                        </>
-                                    }
+                                    )}
                                  </Button>
                               </div>
                            </div>

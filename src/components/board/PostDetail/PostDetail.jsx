@@ -7,7 +7,7 @@ import styles from '../../../styles/pages/Board_fixed.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteBoardThunk, getBoardByIdThunk } from '../../../features/boardSlice'
 
-const PostDetail = ({ boardId, onBackToList }) => {
+const PostDetail = ({ boardId, onBackToList, onEdit }) => {
    const navigate = useNavigate()
 
    const dispatch = useDispatch()
@@ -21,7 +21,7 @@ const PostDetail = ({ boardId, onBackToList }) => {
    }, [dispatch, boardId])
 
    const handleEdit = () => {
-      navigate(`/board/${boardId}/edit`)
+      onEdit(boardId)
    }
 
    const handleDelete = () => {
@@ -185,7 +185,7 @@ const PostDetail = ({ boardId, onBackToList }) => {
                         {board.board_img && (
                            <div className={styles.postImage}>
                               <img
-                                 src={`/uploads/${board.board_img}`}
+                                 src={`${import.meta.env.VITE_API_URI}/uploads/${board.board_img}`}
                                  alt="게시글 이미지"
                                  className="img-fluid mb-3"
                                  onError={(e) => {
