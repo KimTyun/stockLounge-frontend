@@ -6,7 +6,7 @@ import { getBoardsAsync, getUsersAsync } from '../../../features/adminSlice'
 
 const Dashboard = () => {
    const dispatch = useDispatch()
-   const { users, boards, loading, error } = useSelector((state) => state.admin)
+   const { users = [], boards = [], loading, error } = useSelector((state) => state.admin)
 
    useEffect(() => {
       dispatch(getUsersAsync())
@@ -90,15 +90,21 @@ const Dashboard = () => {
 
    return (
       <div>
-         {/* 통계 */}
          <Row>
-            {/* 총 회원수 - users 배열 길이 사용 */}
             {renderStatCard('총 회원수', users.length, 'fas fa-users', 'iconPrimary')}
-            {/* 총 게시글 - boards 배열 길이 사용 */}
-            {renderStatCard('총 게시판', boards.length, 'fas fa-file-alt', 'iconSuccess')}
+            {renderStatCard('총 게시글', boards.length, 'fas fa-file-alt', 'iconSuccess')}
          </Row>
+         <div>
+            {/* 통계 */}
+            <Row>
+               {/* users 배열이 존재하면 users.length를, 그렇지 않으면 undefined를 전달 */}
+               {renderStatCard('총 회원수', users?.length, 'fas fa-users', 'iconPrimary')}
+               {/* boards 배열이 존재하면 boards.length를, 그렇지 않으면 undefined를 전달 */}
+               {renderStatCard('총 게시글', boards?.length, 'fas fa-file-alt', 'iconSuccess')}
+            </Row>
+            {/* ... */}
+         </div>
 
-         {/* 최근 활동 */}
          <Row>
             <Col lg={12} className="mb-4">
                <Card className={styles.contentCard}>
@@ -119,14 +125,21 @@ const Dashboard = () => {
                               </tr>
                            </thead>
                            <tbody>
-                              {/* Redux에서 가져온 users 배열 사용 */}
-                              {users.slice(0, 10).map((user) => (
-                                 <tr key={user.id}>
-                                    <td>{user.id}</td>
-                                    <td>{user.nickname}</td>
-                                    <td>{getStatusBadge(user.status)}</td>
+                              {users && users.length > 0 ? (
+                                 users.slice(0, 10).map((user) => (
+                                    <tr key={user.id}>
+                                       <td>{user.id}</td>
+                                       <td>{user.nickname}</td>
+                                       <td>{getStatusBadge(user.status)}</td>
+                                    </tr>
+                                 ))
+                              ) : (
+                                 <tr>
+                                    <td colSpan="3" className="text-center text-muted py-3">
+                                       최근 가입한 회원이 없습니다.
+                                    </td>
                                  </tr>
-                              ))}
+                              )}
                            </tbody>
                         </Table>
                      </div>
@@ -138,7 +151,7 @@ const Dashboard = () => {
                   <div className={styles.cardHeader}>
                      <h4 className={styles.cardTitle}>
                         <i className="fas fa-file-alt me-2"></i>
-                        최근 게시판
+                        최근 게시글
                      </h4>
                   </div>
                   <Card.Body className="p-0">
@@ -146,20 +159,27 @@ const Dashboard = () => {
                         <Table responsive className={styles.adminTable}>
                            <thead>
                               <tr>
-                                 <th>게시판명</th>
+                                 <th>게시글 제목</th>
                                  <th>작성자</th>
                                  <th>생성일</th>
                               </tr>
                            </thead>
                            <tbody>
-                              {/* Redux에서 가져온 boards 배열 사용 */}
-                              {boards.slice(0, 10).map((board) => (
-                                 <tr key={board.id}>
-                                    <td>{board.name}</td>
-                                    <td>{board.author}</td>
-                                    <td>{board.createdAt}</td>
+                              {boards && boards.length > 0 ? (
+                                 boards.slice(0, 10).map((board) => (
+                                    <tr key={board.id}>
+                                       <td>{board.title}</td>
+                                       <td>{board.author}</td>
+                                       <td>{board.created}</td>
+                                    </tr>
+                                 ))
+                              ) : (
+                                 <tr>
+                                    <td colSpan="3" className="text-center text-muted py-3">
+                                       최근 게시글이 없습니다.
+                                    </td>
                                  </tr>
-                              ))}
+                              )}
                            </tbody>
                         </Table>
                      </div>

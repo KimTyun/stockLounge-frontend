@@ -7,7 +7,27 @@ export const getUsersAsync = createAsyncThunk('admin/getUsers', async (_, { reje
       const response = await adminApi.getUsers()
       return response.users
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
+   }
+})
+
+// 사용자 제재 갱신
+export const updateUserStatusAsync = createAsyncThunk('admin/updateUserBanStatus', async ({ userId, isBanned }, { rejectWithValue }) => {
+   try {
+      await adminApi.updateUserBanStatus(userId, isBanned)
+      return { userId, isBanned }
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
+// 사용자 삭제
+export const deleteUserAsync = createAsyncThunk('admin/deleteUser', async (userId, { rejectWithValue }) => {
+   try {
+      await adminApi.deleteUser(userId)
+      return userId
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -17,7 +37,7 @@ export const getBoardsAsync = createAsyncThunk('admin/getBoards', async (_, { re
       const response = await adminApi.getBoards()
       return response.boards
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -27,7 +47,7 @@ export const deleteBoardAsync = createAsyncThunk('admin/deleteBoard', async (boa
       await adminApi.deleteBoard(boardId)
       return boardId
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -37,7 +57,7 @@ export const getSiteSettingsAsync = createAsyncThunk('admin/getSiteSettings', as
       const response = await adminApi.getSiteSettings()
       return response.settings
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -47,7 +67,7 @@ export const updateSiteSettingsAsync = createAsyncThunk('admin/updateSiteSetting
       const response = await adminApi.updateSiteSettings(settings)
       return response.settings
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -57,7 +77,7 @@ export const getBanWordsAsync = createAsyncThunk('admin/getBanWords', async (_, 
       const response = await adminApi.getBanWords()
       return response.banWords
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -67,7 +87,7 @@ export const addBanWordAsync = createAsyncThunk('admin/addBanWord', async (word,
       const response = await adminApi.addBanWord(word)
       return response.banWord
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -77,17 +97,7 @@ export const deleteBanWordAsync = createAsyncThunk('admin/deleteBanWord', async 
       await adminApi.deleteBanWord(wordId)
       return wordId
    } catch (error) {
-      return rejectWithValue(error.message)
-   }
-})
-
-// 사용자 제재 갱신
-export const updateUserBanStatusAsync = createAsyncThunk('admin/updateUserBanStatus', async ({ userId, isBanned }, { rejectWithValue }) => {
-   try {
-      await adminApi.updateUserBanStatus(userId, isBanned)
-      return { userId, isBanned }
-   } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -97,7 +107,7 @@ export const getRewardsAsync = createAsyncThunk('admin/getRewards', async (_, { 
       const response = await adminApi.getRewards()
       return response.rewards
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -107,7 +117,7 @@ export const addRewardAsync = createAsyncThunk('admin/addReward', async (rewardD
       const response = await adminApi.addReward(rewardData)
       return response.reward
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -117,7 +127,7 @@ export const updateRewardAsync = createAsyncThunk('admin/updateReward', async ({
       const response = await adminApi.updateReward(rewardId, rewardData)
       return response.reward
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -127,7 +137,7 @@ export const deleteRewardAsync = createAsyncThunk('admin/deleteReward', async (r
       await adminApi.deleteReward(rewardId)
       return rewardId
    } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -149,34 +159,18 @@ const adminSlice = createSlice({
    },
    extraReducers: (builder) => {
       builder
-         //.pending 공통 로직
-         .addMatcher(
-            (action) => action.type.endsWith('/pending'),
-            (state) => {
-               state.loading = true
-               state.error = null
-            }
-         )
-         //.rejected 공통 로직
-         .addMatcher(
-            (action) => action.type.endsWith('/rejected'),
-            (state, action) => {
-               state.loading = false
-               state.error = action.payload || '알 수 없는 에러가 발생했습니다.'
-            }
-         )
          // 사용자
          .addCase(getUsersAsync.fulfilled, (state, action) => {
             state.loading = false
             state.users = action.payload
          })
          //사용자 제재
-         .addCase(updateUserBanStatusAsync.fulfilled, (state, action) => {
+         .addCase(updateUserStatusAsync.fulfilled, (state, action) => {
             state.loading = false
             const { userId, isBanned } = action.payload
             const userIndex = state.users.findIndex((user) => user.id === userId)
             if (userIndex !== -1) {
-               state.users[userIndex].isban = isBanned
+               state.users[userIndex].is_ban = isBanned
             }
          })
          // 게시판 조회
@@ -242,6 +236,22 @@ const adminSlice = createSlice({
             // 배열에서 교환품 삭제
             state.rewards = state.rewards.filter((reward) => reward.id !== action.payload)
          })
+         //.pending 공통 로직
+         .addMatcher(
+            (action) => action.type.endsWith('/pending'),
+            (state) => {
+               state.loading = true
+               state.error = null
+            }
+         )
+         //.rejected 공통 로직
+         .addMatcher(
+            (action) => action.type.endsWith('/rejected'),
+            (state, action) => {
+               state.loading = false
+               state.error = action.payload || '알 수 없는 에러가 발생했습니다.'
+            }
+         )
    },
 })
 
