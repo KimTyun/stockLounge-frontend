@@ -134,7 +134,6 @@ const PostEditor = ({ onSuccess, editPostId }) => {
 
          if (isEditMode) {
             // 수정 모드
-            data.append('id', postId)
             await dispatch(updateBoardThunk({ id: postId, data })).unwrap()
             alert('게시글 수정 완료!')
          } else {

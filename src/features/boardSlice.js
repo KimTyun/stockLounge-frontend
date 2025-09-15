@@ -58,7 +58,6 @@ export const updateBoardThunk = createAsyncThunk('board/updateBoard', async (dat
    try {
       const { id, data: boardData } = data
       await updateBoard(id, boardData)
-      return id
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
