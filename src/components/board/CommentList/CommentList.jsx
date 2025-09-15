@@ -216,7 +216,7 @@ const CommentList = ({ postId }) => {
                   alt={comment.author.nickname}
                   className={styles.authorImage}
                   onError={(e) => {
-                     e.target.src = 'https://via.placeholder.com/40x40/5E94CA/ffffff?text=U'
+                     e.target.src = '/vite.svg'
                   }}
                />
                <div className={styles.authorDetails}>

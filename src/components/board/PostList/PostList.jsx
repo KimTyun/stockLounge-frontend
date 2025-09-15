@@ -3,99 +3,30 @@ import { Card, Badge, Button, Pagination, Collapse } from 'react-bootstrap'
 import styles from '../../../styles/components/board/PostList.module.css'
 import PostEditor from '../PostEditor/PostEditor'
 import PostDetail from '../PostDetail/PostDetail'
+import { useDispatch, useSelector } from 'react-redux'
+import { getBoardThunk } from '../../../features/boardSlice'
 
-const PostList = ({ category = 'all' }) => {
-   const [posts, setPosts] = useState([])
-   const [loading, setLoading] = useState(true)
+const PostList = ({ category = 'free' }) => {
    const [currentPage, setCurrentPage] = useState(1)
    const [totalPages, setTotalPages] = useState(1)
-   const postsPerPage = 10
    const [write, setWrite] = useState(false)
 
    const [selectedPostId, setSelectedPostId] = useState(null)
 
+   const dispatch = useDispatch()
+   const { boards, error, loading } = useSelector((state) => state.board)
+
    useEffect(() => {
-      setSelectedPostId(null)
-      loadPosts()
-   }, [category, currentPage])
+      dispatch(getBoardThunk())
+   }, [dispatch])
 
-   const loadPosts = async () => {
-      setLoading(true)
-      try {
-         await new Promise((resolve) => setTimeout(resolve, 800))
-         const mockPosts = [
-            {
-               id: 1,
-               title: '비트코인 50,000달러 돌파 가능성 분석 - 기관 투자 증가와 규제 개선 신호',
-               author: { nickname: '크립토분석가', level: 'Gold', profileImage: '/assets/images/profile1.png' },
-               category: '분석',
-               createdAt: '2025-09-04 15:30',
-               views: 1243,
-               likes: 89,
-               comments: 23,
-               isPinned: true,
-               content: '최근 비트코인이 강세를 보이고 있는 가운데, 여러 기관투자자들의 진입과 규제 환경 개선으로 50,000달러 돌파 가능성이 높아지고 있습니다.',
-            },
-            {
-               id: 2,
-               title: '이더리움 2.0 업그레이드 완료 후 가격 전망',
-               author: { nickname: 'ETH마니아', level: 'Platinum', profileImage: '/assets/images/profile2.png' },
-               category: '분석',
-               createdAt: '2025-09-04 14:15',
-               views: 987,
-               likes: 67,
-               comments: 18,
-               content: '이더리움 2.0 업그레이드가 성공적으로 완료되면서 스테이킹 수익률과 네트워크 효율성이 크게 개선될 것으로 예상됩니다.',
-            },
-            {
-               id: 3,
-               title: '알트코인 시즌 시작? 주목해야 할 코인 5선',
-               author: { nickname: '알트코인헌터', level: 'Silver', profileImage: '/assets/images/profile3.png' },
-               category: '추천',
-               createdAt: '2025-09-04 13:45',
-               views: 756,
-               likes: 45,
-               comments: 12,
-               content: '비트코인 도미넌스가 하락하면서 알트코인 시즌이 시작될 조짐을 보이고 있습니다. 특히 주목해야 할 5개 코인을 분석해보겠습니다.',
-            },
-            {
-               id: 4,
-               title: 'DeFi 프로토콜 수익률 비교 및 리스크 분석',
-               author: { nickname: 'DeFi전문가', level: 'Gold', profileImage: '/assets/images/profile4.png' },
-               category: 'DeFi',
-               createdAt: '2025-09-04 12:20',
-               views: 612,
-               likes: 38,
-               comments: 9,
-               content: '주요 DeFi 프로토콜들의 수익률을 비교분석하고, 각각의 리스크 요소들을 체크해보겠습니다.',
-            },
-            {
-               id: 5,
-               title: 'NFT 시장 현황과 향후 전망 - 게임 NFT가 답일까?',
-               author: { nickname: 'NFT콜렉터', level: 'Bronze', profileImage: '/assets/images/profile5.png' },
-               category: 'NFT',
-               createdAt: '2025-09-04 11:30',
-               views: 445,
-               likes: 28,
-               comments: 7,
-               content: 'NFT 시장이 침체기를 겪고 있는 가운데, 게임 NFT가 새로운 돌파구가 될 수 있을지 분석해보겠습니다.',
-            },
-         ]
-         setPosts(mockPosts)
-         setTotalPages(Math.ceil(mockPosts.length / postsPerPage))
-      } catch (error) {
-         console.error('게시글 로드 실패:', error)
-      } finally {
-         setLoading(false)
-      }
-   }
-
-   const handlePostClick = (postId) => {
-      setSelectedPostId(postId)
+   const handlePostClick = (id) => {
+      setSelectedPostId(id)
    }
 
    const handleBackToList = () => {
       setSelectedPostId(null)
+      dispatch(getBoardThunk())
    }
 
    const handleWritePost = () => {
@@ -125,22 +56,16 @@ const PostList = ({ category = 'all' }) => {
    }
 
    if (loading) {
-      return (
-         <div className={styles.loading}>
-            <div className="text-center py-5">
-               <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
-               </div>
-               <p className="mt-3">게시글을 불러오는 중...</p>
-            </div>
-         </div>
-      )
+      return <div>로딩 중...</div>
+   }
+   if (error) {
+      return <div>{error}</div>
    }
 
    return (
       <div className={styles.postList}>
          {selectedPostId ? (
-            <PostDetail postId={selectedPostId} onBackToList={handleBackToList} />
+            <PostDetail boardId={selectedPostId} onBackToList={handleBackToList} />
          ) : (
             <>
                <div className={styles.header}>
@@ -166,7 +91,12 @@ const PostList = ({ category = 'all' }) => {
                            </Button>
                         </Card.Header>
                         <Card.Body>
-                           <PostEditor />
+                           <PostEditor
+                              onSuccess={() => {
+                                 setWrite(false)
+                                 dispatch(getBoardThunk())
+                              }}
+                           />
                         </Card.Body>
                      </Card>
                   </div>
@@ -182,83 +112,88 @@ const PostList = ({ category = 'all' }) => {
                         <div className={styles.likesColumn}>추천수</div>
                         <div className={styles.dateColumn}>등록일</div>
                      </li>
-                     {posts.map((post) => (
-                        <li key={post.id} className={`${styles.postRow} ${post.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(post.id)}>
-                           <div className={styles.titleColumn}>
-                              {post.isPinned && (
-                                 <Badge bg="danger" className="me-2">
-                                    <i className="fas fa-thumbtack me-1"></i>공지
-                                 </Badge>
-                              )}
-                              <span className={styles.postTitle}>{post.title}</span>
-                              {post.comments > 0 && <span className={styles.commentCount}>[{post.comments}]</span>}
-                           </div>
-                           <div className={styles.authorColumn}>
-                              <span className={styles.authorName}>{post.author.nickname}</span>
-                              {getLevelBadge(post.author.level)}
-                           </div>
-                           <div className={styles.viewsColumn}>
-                              <i className="fas fa-eye me-1"></i>
-                              {post.views.toLocaleString()}
-                           </div>
-                           <div className={styles.likesColumn}>
-                              <i className="fas fa-heart me-1"></i>
-                              {post.likes}
-                           </div>
-                           <div className={styles.dateColumn}>{formatTimeAgo(post.createdAt)}</div>
-                        </li>
-                     ))}
+                     {boards && boards.length > 0 ? (
+                        boards.map((board) => (
+                           <li key={board.id} className={`${styles.postRow} ${board.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(board.id)}>
+                              <div className={styles.titleColumn}>
+                                 {board.isPinned && (
+                                    <Badge bg="danger" className="me-2">
+                                       <i className="fas fa-thumbtack me-1"></i>공지
+                                    </Badge>
+                                 )}
+                                 <span className={styles.postTitle}>{board.title}</span>
+                                 {(board.comment_count || 0) > 0 && <span className={styles.commentCount}>[{board.comment_count}]</span>}
+                              </div>
+                              <div className={styles.authorColumn}>
+                                 <span className={styles.authorName}>{board.user_id ? `사용자${board.user_id}` : '익명'}</span>
+                                 {/* author 정보가 없으므로 기본 레벨 표시 */}
+                                 {getLevelBadge('Bronze')}
+                              </div>
+                              <div className={styles.viewsColumn}>
+                                 <i className="fas fa-eye me-1"></i>
+                                 {(board.view_count || 0).toLocaleString()}
+                              </div>
+                              <div className={styles.likesColumn}>
+                                 <i className="fas fa-heart me-1"></i>
+                                 {board.like_count || 0}
+                              </div>
+                              <div className={styles.dateColumn}>{formatTimeAgo(board.createdAt)}</div>
+                           </li>
+                        ))
+                     ) : (
+                        <div>게시글이 없습니다.</div>
+                     )}
                   </ul>
                </div>
 
                {/* 1000px 이하일때 */}
                <div className={`${styles.posts} ${styles.cardView}`}>
-                  {posts.map((post) => (
-                     <Card key={post.id} className={`${styles.postCard} ${post.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(post.id)}>
+                  {boards.map((board) => (
+                     <Card key={board.id} className={`${styles.postCard} ${board.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(board.id)}>
                         <Card.Body>
                            <div className={styles.postHeader}>
-                              {post.isPinned && (
+                              {board.isPinned && (
                                  <Badge bg="danger">
                                     <i className="fas fa-thumbtack me-1"></i>공지
                                  </Badge>
                               )}
                               <div className="postMeta ms-auto">
-                                 <div className={styles.postTime}>{formatTimeAgo(post.createdAt)}</div>
+                                 <div className={styles.postTime}>{formatTimeAgo(board.createdAt)}</div>
                               </div>
                            </div>
 
-                           <h5 className={styles.postTitle}>{post.title}</h5>
+                           <h5 className={styles.postTitle}>{board.title}</h5>
 
-                           {post.content && <p className={styles.postContent}>{post.content}</p>}
+                           {board.content && <p className={styles.postContent}>{board.content}</p>}
 
                            <div className={styles.postFooter}>
                               <div className={styles.authorInfo}>
                                  <img
-                                    src={post.author.profileImage}
-                                    alt={post.author.nickname}
+                                    src="./vite.svg"
+                                    alt={board.user_id ? `사용자${board.user_id}` : '익명'}
                                     className={styles.authorImage}
                                     onError={(e) => {
                                        e.target.src = './vite.svg'
                                     }}
                                  />
                                  <div className={styles.authorName}>
-                                    {post.author.nickname}
-                                    {getLevelBadge(post.author.level)}
+                                    {board.user_id ? `사용자${board.user_id}` : '익명'}
+                                    {getLevelBadge('Bronze')}
                                  </div>
                               </div>
 
                               <div className={styles.postStats}>
                                  <span className={styles.stat}>
                                     <i className="fas fa-eye me-1"></i>
-                                    {post.views.toLocaleString()}
+                                    {(board.view_count || 0).toLocaleString()}
                                  </span>
                                  <span className={styles.stat}>
                                     <i className="fas fa-heart me-1"></i>
-                                    {post.likes}
+                                    {board.like_count || 0}
                                  </span>
                                  <span className={styles.stat}>
                                     <i className="fas fa-comment me-1"></i>
-                                    {post.comments}
+                                    {board.comment_count || 0}
                                  </span>
                               </div>
                            </div>
