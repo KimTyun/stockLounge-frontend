@@ -79,7 +79,7 @@ const LandingPage = () => {
                <div className="hero-content">
                   <div className="hero-text">
                      <h1 className="hero-title fade-in">의견을 공유하여 당신의 투자력을 높이세요</h1>
-                     <p className="hero-description slide-up">KOJARAL은 실시간 암호화폐 차트와 최신 투자 뉴스, 그리고 투자자들의 소통 공간을 제공하는 종합 투자 플랫폼입니다.</p>
+                     <p className="hero-description slide-up">STOCKLOUNGE는 실시간 암호화폐 차트와 최신 투자 뉴스, 그리고 투자자들의 소통 공간을 제공하는 종합 투자 플랫폼입니다.</p>
                      <div className="hero-buttons slide-up">
                         <Link to="/markets" className="btn btn-primary">
                            차트 보기
