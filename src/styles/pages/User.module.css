@@ -130,6 +130,19 @@
    margin: 0;
 }
 
+.pointHistory.historyTable col:nth-of-type(1) {
+   width: 15%;
+}
+.pointHistory.historyTable col:nth-of-type(2) {
+   width: 40%;
+}
+.pointHistory.historyTable col:nth-of-type(3) {
+   width: 20%;
+}
+.pointHistory.historyTable col:nth-of-type(4) {
+   width: 20%;
+}
+
 /* 수정 탭 */
 .editNote {
    color: #666;
@@ -271,6 +284,7 @@
 
 .historyTable {
    margin: 0;
+   table-layout: fixed;
 }
 
 .historyTable thead th {
@@ -279,6 +293,7 @@
    border-bottom: 2px solid #dee2e6;
    font-weight: 600;
    color: #495057;
+   font-size: 1rem;
    padding: 1rem;
 }
 
@@ -315,6 +330,16 @@ td.tdwrap {
    max-width: 300px;
 }
 
+.historyTable col:nth-of-type(1) {
+   width: 20%;
+}
+.historyTable col:nth-of-type(2) {
+   width: 60%;
+}
+.historyTable col:nth-of-type(3) {
+   width: 20%;
+}
+
 /* 반응형 */
 @media (max-width: 991.98px) {
    .profileInfo {
@@ -330,6 +355,15 @@ td.tdwrap {
 }
 
 @media (max-width: 767.98px) {
+   .pointHistory.historyTable col:nth-of-type(1) {
+      width: 0;
+      display: none;
+   }
+   .pointHistory.historyTable tr > th:nth-of-type(1),
+   .pointHistory.historyTable tr > td:nth-of-type(1) {
+      display: none;
+   }
+
    .user {
       padding: 1rem 0;
    }
@@ -386,6 +420,13 @@ td.tdwrap {
    .historyTable thead th,
    .historyTable tbody td {
       padding: 0.75rem 0.5rem;
+   }
+
+   .historyTable thead th {
+      font-size: 0.8rem;
+   }
+   .historyTable col:nth-of-type(3) {
+      width: 0;
    }
 }
 

@@ -117,7 +117,13 @@ const InfoTab = ({ userData, pointHistory, totalpage }) => {
                      <h4>포인트 내역</h4>
                   </Card.Header>
                   <Card.Body className={styles.historyBody}>
-                     <Table responsive className={styles.historyTable}>
+                     <Table responsive className={`${styles.historyTable} ${styles.pointHistory}`}>
+                        <colgroup>
+                           <col />
+                           <col />
+                           <col />
+                           <col />
+                        </colgroup>
                         <thead>
                            <tr>
                               <th>구분</th>
@@ -145,9 +151,9 @@ const InfoTab = ({ userData, pointHistory, totalpage }) => {
 
                   <Pagination className="pagination-sm justify-content-center">
                      <Pagination.First onClick={handlePage(1)} />
-                     <Pagination.Prev onClick={handlePage(activePage - 1)} />
+                     {window.innerWidth > 767 && <Pagination.Prev onClick={handlePage(activePage - 1)} />}
                      {pageItems}
-                     <Pagination.Next onClick={handlePage(activePage + 1)} />
+                     {window.innerWidth > 767 && <Pagination.Next onClick={handlePage(activePage + 1)} />}
                      <Pagination.Last onClick={handlePage(totalpage)} />
                   </Pagination>
                </Card>
