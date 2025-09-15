@@ -1,366 +1,305 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Form,
-  Button,
-  Alert,
-  Badge,
-} from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
-import styles from "../../../styles/pages/Board_fixed.module.css";
-import {
-  getBoardThunk,
-  writeBoardThunk,
-  updateBoardThunk,
-  getBoardByIdThunk,
-} from "../../../features/boardSlice";
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Container, Row, Col, Card, Form, Button, Alert, Badge } from 'react-bootstrap'
+import { useNavigate, useParams } from 'react-router-dom'
+import styles from '../../../styles/pages/Board_fixed.module.css'
+import { getBoardThunk, writeBoardThunk, updateBoardThunk, getBoardByIdThunk } from '../../../features/boardSlice'
 
 const PostEditor = ({ onSuccess, editPostId }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { loading, error, board } = useSelector((state) => state.board);
-  const { id } = useParams();
+   const dispatch = useDispatch()
+   const navigate = useNavigate()
+   const { loading, error, board } = useSelector((state) => state.board)
+   const { id } = useParams()
 
-  const postId = editPostId || id;
-  const isEditMode = Boolean(postId);
+   const postId = editPostId || id
+   const isEditMode = Boolean(postId)
 
-  const [formData, setFormData] = useState({
-    title: "",
-    category: "free",
-    content: "",
-  });
+   const [formData, setFormData] = useState({
+      title: '',
+      category: 'free',
+      content: '',
+   })
 
-  const [imgUrl, setImgUrl] = useState(null); // 이미지 미리보기 URL
-  const [imgFile, setImgFile] = useState(null); // 이미지 파일
-  const [success, setSuccess] = useState("");
-  const [wordCount, setWordCount] = useState(0);
+   const [imgUrl, setImgUrl] = useState(null) // 이미지 미리보기 URL
+   const [imgFile, setImgFile] = useState(null) // 이미지 파일
+   const [success, setSuccess] = useState('')
+   const [wordCount, setWordCount] = useState(0)
 
-  // 카테고리 옵션
-  const categories = [
-    { value: "free", label: "자유토론" },
-    { value: "bitcoin", label: "비트코인" },
-    { value: "ethereum", label: "이더리움" },
-    { value: "ripple", label: "리플" },
-    { value: "nft", label: "NFT" },
-    { value: "defi", label: "DeFi" },
-    { value: "news", label: "뉴스" },
-    { value: "analysis", label: "분석" },
-  ];
+   // 카테고리 옵션
+   const categories = [
+      { value: 'free', label: '자유토론' },
+      { value: 'bitcoin', label: '비트코인' },
+      { value: 'ethereum', label: '이더리움' },
+      { value: 'ripple', label: '리플' },
+      { value: 'nft', label: 'NFT' },
+      { value: 'defi', label: 'DeFi' },
+      { value: 'news', label: '뉴스' },
+      { value: 'analysis', label: '분석' },
+   ]
 
-  // 수정 모드일 때 기존 데이터 로드
-  useEffect(() => {
-    if (isEditMode && postId) {
-      // 게시글 데이터 가져오기
-      dispatch(getBoardByIdThunk(postId));
-    }
-  }, [isEditMode, postId, dispatch]);
-
-  // 게시글 데이터가 로드되면 폼 데이터 설정
-  useEffect(() => {
-    if (isEditMode && board) {
-      setFormData({
-        title: board.title || "",
-        category: board.category || "free",
-        content: board.content || "",
-      });
-      setWordCount((board.content || "").length);
-
-      // 기존 이미지가 있다면 미리보기 설정
-      if (board.board_img) {
-        setImgUrl(`/uploads/${board.board_img}`);
+   // 수정 모드일 때 기존 데이터 로드
+   useEffect(() => {
+      if (isEditMode && postId) {
+         // 게시글 데이터 가져오기
+         dispatch(getBoardByIdThunk(postId))
       }
-    }
-  }, [isEditMode, board]);
+   }, [isEditMode, postId, dispatch])
 
-  // 폼 데이터 변경 핸들러
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+   // 게시글 데이터가 로드되면 폼 데이터 설정
+   useEffect(() => {
+      if (isEditMode && board) {
+         setFormData({
+            title: board.title || '',
+            category: board.category || 'free',
+            content: board.content || '',
+         })
+         setWordCount((board.content || '').length)
 
-    if (name === "content") {
-      setWordCount(value.length);
-    }
-  };
+         // 기존 이미지가 있다면 미리보기 설정
+         if (board.board_img) {
+            setImgUrl(`${import.meta.env.VITE_API_URI}/uploads/${board.board_img}`)
+         }
+      }
+   }, [isEditMode, board])
 
-  // 이미지 파일 업로드 핸들러
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
+   // 폼 데이터 변경 핸들러
+   const handleChange = (e) => {
+      const { name, value, type, checked } = e.target
+      setFormData((prev) => ({
+         ...prev,
+         [name]: type === 'checkbox' ? checked : value,
+      }))
 
-    if (!file) {
-      setImgFile(null);
-      setImgUrl(null);
-      return;
-    }
+      if (name === 'content') {
+         setWordCount(value.length)
+      }
+   }
 
-    // 파일 크기 체크 (5MB 제한)
-    if (file.size > 5 * 1024 * 1024) {
-      alert("파일 크기는 5MB 이하여야 합니다.");
-      return;
-    }
+   // 이미지 파일 업로드 핸들러
+   const handleImageChange = (e) => {
+      const file = e.target.files[0]
 
-    // 파일 타입 체크
-    if (!file.type.startsWith("image/")) {
-      alert("이미지 파일만 업로드 가능합니다.");
-      return;
-    }
-
-    setImgFile(file);
-
-    // 미리보기 생성
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setImgUrl(event.target.result);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // 폼 제출 핸들러
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.title.trim()) {
-      alert("제목을 입력해주세요.");
-      return;
-    }
-
-    if (!formData.content.trim()) {
-      alert("내용을 입력해주세요.");
-      return;
-    }
-
-    try {
-      const data = new FormData();
-      data.append("title", formData.title);
-      data.append("category", formData.category);
-      data.append("content", formData.content);
-
-      // 이미지 파일이 있을 경우 추가
-      if (imgFile) {
-        data.append("file", imgFile);
+      if (!file) {
+         setImgFile(null)
+         setImgUrl(null)
+         return
       }
 
-      if (isEditMode) {
-        // 수정 모드
-        data.append("id", postId);
-        await dispatch(updateBoardThunk({ id: postId, data })).unwrap();
-        alert("게시글 수정 완료!");
-      } else {
-        // 새 글 작성 모드
-        await dispatch(writeBoardThunk(data)).unwrap();
-        alert("게시글 등록 완료!");
+      // 파일 크기 체크 (5MB 제한)
+      if (file.size > 5 * 1024 * 1024) {
+         alert('파일 크기는 5MB 이하여야 합니다.')
+         return
       }
 
-      if (onSuccess) {
-        onSuccess();
+      // 파일 타입 체크
+      if (!file.type.startsWith('image/')) {
+         alert('이미지 파일만 업로드 가능합니다.')
+         return
       }
 
-      if (!editPostId) {
-        navigate("/board");
-      }
-    } catch (error) {
-      console.error("게시글 처리 오류:", error);
-      alert(`게시글 ${isEditMode ? "수정" : "등록"} 중 오류가 발생했습니다.`);
-    }
-  };
+      setImgFile(file)
 
-  if (loading) {
-    return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-        <p className="mt-3">
-          {isEditMode ? "게시글 정보를 불러오는 중..." : "처리 중..."}
-        </p>
+      // 미리보기 생성
+      const reader = new FileReader()
+      reader.onload = (event) => {
+         setImgUrl(event.target.result)
+      }
+      reader.readAsDataURL(file)
+   }
+
+   // 폼 제출 핸들러
+   const handleSubmit = async (e) => {
+      e.preventDefault()
+
+      if (!formData.title.trim()) {
+         alert('제목을 입력해주세요.')
+         return
+      }
+
+      if (!formData.content.trim()) {
+         alert('내용을 입력해주세요.')
+         return
+      }
+
+      try {
+         const data = new FormData()
+         data.append('title', formData.title)
+         data.append('category', formData.category)
+         data.append('content', formData.content)
+
+         // 이미지 파일이 있을 경우 추가
+         if (imgFile) {
+            data.append('file', imgFile)
+         }
+
+         if (isEditMode) {
+            // 수정 모드
+            data.append('id', postId)
+            await dispatch(updateBoardThunk({ id: postId, data })).unwrap()
+            alert('게시글 수정 완료!')
+         } else {
+            // 새 글 작성 모드
+            await dispatch(writeBoardThunk(data)).unwrap()
+            alert('게시글 등록 완료!')
+         }
+
+         if (onSuccess) {
+            onSuccess()
+         }
+
+         if (!editPostId) {
+            navigate('/board')
+         }
+      } catch (error) {
+         console.error('게시글 처리 오류:', error)
+         alert(`게시글 ${isEditMode ? '수정' : '등록'} 중 오류가 발생했습니다.`)
+      }
+   }
+
+   if (loading) {
+      return (
+         <div className="text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+               <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3">{isEditMode ? '게시글 정보를 불러오는 중...' : '처리 중...'}</p>
+         </div>
+      )
+   }
+
+   if (error) {
+      return <Alert variant="danger">{error}</Alert>
+   }
+
+   return (
+      <div className={styles.postEditor}>
+         <Container>
+            <Row>
+               <Col lg={10} xl={8} className="mx-auto">
+                  <Card className={styles.editorCard}>
+                     <Card.Header className={styles.editorHeader}>
+                        <h3>
+                           <i className={`fas fa-${isEditMode ? 'edit' : 'pen'} me-2`}></i>
+                           {isEditMode ? '게시글 수정' : '새 게시글 작성'}
+                        </h3>
+                     </Card.Header>
+
+                     <Card.Body>
+                        {success && <Alert variant="success">{success}</Alert>}
+
+                        <Form onSubmit={handleSubmit}>
+                           {/* 제목 및 카테고리 */}
+                           <Row className="mb-3">
+                              <Col md={8}>
+                                 <Form.Group>
+                                    <Form.Label>제목 *</Form.Label>
+                                    <Form.Control type="text" name="title" value={formData.title} onChange={handleChange} placeholder="제목을 입력하세요" maxLength={100} />
+                                    <Form.Text className="text-muted">{formData.title.length}/100</Form.Text>
+                                 </Form.Group>
+                              </Col>
+                              <Col md={4}>
+                                 <Form.Group>
+                                    <Form.Label>카테고리</Form.Label>
+                                    <Form.Select name="category" value={formData.category} onChange={handleChange}>
+                                       {categories.map((cat) => (
+                                          <option key={cat.value} value={cat.value}>
+                                             {cat.label}
+                                          </option>
+                                       ))}
+                                    </Form.Select>
+                                 </Form.Group>
+                              </Col>
+                           </Row>
+
+                           {/* 이미지 업로드 */}
+                           <Form.Group className="mb-3">
+                              <Form.Label>이미지 첨부</Form.Label>
+                              <Form.Control type="file" accept="image/*" onChange={handleImageChange} />
+                              <Form.Text className="text-muted">이미지 파일만 업로드 가능합니다. (최대 5MB)</Form.Text>
+                           </Form.Group>
+
+                           {/* 이미지 미리보기 */}
+                           {imgUrl && (
+                              <div className="mb-3">
+                                 <h5>미리보기:</h5>
+                                 <div
+                                    style={{
+                                       width: '200px',
+                                       height: '200px',
+                                       border: '1px solid #ccc',
+                                       borderRadius: '8px',
+                                       overflow: 'hidden',
+                                       display: 'flex',
+                                       justifyContent: 'center',
+                                       alignItems: 'center',
+                                    }}
+                                 >
+                                    <img
+                                       src={imgUrl}
+                                       alt="미리보기"
+                                       style={{
+                                          width: '100%',
+                                          height: '100%',
+                                          objectFit: 'cover',
+                                       }}
+                                    />
+                                 </div>
+                              </div>
+                           )}
+
+                           {/* 내용 */}
+                           <Form.Group className="mb-3">
+                              <Form.Label>
+                                 내용 *
+                                 <Badge bg="secondary" className="ms-2">
+                                    {wordCount.toLocaleString()}자
+                                 </Badge>
+                              </Form.Label>
+                              <Form.Control as="textarea" rows={20} name="content" value={formData.content} onChange={handleChange} placeholder="내용을 입력하세요. 마크다운 문법을 지원합니다. 예시: ## 제목 ### 소제목 **굵은글씨** *기울임* - 목록 아이템" className={styles.contentTextarea} />
+                              <Form.Text className="text-muted">마크다운 문법을 지원합니다. (## 제목, **굵은글씨**, *기울임*, - 목록)</Form.Text>
+                           </Form.Group>
+
+                           {/* 버튼 영역 */}
+                           <div className={styles.buttonArea}>
+                              <div className={styles.rightButtons}>
+                                 <Button
+                                    variant="secondary"
+                                    onClick={() => {
+                                       if (editPostId && onSuccess) {
+                                          onSuccess()
+                                       } else {
+                                          navigate('/board')
+                                       }
+                                    }}
+                                    className="me-2"
+                                 >
+                                    취소
+                                 </Button>
+                                 <Button variant="primary" type="submit" disabled={loading}>
+                                    {loading ? (
+                                       <>
+                                          <div className="spinner-border spinner-border-sm me-2" role="status">
+                                             <span className="visually-hidden">Loading...</span>
+                                          </div>
+                                          처리 중...
+                                       </>
+                                    ) : (
+                                       <>
+                                          <i className={`fas fa-${isEditMode ? 'check' : 'paper-plane'} me-2`}></i>
+                                          {isEditMode ? '수정완료' : '게시하기'}
+                                       </>
+                                    )}
+                                 </Button>
+                              </div>
+                           </div>
+                        </Form>
+                     </Card.Body>
+                  </Card>
+               </Col>
+            </Row>
+         </Container>
       </div>
-    );
-  }
+   )
+}
 
-  if (error) {
-    return <Alert variant="danger">{error}</Alert>;
-  }
-
-  return (
-    <div className={styles.postEditor}>
-      <Container>
-        <Row>
-          <Col lg={10} xl={8} className="mx-auto">
-            <Card className={styles.editorCard}>
-              <Card.Header className={styles.editorHeader}>
-                <h3>
-                  <i
-                    className={`fas fa-${isEditMode ? "edit" : "pen"} me-2`}
-                  ></i>
-                  {isEditMode ? "게시글 수정" : "새 게시글 작성"}
-                </h3>
-              </Card.Header>
-
-              <Card.Body>
-                {success && <Alert variant="success">{success}</Alert>}
-
-                <Form onSubmit={handleSubmit}>
-                  {/* 제목 및 카테고리 */}
-                  <Row className="mb-3">
-                    <Col md={8}>
-                      <Form.Group>
-                        <Form.Label>제목 *</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="title"
-                          value={formData.title}
-                          onChange={handleChange}
-                          placeholder="제목을 입력하세요"
-                          maxLength={100}
-                        />
-                        <Form.Text className="text-muted">
-                          {formData.title.length}/100
-                        </Form.Text>
-                      </Form.Group>
-                    </Col>
-                    <Col md={4}>
-                      <Form.Group>
-                        <Form.Label>카테고리</Form.Label>
-                        <Form.Select
-                          name="category"
-                          value={formData.category}
-                          onChange={handleChange}
-                        >
-                          {categories.map((cat) => (
-                            <option key={cat.value} value={cat.value}>
-                              {cat.label}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-
-                  {/* 이미지 업로드 */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>이미지 첨부</Form.Label>
-                    <Form.Control
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                    <Form.Text className="text-muted">
-                      이미지 파일만 업로드 가능합니다. (최대 5MB)
-                    </Form.Text>
-                  </Form.Group>
-
-                  {/* 이미지 미리보기 */}
-                  {imgUrl && (
-                    <div className="mb-3">
-                      <h5>미리보기:</h5>
-                      <div
-                        style={{
-                          width: "200px",
-                          height: "200px",
-                          border: "1px solid #ccc",
-                          borderRadius: "8px",
-                          overflow: "hidden",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <img
-                          src={imgUrl}
-                          alt="미리보기"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 내용 */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
-                      내용 *
-                      <Badge bg="secondary" className="ms-2">
-                        {wordCount.toLocaleString()}자
-                      </Badge>
-                    </Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={20}
-                      name="content"
-                      value={formData.content}
-                      onChange={handleChange}
-                      placeholder="내용을 입력하세요. 마크다운 문법을 지원합니다. 예시: ## 제목 ### 소제목 **굵은글씨** *기울임* - 목록 아이템"
-                      className={styles.contentTextarea}
-                    />
-                    <Form.Text className="text-muted">
-                      마크다운 문법을 지원합니다. (## 제목, **굵은글씨**,
-                      *기울임*, - 목록)
-                    </Form.Text>
-                  </Form.Group>
-
-                  {/* 버튼 영역 */}
-                  <div className={styles.buttonArea}>
-                    <div className={styles.rightButtons}>
-                      <Button
-                        variant="secondary"
-                        onClick={() => {
-                          if (editPostId && onSuccess) {
-                            onSuccess();
-                          } else {
-                            navigate("/board");
-                          }
-                        }}
-                        className="me-2"
-                      >
-                        취소
-                      </Button>
-                      <Button
-                        variant="primary"
-                        type="submit"
-                        disabled={loading}
-                      >
-                        {loading ? (
-                          <>
-                            <div
-                              className="spinner-border spinner-border-sm me-2"
-                              role="status"
-                            >
-                              <span className="visually-hidden">
-                                Loading...
-                              </span>
-                            </div>
-                            처리 중...
-                          </>
-                        ) : (
-                          <>
-                            <i
-                              className={`fas fa-${
-                                isEditMode ? "check" : "paper-plane"
-                              } me-2`}
-                            ></i>
-                            {isEditMode ? "수정완료" : "게시하기"}
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </div>
-  );
-};
-
-export default PostEditor;
+export default PostEditor
