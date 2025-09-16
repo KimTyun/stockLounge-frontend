@@ -1,0 +1,109 @@
+import axios from 'axios'
+
+const API_BASE_URL = 'http://localhost:5000/api'
+
+// Axios 인스턴스 생성
+const api = axios.create({
+   baseURL: API_BASE_URL,
+   timeout: 10000,
+   headers: {
+      'Content-Type': 'application/json',
+   },
+})
+
+// API 서비스 클래스
+class ApiService {
+   // 헬스체크
+   async healthCheck() {
+      try {
+         const response = await api.get('/health')
+         return response.data
+      } catch (error) {
+         console.error('Health check failed:', error)
+         throw error
+      }
+   }
+
+   // 코인 관련 API
+   async getAllCoins() {
+      try {
+         const response = await api.get('/coins')
+         return response.data
+      } catch (error) {
+         console.error('Error fetching coins:', error)
+         throw error
+      }
+   }
+
+   async getCoinData(market) {
+      try {
+         const response = await api.get(`/coins/${market}`)
+         return response.data
+      } catch (error) {
+         console.error('Error fetching coin data:', error)
+         throw error
+      }
+   }
+
+   async getCandles(market, timeframe = 'minutes/5', count = 200) {
+      try {
+         const response = await api.get(`/coins/${market}/candles/${timeframe}`, {
+            params: { count },
+         })
+         return response.data
+      } catch (error) {
+         console.error('Error fetching candles:', error)
+         throw error
+      }
+   }
+
+   // 뉴스 관련 API
+   async getNews(category = 'all', page = 1) {
+      try {
+         const response = await api.get('/news', {
+            params: { category, page },
+         })
+         return response.data
+      } catch (error) {
+         console.error('Error fetching news:', error)
+         throw error
+      }
+   }
+
+   async getCryptoNews() {
+      try {
+         const response = await api.get('/news/crypto')
+         return response.data
+      } catch (error) {
+         console.error('Error fetching crypto news:', error)
+         throw error
+      }
+   }
+
+   // 실시간 WebSocket 연결 (향후 구현)
+   connectWebSocket(onMessage) {
+      const socket = new WebSocket('wss://api.upbit.com/websocket/v1')
+
+      socket.onopen = () => {
+         console.log('WebSocket connected')
+         // 구독할 코인들 설정
+         const subscribeData = [{ ticket: 'UNIQUE_TICKET' }, { type: 'ticker', codes: ['KRW-BTC', 'KRW-ETH', 'KRW-XRP'] }]
+         socket.send(JSON.stringify(subscribeData))
+      }
+
+      socket.onmessage = (event) => {
+         const data = JSON.parse(event.data)
+         if (onMessage) {
+            onMessage(data)
+         }
+      }
+
+      socket.onerror = (error) => {
+         console.error('WebSocket error:', error)
+      }
+
+      return socket
+   }
+}
+
+export default new ApiService()
