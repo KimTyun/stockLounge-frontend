@@ -118,9 +118,9 @@ const PostTab = ({ postPage, commentPage, posts, comments }) => {
                </Table>
                <Pagination className="pagination-sm justify-content-center">
                   <Pagination.First onClick={handlePostPage(1)} />
-                  {window.innerWidth > 767 && <Pagination.Prev onClick={handlePostPage(activePostPage - 1)} />}
+                  <Pagination.Prev onClick={handlePostPage(activePostPage - 1)} className={styles.smallPagenation} />
                   {postPageItems}
-                  {window.innerWidth > 767 && <Pagination.Next onClick={handlePostPage(activePostPage + 1)} />}
+                  <Pagination.Next onClick={handlePostPage(activePostPage + 1)} className={styles.smallPagenation} />
                   <Pagination.Last onClick={handlePostPage(postPage)} />
                </Pagination>
             </Card.Body>
@@ -160,9 +160,9 @@ const PostTab = ({ postPage, commentPage, posts, comments }) => {
                </Table>
                <Pagination className="pagination-sm justify-content-center">
                   <Pagination.First onClick={handleCommentPage(1)} />
-                  {window.innerWidth > 767 && <Pagination.Prev onClick={handleCommentPage(activeCommentPage - 1)} />}
+                  <Pagination.Prev onClick={handleCommentPage(activeCommentPage - 1)} className={styles.smallPagenation} />
                   {commentPageItems}
-                  {window.innerWidth > 767 && <Pagination.Next onClick={handleCommentPage(activeCommentPage + 1)} />}
+                  <Pagination.Next onClick={handleCommentPage(activeCommentPage + 1)} className={styles.smallPagenation} />
                   <Pagination.Last onClick={handleCommentPage(commentPage)} />
                </Pagination>
             </Card.Body>

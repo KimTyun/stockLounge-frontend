@@ -72,7 +72,7 @@ export const getMyPosts = async (limit = 10, page = 1) => {
 }
 
 //내 작성 댓글 목록 가져오기
-export const getMyComments = async ({ limit = 10, page = 1 }) => {
+export const getMyComments = async (limit = 10, page = 1) => {
    try {
       const response = await axiosApi.get(`/users/me/comments`, { params: { limit, page } })
       return response.data
@@ -83,7 +83,7 @@ export const getMyComments = async ({ limit = 10, page = 1 }) => {
 }
 
 //포인트 기록 가져오기
-export const getMyReward = async ({ limit = 10, page = 1 }) => {
+export const getMyReward = async (limit = 10, page = 1) => {
    try {
       const response = await axiosApi.get(`/users/me/reward`, { params: { limit, page } })
       return response.data

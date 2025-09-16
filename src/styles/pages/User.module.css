@@ -428,6 +428,11 @@ td.tdwrap {
    .historyTable col:nth-of-type(3) {
       width: 0;
    }
+
+   .smallPagenation {
+      display: none;
+      width: 0;
+   }
 }
 
 @media (max-width: 575.98px) {

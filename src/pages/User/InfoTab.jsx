@@ -151,9 +151,9 @@ const InfoTab = ({ userData, pointHistory, totalpage }) => {
 
                   <Pagination className="pagination-sm justify-content-center">
                      <Pagination.First onClick={handlePage(1)} />
-                     {window.innerWidth > 767 && <Pagination.Prev onClick={handlePage(activePage - 1)} />}
+                     <Pagination.Prev onClick={handlePage(activePage - 1)} className={styles.smallPagenation} />
                      {pageItems}
-                     {window.innerWidth > 767 && <Pagination.Next onClick={handlePage(activePage + 1)} />}
+                     <Pagination.Next onClick={handlePage(activePage + 1)} className={styles.smallPagenation} />
                      <Pagination.Last onClick={handlePage(totalpage)} />
                   </Pagination>
                </Card>
