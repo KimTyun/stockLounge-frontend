@@ -49,3 +49,19 @@ export const deleteBoard = async (id) => {
       throw error
    }
 }
+
+// 게시글 수정
+export const updateBoard = async (id, boardData) => {
+   try {
+      const response = await axiosApi.put(`/board/${id}`, boardData, {
+         // headers로 감싸서 폼데이터 형식으로 보냄
+         headers: {
+            'Content-Type': 'multipart/form-data',
+         },
+      })
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}

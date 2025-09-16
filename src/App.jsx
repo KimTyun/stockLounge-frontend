@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Layout from './components/common/Layout'
+import LandingPage from './pages/Home/LandingPage'
 import Home from './pages/Home'
 import Board from './pages/Board'
 import PostEditor from './components/board/PostEditor/PostEditor'
@@ -21,6 +22,7 @@ function App() {
       <Router>
          <Layout>
             <Routes>
+               <Route path={ROUTES.HOME} element={<LandingPage />} />
                <Route path={ROUTES.HOME} element={<Home />} />
                <Route path={ROUTES.BOARD} element={<Board />} />
                <Route path={ROUTES.BOARD_WRITE} element={<PostEditor />}></Route>
