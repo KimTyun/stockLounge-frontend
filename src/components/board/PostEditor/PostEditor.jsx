@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Container, Row, Col, Card, Form, Button, Alert, Badge } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
 import styles from '../../../styles/pages/Board_fixed.module.css'
-import { getBoardThunk, writeBoardThunk, updateBoardThunk, getBoardByIdThunk } from '../../../features/boardSlice'
+import { writeBoardThunk, updateBoardThunk, getBoardByIdThunk } from '../../../features/boardSlice'
 
 const PostEditor = ({ onSuccess, editPostId }) => {
    const dispatch = useDispatch()

@@ -117,7 +117,7 @@ const boardSlice = createSlice({
             state.loadingDetail = true
             state.error = null
          })
-         .addCase(deleteBoardThunk.fulfilled, (state, action) => {
+         .addCase(deleteBoardThunk.fulfilled, (state) => {
             state.loadingDetail = false
          })
          .addCase(deleteBoardThunk.rejected, (state, action) => {
@@ -128,7 +128,7 @@ const boardSlice = createSlice({
             state.loadingDetail = true
             state.error = null
          })
-         .addCase(updateBoardThunk.fulfilled, (state, action) => {
+         .addCase(updateBoardThunk.fulfilled, (state) => {
             state.loadingDetail = false
          })
          .addCase(updateBoardThunk.rejected, (state, action) => {
