@@ -58,7 +58,7 @@ export const updateMeThunk = createAsyncThunk('user/updateMe', async (data, { re
  * 프로필 사진 수정하기
  * formData : 프로필 사진 파일
  */
-export const updateMyProfileThunk = createAsyncThunk('user/updateMe', async (formData, { rejectWithValue }) => {
+export const updateMyProfileThunk = createAsyncThunk('user/updateMyProfile', async (formData, { rejectWithValue }) => {
    try {
       const response = await updateMyProfile(formData)
       return response
@@ -121,6 +121,7 @@ const userSlice = createSlice({
    reducers: {},
    extraReducers: (builder) => {
       builder
+         //유저 리스트 가져오기
          .addCase(getUsersThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -133,7 +134,7 @@ const userSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 유저 리스트를 가져오지 못했습니다.'
          })
-
+         //유저 정보 가져오기
          .addCase(getUserByIdThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -146,7 +147,7 @@ const userSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 유저 정보를 가져오지 못했습니다.'
          })
-
+         //내정보 가져오기
          .addCase(getMeThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -159,7 +160,7 @@ const userSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 유저 정보를 가져오지 못했습니다.'
          })
-
+         //내정보 수정하기
          .addCase(updateMeThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -171,7 +172,7 @@ const userSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 유저 정보 업데이트를 실패하였습니다.'
          })
-
+         //내프로필 수정하기
          .addCase(updateMyProfileThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -183,7 +184,7 @@ const userSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 유저 프로필 변경에 실패하였습니다.'
          })
-
+         //내 작성글 가져오기
          .addCase(getMyPostsThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -196,7 +197,7 @@ const userSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 내 작성글 목록을 가져오지 못했습니다.'
          })
-
+         //내 작성 댓글 가져오기
          .addCase(getMyCommentsThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -209,7 +210,7 @@ const userSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 내 작성 댓글 목록을 가져오지 못했습니다.'
          })
-
+         //내 포인트 기록 가져오기
          .addCase(getMyRewardThunk.pending, (state) => {
             state.loading = true
             state.error = null
