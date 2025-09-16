@@ -6,29 +6,14 @@ import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const SiteManagement = () => {
    const dispatch = useDispatch()
-   const { settings: reduxSettings, banWords = [], rewards = [], loading, error } = useSelector((state) => state.admin)
+   const { settings: reduxSettings, banWords = [], rewards = [], loading, erroror } = useSelector((state) => state.admin)
 
    const [newBanWord, setNewBanWord] = useState('')
    const [newReward, setNewReward] = useState({ name: '', points: 0, stock: 0 })
    const [showAlert, setShowAlert] = useState(false)
    const [alertMessage, setAlertMessage] = useState('')
    const [alertType, setAlertType] = useState('success')
-   const [settings, setSettings] = useState(
-      reduxSettings || {
-         siteName: '',
-         siteDescription: '',
-         maintenanceMode: false,
-         allowRegistration: false,
-         pointsPerPost: 0,
-         pointsPerComment: 0,
-         pointsPerLike: 0,
-         coinExchangeRate: 1,
-         maxPostsPerDay: 10,
-         maxCommentsPerDay: 20,
-         requireEmailVerification: false,
-         enableSocialLogin: true,
-      }
-   )
+   const [settings, setSettings] = useState(null)
 
    // 컴포넌트 마운트 시 데이터 조회
    useEffect(() => {
@@ -57,8 +42,8 @@ const SiteManagement = () => {
          await dispatch(updateSiteSettingsAsync(settings)).unwrap()
          setAlertMessage('설정이 성공적으로 저장되었습니다.')
          setAlertType('success')
-      } catch (err) {
-         setAlertMessage(`설정 저장 실패: ${err}`)
+      } catch (erroror) {
+         setAlertMessage(`설정 저장 실패: ${erroror.message}`)
          setAlertType('danger')
       } finally {
          setShowAlert(true)
@@ -73,9 +58,9 @@ const SiteManagement = () => {
          await dispatch(addBanWordAsync({ word: newBanWord.trim() })).unwrap()
          setNewBanWord('')
          setAlertMessage('금칙어가 추가되었습니다.')
-         setAlertType('succenss')
-      } catch (error) {
-         setAlertMessage(`금칙어 추가 실패: ${error}`)
+         setAlertType('success')
+      } catch (erroror) {
+         setAlertMessage(`금칙어 추가 실패: ${erroror}`)
          setAlertType('danger')
       } finally {
          setShowAlert(true)
@@ -89,8 +74,8 @@ const SiteManagement = () => {
          await dispatch(deleteBanWordAsync(wordId)).unwrap()
          setAlertMessage('금칙어가 삭제되었습니다.')
          setAlertType('info')
-      } catch (error) {
-         setAlertMessage(`금칙어 삭제 실패: ${error}`)
+      } catch (erroror) {
+         setAlertMessage(`금칙어 삭제 실패: ${erroror}`)
          setAlertType('danger')
       } finally {
          setShowAlert(true)
@@ -112,8 +97,8 @@ const SiteManagement = () => {
          setNewReward({ name: '', points: 0, stock: 0 })
          setAlertMessage('새로운 상품이 추가되었습니다.')
          setAlertType('success')
-      } catch (err) {
-         setAlertMessage(`상품 추가 실패: ${err}`)
+      } catch (error) {
+         setAlertMessage(`상품 추가 실패: ${error}`)
          setAlertType('danger')
       } finally {
          setShowAlert(true)
@@ -127,8 +112,8 @@ const SiteManagement = () => {
          await dispatch(deleteRewardAsync(rewardId)).unwrap()
          setAlertMessage('상품이 삭제되었습니다.')
          setAlertType('info')
-      } catch (err) {
-         setAlertMessage(`상품 삭제 실패: ${err}`)
+      } catch (error) {
+         setAlertMessage(`상품 삭제 실패: ${error}`)
          setAlertType('danger')
       } finally {
          setShowAlert(true)
@@ -149,9 +134,9 @@ const SiteManagement = () => {
 
    return (
       <div>
-         {error && (
+         {erroror && (
             <Alert variant="danger" className="mb-4">
-               {error}
+               {erroror}
             </Alert>
          )}
          {showAlert && (
