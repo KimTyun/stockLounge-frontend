@@ -1,82 +1,22 @@
-import React, { useState } from 'react'
-import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal, Alert } from 'react-bootstrap'
+import React, { useState, useEffect } from 'react'
+import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal, Alert, Spinner } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
+import { getUsersAsync, updateUserStatusAsync, deleteUserAsync } from '../../../features/adminSlice'
 import styles from '../../../styles/pages/Admin.module.css'
 
 const UserManagement = () => {
+   const dispatch = useDispatch()
+   const { users, loading, error } = useSelector((state) => state.admin)
+
    const [searchTerm, setSearchTerm] = useState('')
    const [selectedUser, setSelectedUser] = useState(null)
    const [showModal, setShowModal] = useState(false)
    const [filterStatus, setFilterStatus] = useState('all')
    const [sortBy, setSortBy] = useState('joinDate')
 
-   // 사용자 목록 데이터 (실제로는 API에서 가져올 예정)
-   const [users, setUsers] = useState([
-      {
-         id: 1,
-         nickname: '크립토투자자',
-         email: 'crypto@example.com',
-         joinDate: '2024-03-15',
-         lastLogin: '2025-09-04 14:30',
-         status: 'active',
-         level: 'Gold',
-         posts: 45,
-         comments: 123,
-         points: 8750,
-         warnings: 0,
-      },
-      {
-         id: 2,
-         nickname: '비트코인매니아',
-         email: 'bitcoin@example.com',
-         joinDate: '2024-05-22',
-         lastLogin: '2025-09-04 13:15',
-         status: 'active',
-         level: 'Silver',
-         posts: 28,
-         comments: 87,
-         points: 5420,
-         warnings: 1,
-      },
-      {
-         id: 3,
-         nickname: '이더리움홀더',
-         email: 'ethereum@example.com',
-         joinDate: '2024-07-10',
-         lastLogin: '2025-09-03 18:45',
-         status: 'pending',
-         level: 'Bronze',
-         posts: 12,
-         comments: 34,
-         points: 2100,
-         warnings: 0,
-      },
-      {
-         id: 4,
-         nickname: '문제사용자',
-         email: 'problem@example.com',
-         joinDate: '2024-08-05',
-         lastLogin: '2025-09-01 09:20',
-         status: 'banned',
-         level: 'Bronze',
-         posts: 8,
-         comments: 15,
-         points: 500,
-         warnings: 3,
-      },
-      {
-         id: 5,
-         nickname: '신규가입자',
-         email: 'newuser@example.com',
-         joinDate: '2025-09-04',
-         lastLogin: '2025-09-04 16:00',
-         status: 'active',
-         level: 'Bronze',
-         posts: 0,
-         comments: 2,
-         points: 100,
-         warnings: 0,
-      },
-   ])
+   useEffect(() => {
+      dispatch(getUsersAsync())
+   }, [dispatch])
 
    const getStatusBadge = (status) => {
       const variants = {
@@ -115,26 +55,28 @@ const UserManagement = () => {
       )
    }
 
+   // 사용자관리
    const handleUserAction = (user, action) => {
       setSelectedUser(user)
+
       if (action === 'view') {
          setShowModal(true)
       } else if (action === 'ban') {
          if (window.confirm(`${user.nickname} 사용자를 정지하시겠습니까?`)) {
-            setUsers(users.map((u) => (u.id === user.id ? { ...u, status: 'banned' } : u)))
+            dispatch(updateUserStatusAsync({ userId: user.id, isBanned: true }))
          }
       } else if (action === 'activate') {
          if (window.confirm(`${user.nickname} 사용자를 활성화하시겠습니까?`)) {
-            setUsers(users.map((u) => (u.id === user.id ? { ...u, status: 'active' } : u)))
+            dispatch(updateUserStatusAsync({ userId: user.id, isBanned: false }))
          }
       } else if (action === 'delete') {
          if (window.confirm(`${user.nickname} 사용자를 삭제하시겠습니까?`)) {
-            setUsers(users.filter((u) => u.id !== user.id))
+            dispatch(deleteUserAsync(user.id))
          }
       }
    }
 
-   const filteredUsers = users.filter((user) => {
+   const filteredUsers = (users || []).filter((user) => {
       const matchesSearch = user.nickname.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = filterStatus === 'all' || user.status === filterStatus
       return matchesSearch && matchesStatus
@@ -278,6 +220,75 @@ const UserManagement = () => {
       </Modal>
    )
 
+   // 가상 사용자 목록 데이터 (실제로는 API에서 가져올 예정)
+   // const [users, setUsers] = useState([
+   //    {
+   //       id: 1,
+   //       nickname: '크립토투자자',
+   //       email: 'crypto@example.com',
+   //       joinDate: '2024-03-15',
+   //       lastLogin: '2025-09-04 14:30',
+   //       status: 'active',
+   //       level: 'Gold',
+   //       posts: 45,
+   //       comments: 123,
+   //       points: 8750,
+   //       warnings: 0,
+   //    },
+   //    {
+   //       id: 2,
+   //       nickname: '비트코인매니아',
+   //       email: 'bitcoin@example.com',
+   //       joinDate: '2024-05-22',
+   //       lastLogin: '2025-09-04 13:15',
+   //       status: 'active',
+   //       level: 'Silver',
+   //       posts: 28,
+   //       comments: 87,
+   //       points: 5420,
+   //       warnings: 1,
+   //    },
+   //    {
+   //       id: 3,
+   //       nickname: '이더리움홀더',
+   //       email: 'ethereum@example.com',
+   //       joinDate: '2024-07-10',
+   //       lastLogin: '2025-09-03 18:45',
+   //       status: 'pending',
+   //       level: 'Bronze',
+   //       posts: 12,
+   //       comments: 34,
+   //       points: 2100,
+   //       warnings: 0,
+   //    },
+   //    {
+   //       id: 4,
+   //       nickname: '문제사용자',
+   //       email: 'problem@example.com',
+   //       joinDate: '2024-08-05',
+   //       lastLogin: '2025-09-01 09:20',
+   //       status: 'banned',
+   //       level: 'Bronze',
+   //       posts: 8,
+   //       comments: 15,
+   //       points: 500,
+   //       warnings: 3,
+   //    },
+   //    {
+   //       id: 5,
+   //       nickname: '신규가입자',
+   //       email: 'newuser@example.com',
+   //       joinDate: '2025-09-04',
+   //       lastLogin: '2025-09-04 16:00',
+   //       status: 'active',
+   //       level: 'Bronze',
+   //       posts: 0,
+   //       comments: 2,
+   //       points: 100,
+   //       warnings: 0,
+   //    },
+   // ])
+
    return (
       <div>
          <Card className={styles.contentCard}>
@@ -316,70 +327,83 @@ const UserManagement = () => {
                      </Form.Select>
                   </Col>
                   <Col md={2}>
-                     <div className="text-muted">총 {filteredUsers.length}명</div>
+                     <div className="text-muted">총 {(users || []).length}명</div>
                   </Col>
                </Row>
 
-               {/* 사용자 목록 테이블 */}
-               <div className={styles.tableContainer}>
-                  <Table responsive className={styles.adminTable}>
-                     <thead>
-                        <tr>
-                           <th>닉네임</th>
-                           <th>이메일</th>
-                           <th>가입일</th>
-                           <th>최근 로그인</th>
-                           <th>상태</th>
-                           <th>등급</th>
-                           <th>게시글</th>
-                           <th>포인트</th>
-                           <th>경고</th>
-                           <th>관리</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        {sortedUsers.map((user) => (
-                           <tr key={user.id}>
-                              <td>
-                                 <strong>{user.nickname}</strong>
-                              </td>
-                              <td>{user.email}</td>
-                              <td>{user.joinDate}</td>
-                              <td>{user.lastLogin}</td>
-                              <td>{getStatusBadge(user.status)}</td>
-                              <td>{getLevelBadge(user.level)}</td>
-                              <td>{user.posts}</td>
-                              <td>{user.points.toLocaleString()}P</td>
-                              <td>
-                                 <span className={user.warnings > 0 ? 'text-danger' : 'text-success'}>{user.warnings}</span>
-                              </td>
-                              <td>
-                                 <Button variant="outline-primary" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handleUserAction(user, 'view')}>
-                                    <i className="fas fa-eye"></i>
-                                 </Button>
-                                 {user.status === 'active' ? (
-                                    <Button variant="outline-warning" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handleUserAction(user, 'ban')}>
-                                       <i className="fas fa-ban"></i>
-                                    </Button>
-                                 ) : user.status === 'banned' ? (
-                                    <Button variant="outline-success" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handleUserAction(user, 'activate')}>
-                                       <i className="fas fa-check"></i>
-                                    </Button>
-                                 ) : null}
-                                 <Button variant="outline-danger" size="sm" className={styles.actionButton} onClick={() => handleUserAction(user, 'delete')}>
-                                    <i className="fas fa-trash"></i>
-                                 </Button>
-                              </td>
-                           </tr>
-                        ))}
-                     </tbody>
-                  </Table>
-               </div>
-
-               {sortedUsers.length === 0 && (
+               {/* 로딩, 에러, 데이터 없음 상태 처리 */}
+               {loading ? (
+                  <div className="text-center py-5">
+                     <Spinner animation="border" role="status" className="mb-3">
+                        <span className="visually-hidden">Loading...</span>
+                     </Spinner>
+                     <p className="text-muted">사용자 정보를 불러오는 중입니다...</p>
+                  </div>
+               ) : error ? (
+                  <Alert variant="danger" className="text-center">
+                     <i className="fas fa-exclamation-circle me-2"></i>
+                     {error}
+                  </Alert>
+               ) : sortedUsers.length === 0 ? (
                   <div className="text-center py-4">
                      <i className="fas fa-users fa-3x text-muted mb-3"></i>
                      <p className="text-muted">검색 조건에 맞는 사용자가 없습니다.</p>
+                  </div>
+               ) : (
+                  /* 사용자 목록 테이블 */
+                  <div className={styles.tableContainer}>
+                     <Table responsive className={styles.adminTable}>
+                        <thead>
+                           <tr>
+                              <th>닉네임</th>
+                              <th>이메일</th>
+                              <th>가입일</th>
+                              <th>최근 로그인</th>
+                              <th>상태</th>
+                              <th>등급</th>
+                              <th>게시글</th>
+                              <th>포인트</th>
+                              <th>경고</th>
+                              <th>관리</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {sortedUsers.map((user) => (
+                              <tr key={user.id}>
+                                 <td>
+                                    <strong>{user.nickname}</strong>
+                                 </td>
+                                 <td>{user.email}</td>
+                                 <td>{user.joinDate}</td>
+                                 <td>{user.lastLogin}</td>
+                                 <td>{getStatusBadge(user.status)}</td>
+                                 <td>{getLevelBadge(user.level)}</td>
+                                 <td>{user.posts}</td>
+                                 <td>{user.points.toLocaleString()}P</td>
+                                 <td>
+                                    <span className={user.warnings > 0 ? 'text-danger' : 'text-success'}>{user.warnings}</span>
+                                 </td>
+                                 <td>
+                                    <Button variant="outline-primary" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handleUserAction(user, 'view')}>
+                                       <i className="fas fa-eye"></i>
+                                    </Button>
+                                    {user.status === 'active' ? (
+                                       <Button variant="outline-warning" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handleUserAction(user, 'ban')}>
+                                          <i className="fas fa-ban"></i>
+                                       </Button>
+                                    ) : user.status === 'banned' ? (
+                                       <Button variant="outline-success" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handleUserAction(user, 'activate')}>
+                                          <i className="fas fa-check"></i>
+                                       </Button>
+                                    ) : null}
+                                    <Button variant="outline-danger" size="sm" className={styles.actionButton} onClick={() => handleUserAction(user, 'delete')}>
+                                       <i className="fas fa-trash"></i>
+                                    </Button>
+                                 </td>
+                              </tr>
+                           ))}
+                        </tbody>
+                     </Table>
                   </div>
                )}
             </Card.Body>
