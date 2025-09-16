@@ -2,6 +2,7 @@
 export const ROUTES = {
   // 공통 페이지
   HOME: '/',
+  HOME_MAIN: '/home',
   LOGIN: '/login',
   REGISTER: '/register',
   

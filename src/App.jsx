@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import Layout from './components/common/Layout'
 import LandingPage from './pages/Home/LandingPage'
 import Home from './pages/Home'
@@ -8,6 +8,7 @@ import PostDetail from './components/board/PostDetail/PostDetail'
 import Chart from './pages/Chart'
 import News from './pages/News'
 import User from './pages/User'
+import LoginPage from './pages/User/LoginPage'
 import Admin from './pages/Admin'
 import { ROUTES } from './config/routes'
 
@@ -19,22 +20,21 @@ import './App.css'
 
 function App() {
    return (
-      <Router>
-         <Layout>
-            <Routes>
-               <Route path={ROUTES.HOME} element={<LandingPage />} />
-               <Route path={ROUTES.HOME} element={<Home />} />
-               <Route path={ROUTES.BOARD} element={<Board />} />
-               <Route path={ROUTES.BOARD_WRITE} element={<PostEditor />}></Route>
-               <Route path={ROUTES.BOARD_DETAIL} element={<PostDetail />}></Route>
-               <Route path={ROUTES.CHART} element={<Chart />} />
-               <Route path={ROUTES.NEWS} element={<News />} />
-               <Route path={ROUTES.USER_INFO} element={<User />} />
-               <Route path={ROUTES.ADMIN} element={<Admin />} />
-               {/* 추후 다른 라우트들을 추가할 예정 */}
-            </Routes>
-         </Layout>
-      </Router>
+      <Layout>
+         <Routes>
+            <Route path={ROUTES.HOME} element={<Home />} />
+            <Route path={ROUTES.HOME_MAIN} element={<Home />} />
+            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+            <Route path={ROUTES.BOARD} element={<Board />} />
+            <Route path={ROUTES.BOARD_WRITE} element={<PostEditor />}></Route>
+            <Route path={ROUTES.BOARD_DETAIL} element={<PostDetail />}></Route>
+            <Route path={ROUTES.CHART} element={<Chart />} />
+            <Route path={ROUTES.NEWS} element={<News />} />
+            <Route path={ROUTES.USER_INFO} element={<User />} />
+            <Route path={ROUTES.ADMIN} element={<Admin />} />
+            {/* 추후 다른 라우트들을 추가할 예정 */}
+         </Routes>
+      </Layout>
    )
 }
 

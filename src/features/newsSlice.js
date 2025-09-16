@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getNews } from '../api/naverApi'
+import naverApi from '../api/naverApi'
 
 /**
  * 뉴스 가져오기
@@ -9,7 +9,7 @@ import { getNews } from '../api/naverApi'
  */
 export const getNewsThunk = createAsyncThunk('news/getNews', async ({ length, query, start }, { rejectWithValue }) => {
    try {
-      const response = await getNews(length, query, start)
+      const response = await naverApi.getNews(query, length, start)
       return response
    } catch (error) {
       return rejectWithValue(error.response?.data)

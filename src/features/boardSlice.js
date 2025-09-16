@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getBoard, writeBoard, getBoardById, deleteBoard } from '../api/boardApi'
+import boardApi from '../api/boardApi'
 
 /**
  * 게시글 리스트 가져오기
  */
 export const getBoardThunk = createAsyncThunk('board/list', async (_, { rejectWithValue }) => {
    try {
-      const response = await getBoard()
+      const response = await boardApi.getPosts()
       return response
    } catch (error) {
       return rejectWithValue(error.response?.data)
@@ -19,7 +19,7 @@ export const getBoardThunk = createAsyncThunk('board/list', async (_, { rejectWi
  */
 export const writeBoardThunk = createAsyncThunk('board/write', async (boardData, { rejectWithValue }) => {
    try {
-      const response = await writeBoard(boardData)
+      const response = await boardApi.createPost(boardData)
       return response
    } catch (error) {
       return rejectWithValue(error.response?.data)
@@ -31,7 +31,7 @@ export const writeBoardThunk = createAsyncThunk('board/write', async (boardData,
  */
 export const getBoardByIdThunk = createAsyncThunk('board/fetchItemById', async (id, { rejectWithValue }) => {
    try {
-      const response = await getBoardById(id)
+      const response = await boardApi.getPost(id)
       return response
    } catch (error) {
       return rejectWithValue(error.response?.data)
@@ -43,7 +43,7 @@ export const getBoardByIdThunk = createAsyncThunk('board/fetchItemById', async (
  */
 export const deleteBoardThunk = createAsyncThunk('board/deleteBoard', async (id, { rejectWithValue }) => {
    try {
-      await deleteBoard(id)
+      await boardApi.deletePost(id)
       return id
    } catch (error) {
       return rejectWithValue(error.response?.data)

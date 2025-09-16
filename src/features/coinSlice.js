@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getCandles, getMarketAll, getTickerAll } from '../api/upbitApi'
+import upbitApi from '../api/upbitApi'
 
 /**
  * upbit의 코인 목록 가져오기
  */
 export const getMarketAllThunk = createAsyncThunk('coin/getMarketAll', async (_, { rejectWithValue }) => {
    try {
-      const response = await getMarketAll()
-      return response
+      const response = await upbitApi.getAllCoins()
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -17,10 +17,10 @@ export const getMarketAllThunk = createAsyncThunk('coin/getMarketAll', async (_,
  * 코인 정보 가져오기
  * n : 가져올 개수, 기본 15개
  */
-export const getTickerAllThunk = createAsyncThunk('coin/getTickerAll', async (n, { rejectWithValue }) => {
+export const getTickerAllThunk = createAsyncThunk('coin/getTickerAll', async (markets, { rejectWithValue }) => {
    try {
-      const response = await getTickerAll(n)
-      return response
+      const response = await upbitApi.getTickers(markets)
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -33,8 +33,8 @@ export const getTickerAllThunk = createAsyncThunk('coin/getTickerAll', async (n,
  */
 export const getcandlesThunk = createAsyncThunk('coin/getcandles', async (data, { rejectWithValue }) => {
    try {
-      const response = await getCandles(data.time, data.params)
-      return response
+      const response = await upbitApi.getCandles(data.params.market, data.time, data.params.count)
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }

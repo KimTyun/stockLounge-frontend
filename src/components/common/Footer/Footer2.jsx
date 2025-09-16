@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { TrendingUp, Twitter, Instagram, Youtube, Mail } from 'lucide-react'
-import './Footer.css'
+import '../../../styles/components/common/Footer2.css'
+import { ROUTES } from '../../../config/routes'
 
 const Footer = () => {
    return (
       <footer className="footer">
-         <div className="container">
+         <div className="container-fluid">
             <div className="footer-content">
                {/* 브랜드 섹션 */}
                <div className="footer-section">
@@ -35,13 +36,13 @@ const Footer = () => {
                   <h4 className="footer-title">서비스</h4>
                   <ul className="footer-links">
                      <li>
-                        <Link to="/markets">코인 차트</Link>
+                        <Link to={ROUTES.CHART}>코인 차트</Link>
                      </li>
                      <li>
-                        <Link to="/news">최신 뉴스</Link>
+                        <Link to={ROUTES.NEWS}>최신 뉴스</Link>
                      </li>
                      <li>
-                        <Link to="/community">커뮤니티</Link>
+                        <Link to={ROUTES.BOARD}>커뮤니티</Link>
                      </li>
                      <li>
                         <Link to="/rewards">리워드</Link>

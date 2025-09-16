@@ -1,13 +1,47 @@
-import axiosApi from '.'
-const env = import.meta.env.VITE_ENV
+import axios from 'axios'
 
-//뉴스 가져오기
-export const getNews = async (length = 10, query = '암호화폐', start = 1) => {
-   try {
-      const response = await axiosApi.get('/news/', { params: { length, query, start } })
-      return response.data
-   } catch (error) {
-      if (env === 'development') console.error(error)
-      throw error
+const API_BASE_URL = 'http://localhost:8000'
+
+// Naver News API 서비스 클래스
+class NaverApiService {
+   // 뉴스 검색
+   async getNews(query = '코인', length = 10, start = 1) {
+      try {
+         const response = await axios.get(`${API_BASE_URL}/news`, {
+            params: {
+               query,
+               length,
+               start,
+            },
+         })
+         return response.data
+      } catch (error) {
+         console.error('Error fetching news:', error)
+         throw error
+      }
+   }
+
+   // 암호화폐 뉴스 검색
+   async getCryptoNews(length = 10) {
+      try {
+         const response = await this.getNews('암호화폐 비트코인 이더리움', length)
+         return response
+      } catch (error) {
+         console.error('Error fetching crypto news:', error)
+         throw error
+      }
+   }
+
+   // 경제 뉴스 검색
+   async getEconomyNews(length = 10) {
+      try {
+         const response = await this.getNews('경제 주식', length)
+         return response
+      } catch (error) {
+         console.error('Error fetching economy news:', error)
+         throw error
+      }
    }
 }
+
+export default new NaverApiService()

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { TrendingUp, BarChart3, Newspaper, Users, Shield, Zap, Star, ArrowRight } from 'lucide-react'
-import apiService from '../../api/apiService'
+import upbitApi from '../../api/upbitApi'
+import naverApi from '../../api/naverApi'
 import './LandingPage.css'
 
 const LandingPage = () => {
@@ -12,14 +13,14 @@ const LandingPage = () => {
    useEffect(() => {
       const loadData = async () => {
          try {
-            // 인기 코인 정보 로드 - 데이터 연결 필요
-            const coins = await apiService.getAllCoins()
-            const krwCoins = coins.filter((coin) => coin.market.startsWith('KRW-')).slice(0, 6)
+            // 인기 코인 정보 로드
+            const coinsResponse = await upbitApi.getAllCoins()
+            const krwCoins = coinsResponse.data.filter((coin) => coin.market.startsWith('KRW-')).slice(0, 6)
             setPopularCoins(krwCoins)
 
-            // 최신 뉴스 로드 - 데이터 연결 필요
-            const news = await apiService.getCryptoNews()
-            setLatestNews(news.slice(0, 3))
+            // 최신 뉴스 로드
+            const newsResponse = await naverApi.getCryptoNews(3)
+            setLatestNews(newsResponse.data?.items || [])
          } catch (error) {
             console.error('Error loading data:', error)
          } finally {
@@ -141,7 +142,7 @@ const LandingPage = () => {
                ) : (
                   <div className="coins-grid">
                      {popularCoins.map((coin, index) => (
-                        <Link key={coin.market} to={`/coin/${coin.market}`} className="coin-card card">
+                        <Link key={coin.market} to={`/chart`} className="coin-card card">
                            <div className="coin-header">
                               <div>
                                  <h4>{coin.korean_name}</h4>
@@ -152,8 +153,8 @@ const LandingPage = () => {
                               </div>
                            </div>
                            <div className="coin-info">
-                              <span className="coin-price">로딩중...</span>
-                              <span className="coin-change">-</span>
+                              <span className="coin-price">차트 보기</span>
+                              <span className="coin-change">→</span>
                            </div>
                         </Link>
                      ))}
@@ -180,11 +181,11 @@ const LandingPage = () => {
                      {latestNews.map((article, index) => (
                         <article key={index} className="news-card card">
                            <div className="news-content">
-                              <h3>{article.title}</h3>
-                              <p>{article.description}</p>
+                              <h3>{article.title?.replace(/<[^>]*>/g, '')}</h3>
+                              <p>{article.description?.replace(/<[^>]*>/g, '')}</p>
                               <div className="news-meta">
-                                 <span className="news-source">{article.source}</span>
-                                 <span className="news-time">{article.time}</span>
+                                 <span className="news-source">뉴스</span>
+                                 <span className="news-time">최신</span>
                               </div>
                            </div>
                            <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link">

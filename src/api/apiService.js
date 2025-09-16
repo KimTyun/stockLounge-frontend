@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+const API_BASE_URL = 'http://localhost:8000'
 
 // Axios 인스턴스 생성
 const api = axios.create({
@@ -24,10 +24,10 @@ class ApiService {
       }
    }
 
-   // 코인 관련 API
+   // 코인 관련 API (Upbit API 사용)
    async getAllCoins() {
       try {
-         const response = await api.get('/coins')
+         const response = await api.get('/upbit/coins')
          return response.data
       } catch (error) {
          console.error('Error fetching coins:', error)
@@ -37,7 +37,7 @@ class ApiService {
 
    async getCoinData(market) {
       try {
-         const response = await api.get(`/coins/${market}`)
+         const response = await api.get(`/upbit/coins/${market}`)
          return response.data
       } catch (error) {
          console.error('Error fetching coin data:', error)
@@ -47,7 +47,7 @@ class ApiService {
 
    async getCandles(market, timeframe = 'minutes/5', count = 200) {
       try {
-         const response = await api.get(`/coins/${market}/candles/${timeframe}`, {
+         const response = await api.get(`/upbit/coins/${market}/candles/${timeframe}`, {
             params: { count },
          })
          return response.data
@@ -57,11 +57,11 @@ class ApiService {
       }
    }
 
-   // 뉴스 관련 API
-   async getNews(category = 'all', page = 1) {
+   // 뉴스 관련 API (Naver API 사용)
+   async getNews(query = '코인', length = 10, start = 1) {
       try {
          const response = await api.get('/news', {
-            params: { category, page },
+            params: { query, length, start },
          })
          return response.data
       } catch (error) {
@@ -70,10 +70,10 @@ class ApiService {
       }
    }
 
-   async getCryptoNews() {
+   async getCryptoNews(length = 10) {
       try {
-         const response = await api.get('/news/crypto')
-         return response.data
+         const response = await this.getNews('암호화폐 비트코인 이더리움', length)
+         return response
       } catch (error) {
          console.error('Error fetching crypto news:', error)
          throw error

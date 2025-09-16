@@ -49,14 +49,14 @@ const Home = () => {
       <div className={styles.home}>
          {/* 섹션1: 코인 차트 영역 */}
          <section className={styles.chartSection}>
-            <Container>
+            <Container fluid>
                <CandleChart coin={{ name: 'BTC' }} />
             </Container>
          </section>
 
          {/* 섹션2: 인기 게시글 영역 */}
          <section className={styles.popularPostsSection}>
-            <Container>
+            <Container fluid>
                <div className={styles.sectionHeader}>
                   <h2>오늘의 인기글</h2>
                </div>
@@ -72,7 +72,7 @@ const Home = () => {
 
          {/* 섹션3: 뉴스 영역 */}
          <section className={styles.newsSection}>
-            <Container>
+            <Container fluid>
                <Row>
                   <Col md={6}>
                      <Card className={styles.newsCard}>
