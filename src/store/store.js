@@ -3,6 +3,7 @@ import newsSlice from '../features/newsSlice.js'
 import boardSlice from '../features/boardSlice.js'
 import coinSlice from '../features/coinSlice.js'
 import commentSlice from '../features/commentSlice.js'
+import adminSlice from '../features/adminSlice.js'
 
 const store = configureStore({
    reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
       coin: coinSlice,
       board: boardSlice,
       comment: commentSlice,
+      admin: adminSlice,
    },
 })
 
