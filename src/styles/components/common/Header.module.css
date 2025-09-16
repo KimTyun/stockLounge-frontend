@@ -1,12 +1,12 @@
 .navbar {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 0.75rem 0;
 }
 
 .brand {
   font-weight: bold;
   font-size: 1.5rem;
-  color: #5E94CA !important;
+  color: #5e94ca !important;
   text-decoration: none;
 }
 
@@ -16,13 +16,13 @@
 }
 
 .loginBtn {
-  border-color: #5E94CA;
-  color: #5E94CA;
+  border-color: #5e94ca;
+  color: #5e94ca;
 }
 
 .loginBtn:hover {
-  background-color: #5E94CA;
-  border-color: #5E94CA;
+  background-color: #5e94ca;
+  border-color: #5e94ca;
 }
 
 .registerBtn {

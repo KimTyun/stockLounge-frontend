@@ -1,18 +1,20 @@
-import { configureStore } from '@reduxjs/toolkit'
-import newsSlice from '../features/newsSlice.js'
-import boardSlice from '../features/boardSlice.js'
-import coinSlice from '../features/coinSlice.js'
-import userSlice from '../features/userSlice.js'
-import adminSlice from '../features/adminSlice.js'
+import { configureStore } from "@reduxjs/toolkit";
+import newsSlice from "../features/newsSlice.js";
+import boardSlice from "../features/boardSlice.js";
+import coinSlice from "../features/coinSlice.js";
+import userSlice from "../features/userSlice.js";
+import commentSlice from "../features/commentSlice.js";
+import adminSlice from "../features/adminSlice.js";
 
 const store = configureStore({
-   reducer: {
-      news: newsSlice,
-      coin: coinSlice,
-      board: boardSlice,
-      user: userSlice,
-      admin: adminSlice,
-   },
-})
+  reducer: {
+    news: newsSlice,
+    coin: coinSlice,
+    board: boardSlice,
+    user: userSlice,
+    comment: commentSlice,
+    admin: adminSlice,
+  },
+});
 
-export default store
+export default store;
