@@ -1,17 +1,15 @@
-import Header from '../Header';
-import Footer from '../Footer';
-import styles from '../../../styles/components/common/Layout.module.css';
+import Header from '../Header'
+import Footer from '../Footer'
+import styles from '../../../styles/components/common/Layout.module.css'
 
 const Layout = ({ children }) => {
-  return (
-    <div className={styles.layout}>
-      <Header />
-      <main className={styles.main}>
-        {children}
-      </main>
-      <Footer />
-    </div>
-  );
-};
+   return (
+      <div className={styles.layout}>
+         <Header />
+         <main className={styles.main}>{children}</main>
+         <Footer />
+      </div>
+   )
+}
 
-export default Layout;
+export default Layout
