@@ -151,9 +151,27 @@ const adminSlice = createSlice({
       rewards: [],
       loading: false,
       error: null,
+      token: null,
    },
    reducers: {
       clearError: (state) => {
+         state.error = null
+      },
+      // ✨ loginSuccess 액션 추가
+      loginSuccess: (state, action) => {
+         state.token = action.payload // payload로 받은 토큰을 상태에 저장
+         state.loading = false
+         state.error = null
+      },
+      // ✨ 로그아웃 액션
+      logout: (state) => {
+         state.token = null
+         state.users = []
+         state.boards = []
+         state.settings = null
+         state.banWords = []
+         state.rewards = []
+         state.loading = false
          state.error = null
       },
    },
@@ -254,5 +272,6 @@ const adminSlice = createSlice({
          )
    },
 })
+export const { clearError, loginSuccess, logout } = adminSlice.actions
 
 export default adminSlice.reducer
