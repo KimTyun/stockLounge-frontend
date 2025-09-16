@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Row, Col, Card, Form, Button, Alert, Table, Spinner } from 'react-bootstrap'
-import { getSiteSettingsAsync, updateSiteSettingsAsync, getBanWordsAsync, addBanWordAsync, deleteBanWordAsync, getRewardsAsync, addRewardAsync, deleteRewardAsync } from '../../../features/adminSlice'
+import { getSiteSettingsThunk, updateSiteSettingsThunk, getBanWordsThunk, addBanWordThunk, deleteBanWordThunk, getRewardsThunk, addRewardThunk, deleteRewardThunk } from '../../../features/adminSlice'
 import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const SiteManagement = () => {
@@ -17,9 +17,9 @@ const SiteManagement = () => {
 
    // 컴포넌트 마운트 시 데이터 조회
    useEffect(() => {
-      dispatch(getSiteSettingsAsync())
-      dispatch(getBanWordsAsync())
-      dispatch(getRewardsAsync())
+      dispatch(getSiteSettingsThunk())
+      dispatch(getBanWordsThunk())
+      dispatch(getRewardsThunk())
    }, [dispatch])
 
    useEffect(() => {
@@ -39,7 +39,7 @@ const SiteManagement = () => {
    // 설정 저장
    const handleSaveSettings = async () => {
       try {
-         await dispatch(updateSiteSettingsAsync(settings)).unwrap()
+         await dispatch(updateSiteSettingsThunk(settings)).unwrap()
          setAlertMessage('설정이 성공적으로 저장되었습니다.')
          setAlertType('success')
       } catch (error) {
@@ -55,7 +55,7 @@ const SiteManagement = () => {
    const handleAddBanWord = async () => {
       if (!newBanWord.trim()) return
       try {
-         await dispatch(addBanWordAsync({ word: newBanWord.trim() })).unwrap()
+         await dispatch(addBanWordThunk({ word: newBanWord.trim() })).unwrap()
          setNewBanWord('')
          setAlertMessage('금칙어가 추가되었습니다.')
          setAlertType('success')
@@ -71,7 +71,7 @@ const SiteManagement = () => {
    // 금칙어 삭제
    const handleRemoveBanWord = async (wordId) => {
       try {
-         await dispatch(deleteBanWordAsync(wordId)).unwrap()
+         await dispatch(deleteBanWordThunk(wordId)).unwrap()
          setAlertMessage('금칙어가 삭제되었습니다.')
          setAlertType('info')
       } catch (error) {
@@ -93,7 +93,7 @@ const SiteManagement = () => {
          return
       }
       try {
-         await dispatch(addRewardAsync(newReward)).unwrap()
+         await dispatch(addRewardThunk(newReward)).unwrap()
          setNewReward({ name: '', points: 0, stock: 0 })
          setAlertMessage('새로운 상품이 추가되었습니다.')
          setAlertType('success')
@@ -109,7 +109,7 @@ const SiteManagement = () => {
    // 교환품 삭제
    const handleDeleteReward = async (rewardId) => {
       try {
-         await dispatch(deleteRewardAsync(rewardId)).unwrap()
+         await dispatch(deleteRewardThunk(rewardId)).unwrap()
          setAlertMessage('상품이 삭제되었습니다.')
          setAlertType('info')
       } catch (error) {

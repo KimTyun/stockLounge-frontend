@@ -2,15 +2,16 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col, Card, Table, Badge, Button } from 'react-bootstrap'
 import styles from '../../../styles/components/admin/admin-common.module.css'
-import { getBoardsAsync, getUsersAsync } from '../../../features/adminSlice'
+import { getBoardThunk } from '../../../features/boardSlice'
+import { getUser } from '../../../features/UserSlice'
 
 const Dashboard = () => {
    const dispatch = useDispatch()
    const { users = [], boards = [], loading, error } = useSelector((state) => state.admin)
 
    useEffect(() => {
-      dispatch(getUsersAsync())
-      dispatch(getBoardsAsync())
+      dispatch(getUser())
+      dispatch(getBoardThunk())
    }, [dispatch])
 
    const formatNumber = (num) => {

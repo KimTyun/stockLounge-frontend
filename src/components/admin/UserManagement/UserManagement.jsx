@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal, Alert, Spinner } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import { getUsersAsync, updateUserStatusAsync, deleteUserAsync } from '../../../features/adminSlice'
+import { updateUserStatusThunk, deleteUserThunk } from '../../../features/adminSlice'
 import styles from '../../../styles/pages/Admin.module.css'
 
 const UserManagement = () => {
@@ -15,7 +15,7 @@ const UserManagement = () => {
    const [sortBy, setSortBy] = useState('joinDate')
 
    useEffect(() => {
-      dispatch(getUsersAsync())
+      dispatch(getUsers())
    }, [dispatch])
 
    const getStatusBadge = (status) => {
@@ -63,15 +63,15 @@ const UserManagement = () => {
          setShowModal(true)
       } else if (action === 'ban') {
          if (window.confirm(`${user.nickname} 사용자를 정지하시겠습니까?`)) {
-            dispatch(updateUserStatusAsync({ userId: user.id, isBanned: true }))
+            dispatch(updateUserStatusThunk({ userId: user.id, isBanned: true }))
          }
       } else if (action === 'activate') {
          if (window.confirm(`${user.nickname} 사용자를 활성화하시겠습니까?`)) {
-            dispatch(updateUserStatusAsync({ userId: user.id, isBanned: false }))
+            dispatch(updateUserStatusThunk({ userId: user.id, isBanned: false }))
          }
       } else if (action === 'delete') {
          if (window.confirm(`${user.nickname} 사용자를 삭제하시겠습니까?`)) {
-            dispatch(deleteUserAsync(user.id))
+            dispatch(deleteUserThunk(user.id))
          }
       }
    }

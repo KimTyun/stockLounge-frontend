@@ -10,8 +10,8 @@ import styles from '../../styles/pages/Admin.module.css'
 const Admin = () => {
    const [activeTab, setActiveTab] = useState('dashboard')
 
-   // 관리자 권한 체크 (실제로는 Redux나 Context에서 가져올 예정)
-   const isAdmin = true // 임시로 true 설정
+   // 관리자 권한 체크 임시로 true 설정
+   const isAdmin = true
 
    if (!isAdmin) {
       return (
