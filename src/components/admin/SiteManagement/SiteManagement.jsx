@@ -6,7 +6,7 @@ import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const SiteManagement = () => {
    const dispatch = useDispatch()
-   const { settings: reduxSettings, banWords = [], rewards = [], loading, erroror } = useSelector((state) => state.admin)
+   const { settings: reduxSettings, banWords = [], rewards = [], loading, error } = useSelector((state) => state.admin)
 
    const [newBanWord, setNewBanWord] = useState('')
    const [newReward, setNewReward] = useState({ name: '', points: 0, stock: 0 })
@@ -42,8 +42,8 @@ const SiteManagement = () => {
          await dispatch(updateSiteSettingsAsync(settings)).unwrap()
          setAlertMessage('설정이 성공적으로 저장되었습니다.')
          setAlertType('success')
-      } catch (erroror) {
-         setAlertMessage(`설정 저장 실패: ${erroror.message}`)
+      } catch (error) {
+         setAlertMessage(`설정 저장 실패: ${error.message}`)
          setAlertType('danger')
       } finally {
          setShowAlert(true)
@@ -59,8 +59,8 @@ const SiteManagement = () => {
          setNewBanWord('')
          setAlertMessage('금칙어가 추가되었습니다.')
          setAlertType('success')
-      } catch (erroror) {
-         setAlertMessage(`금칙어 추가 실패: ${erroror}`)
+      } catch (error) {
+         setAlertMessage(`금칙어 추가 실패: ${error}`)
          setAlertType('danger')
       } finally {
          setShowAlert(true)
@@ -74,8 +74,8 @@ const SiteManagement = () => {
          await dispatch(deleteBanWordAsync(wordId)).unwrap()
          setAlertMessage('금칙어가 삭제되었습니다.')
          setAlertType('info')
-      } catch (erroror) {
-         setAlertMessage(`금칙어 삭제 실패: ${erroror}`)
+      } catch (error) {
+         setAlertMessage(`금칙어 삭제 실패: ${error}`)
          setAlertType('danger')
       } finally {
          setShowAlert(true)
@@ -134,9 +134,9 @@ const SiteManagement = () => {
 
    return (
       <div>
-         {erroror && (
+         {error && (
             <Alert variant="danger" className="mb-4">
-               {erroror}
+               {error}
             </Alert>
          )}
          {showAlert && (
