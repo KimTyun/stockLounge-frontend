@@ -9,26 +9,26 @@ const LandingPage = () => {
    const [latestNews, setLatestNews] = useState([])
    const [isLoading, setIsLoading] = useState(true)
 
-   useEffect(() => {
-      const loadData = async () => {
-         try {
-            // 인기 코인 정보 로드 - 데이터 연결 필요
-            const coins = await apiService.getAllCoins()
-            const krwCoins = coins.filter((coin) => coin.market.startsWith('KRW-')).slice(0, 6)
-            setPopularCoins(krwCoins)
+   // useEffect(() => {
+   //    const loadData = async () => {
+   //       try {
+   //          // 인기 코인 정보 로드 - 데이터 연결 필요
+   //          const coins = await apiService.getAllCoins()
+   //          const krwCoins = coins.filter((coin) => coin.market.startsWith('KRW-')).slice(0, 6)
+   //          setPopularCoins(krwCoins)
 
-            // 최신 뉴스 로드 - 데이터 연결 필요
-            const news = await apiService.getCryptoNews()
-            setLatestNews(news.slice(0, 3))
-         } catch (error) {
-            console.error('Error loading data:', error)
-         } finally {
-            setIsLoading(false)
-         }
-      }
+   //          // 최신 뉴스 로드 - 데이터 연결 필요
+   //          const news = await apiService.getCryptoNews()
+   //          setLatestNews(news.slice(0, 3))
+   //       } catch (error) {
+   //          console.error('Error loading data:', error)
+   //       } finally {
+   //          setIsLoading(false)
+   //       }
+   //    }
 
-      loadData()
-   }, [])
+   //    loadData()
+   // }, [])
 
    const features = [
       {

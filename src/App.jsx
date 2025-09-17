@@ -16,8 +16,17 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './styles/bootstrap-custom.css'
 import './styles/globals.css'
 import './App.css'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { checkAuthStatusThunk } from './features/authSlice'
 
 function App() {
+   const dispatch = useDispatch()
+
+   useEffect(() => {
+      dispatch(checkAuthStatusThunk())
+   }, [dispatch])
+
    return (
       <Router>
          <Layout>
