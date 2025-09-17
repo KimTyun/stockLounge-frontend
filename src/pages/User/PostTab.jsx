@@ -89,12 +89,16 @@ const PostTab = ({ postPage, commentPage, posts, comments }) => {
             </Card.Header>
             <Card.Body className={styles.historyBody}>
                <Table responsive className={styles.historyTable}>
+                  <colgroup>
+                     <col />
+                     <col />
+                     <col />
+                  </colgroup>
                   <thead>
                      <tr>
                         <th>게시판</th>
                         <th>제목</th>
-
-                        <th>일시</th>
+                        <th className="d-none d-md-table-cell">일시</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -107,16 +111,16 @@ const PostTab = ({ postPage, commentPage, posts, comments }) => {
                            </td>
                            <td className={styles.tdwrap}>{history.action}</td>
 
-                           <td className={styles.historyDate}>{history.date}</td>
+                           <td className={`${styles.historyDate} d-none d-md-table-cell`}>{history.date}</td>
                         </tr>
                      ))}
                   </tbody>
                </Table>
                <Pagination className="pagination-sm justify-content-center">
                   <Pagination.First onClick={handlePostPage(1)} />
-                  <Pagination.Prev onClick={handlePostPage(activePostPage - 1)} />
+                  <Pagination.Prev onClick={handlePostPage(activePostPage - 1)} className={styles.smallPagenation} />
                   {postPageItems}
-                  <Pagination.Next onClick={handlePostPage(activePostPage + 1)} />
+                  <Pagination.Next onClick={handlePostPage(activePostPage + 1)} className={styles.smallPagenation} />
                   <Pagination.Last onClick={handlePostPage(postPage)} />
                </Pagination>
             </Card.Body>
@@ -127,12 +131,16 @@ const PostTab = ({ postPage, commentPage, posts, comments }) => {
             </Card.Header>
             <Card.Body className={styles.historyBody}>
                <Table responsive className={styles.historyTable}>
+                  <colgroup>
+                     <col />
+                     <col />
+                     <col className="d-none d-md-table-cell" />
+                  </colgroup>
                   <thead>
                      <tr>
                         <th>게시판</th>
                         <th>내용</th>
-
-                        <th>일시</th>
+                        <th className="d-none d-md-table-cell">일시</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -145,16 +153,16 @@ const PostTab = ({ postPage, commentPage, posts, comments }) => {
                            </td>
                            <td className={styles.tdwrap}>{history.action}</td>
 
-                           <td className={styles.historyDate}>{history.date}</td>
+                           <td className={`${styles.historyDate} d-none d-md-table-cell`}>{history.date}</td>
                         </tr>
                      ))}
                   </tbody>
                </Table>
                <Pagination className="pagination-sm justify-content-center">
                   <Pagination.First onClick={handleCommentPage(1)} />
-                  <Pagination.Prev onClick={handleCommentPage(activeCommentPage - 1)} />
+                  <Pagination.Prev onClick={handleCommentPage(activeCommentPage - 1)} className={styles.smallPagenation} />
                   {commentPageItems}
-                  <Pagination.Next onClick={handleCommentPage(activeCommentPage + 1)} />
+                  <Pagination.Next onClick={handleCommentPage(activeCommentPage + 1)} className={styles.smallPagenation} />
                   <Pagination.Last onClick={handleCommentPage(commentPage)} />
                </Pagination>
             </Card.Body>
