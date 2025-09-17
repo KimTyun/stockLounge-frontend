@@ -54,11 +54,9 @@ const Board = () => {
             </Nav>
 
             <Tab.Content className={styles.tabContent}>
-              {categories.map((category) => (
-                <Tab.Pane key={category.key} eventKey={category.key}>
-                  <PostList category={category.key} />
-                </Tab.Pane>
-              ))}
+              <Tab.Pane eventKey={activeCategory}>
+                <PostList category={activeCategory} />
+              </Tab.Pane>
             </Tab.Content>
           </Tab.Container>
         </Container>
