@@ -2,11 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Card, Row, Col, Image, Button, Badge, Table, Pagination } from 'react-bootstrap'
 import styles from '../../styles/pages/User.module.css'
 import { useDispatch, useSelector } from 'react-redux'
-import { getMeThunk, getMyRewardThunk, updateMyProfileThunk } from '../../features/userSlice'
+import { getMeThunk, getMyRewardThunk, updateMeThunk, updateMyProfileThunk } from '../../features/userSlice'
 import dayjs from 'dayjs'
 
 const InfoTab = () => {
    const [activePage, setActivePage] = useState(1)
+   const [changeReady, setChangeReady] = useState(false)
+   const [newNickname, setNewNickname] = useState('')
+   const [nicknameErr, setNicknameErr] = useState('')
    const dispatch = useDispatch()
    const { user, data, error } = useSelector((state) => state.user)
    const [totalPage, setTotalPage] = useState(1)
@@ -40,6 +43,19 @@ const InfoTab = () => {
          .then(() => {
             dispatch(getMeThunk())
             e.target.value = ''
+         })
+   }
+
+   const handleChangeNickname = () => {
+      if (/\s/.test(newNickname)) {
+         setNicknameErr('공백을 포함할 수 없습니다.')
+         return
+      }
+      dispatch(updateMeThunk({ name: newNickname }))
+         .unwrap()
+         .then(() => {
+            setChangeReady((prev) => !prev)
+            dispatch(getMeThunk())
          })
    }
 
@@ -88,7 +104,7 @@ const InfoTab = () => {
             <Card className={styles.contentCard}>
                <Card.Body className={styles.profileSection}>
                   <Row>
-                     <Col md={4} className="text-center">
+                     <Col md={4} className={`text-center ${styles.profileDiv}`}>
                         <div className={styles.profileImageSection}>
                            <Image
                               src={user.profile_img.startsWith('http') ? user.profile_img : `${import.meta.env.VITE_API_URL}${user.profile_img}`}
@@ -112,22 +128,71 @@ const InfoTab = () => {
                         <div className={styles.profileInfo}>
                            <h3 className={styles.nickname}>내정보</h3>
                            <div className={styles.userDetails}>
-                              <div className={styles.detailItem}>
-                                 <strong>이름:</strong> {user.name}
+                              <div className={`${styles.detailItem} ${styles.nameChange}`}>
+                                 <span>
+                                    <strong>닉네임: </strong>
+                                    {!changeReady && user.name}
+                                    <input
+                                       type="text"
+                                       name=""
+                                       id="nickname"
+                                       value={newNickname}
+                                       onChange={(e) => {
+                                          setNewNickname(e.target.value)
+                                       }}
+                                       hidden={!changeReady}
+                                       maxLength={8}
+                                    />
+                                    {nicknameErr && <span style={{ color: 'red' }}>{nicknameErr}</span>}
+                                 </span>
+                                 <Button
+                                    className={styles.nameChange}
+                                    hidden={changeReady}
+                                    onClick={() => {
+                                       setChangeReady((prev) => !prev)
+                                       setNewNickname(user.name)
+                                    }}
+                                 >
+                                    변경
+                                 </Button>
+                                 <div hidden={!changeReady} className={styles.buttonWrap}>
+                                    <Button variant="success" className={styles.nameChange} hidden={!changeReady} onClick={handleChangeNickname}>
+                                       적용
+                                    </Button>
+                                    <Button
+                                       variant="warning"
+                                       className={styles.nameChange}
+                                       hidden={!changeReady}
+                                       onClick={() => {
+                                          setChangeReady((prev) => !prev)
+                                          setNicknameErr('')
+                                       }}
+                                    >
+                                       취소
+                                    </Button>
+                                 </div>
                               </div>
                               <div className={styles.detailItem}>
-                                 <strong>이메일:</strong> {user.email}
+                                 <span>
+                                    <strong>이메일:</strong> {user.email}
+                                 </span>
                               </div>
                               <div className={styles.detailItem}>
-                                 <strong>가입일:</strong> {dayjs(user.createdAt).format('YYYY-MM-DD')}
+                                 <span>
+                                    <strong>가입일:</strong> {dayjs(user.createdAt).format('YYYY-MM-DD')}
+                                 </span>
                               </div>
                               <div className={styles.detailItem}>
-                                 <strong>SLC:</strong>
-                                 {data.reward.coin}
+                                 <span>
+                                    <strong>SLC:</strong>
+                                    {data.reward.coin}
+                                 </span>
                               </div>
                               <div className={styles.detailItem}>
-                                 <strong>지갑주소:</strong>
-                                 {user.wallet}
+                                 <span>
+                                    <strong>지갑주소:</strong>
+                                    {user.wallet}
+                                 </span>
                               </div>
                            </div>
                         </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Container, Row, Col, Nav } from 'react-bootstrap'
 import styles from '../../styles/pages/User.module.css'
 import InfoTab from './InfoTab'
-import EditTab from './EditTab'
+
 import ExchangeTab from './ExchangeTab'
 import PostTab from './PostTab'
 import { useSelector } from 'react-redux'
@@ -122,11 +122,7 @@ const User = () => {
                               내 정보 홈
                            </Nav.Link>
                         </Nav.Item>
-                        <Nav.Item>
-                           <Nav.Link active={activeTab === 'edit'} onClick={() => setActiveTab('edit')} className={styles.tabLink}>
-                              내 정보 수정
-                           </Nav.Link>
-                        </Nav.Item>
+
                         <Nav.Item>
                            <Nav.Link active={activeTab === 'post'} onClick={() => setActiveTab('post')} className={styles.tabLink}>
                               작성글 관리
