@@ -16,18 +16,18 @@ const PostList = ({ category = "free" }) => {
   const { boards, error, loading } = useSelector((state) => state.board);
 
   useEffect(() => {
-    dispatch(getBoardThunk());
-  }, [dispatch]);
+    dispatch(getBoardThunk(category));
+  }, [dispatch, category]);
 
   const handlePostClick = (id) => {
-    setSelectedPostId(id);
+    setSelectedPostId(Number(id));
     setEditPostId(null);
   };
 
   const handleBackToList = () => {
     setSelectedPostId(null);
     setEditPostId(null);
-    dispatch(getBoardThunk());
+    dispatch(getBoardThunk(category));
   };
 
   const handleWritePost = () => {
@@ -102,7 +102,7 @@ const PostList = ({ category = "free" }) => {
                 editPostId={editPostId}
                 onSuccess={() => {
                   setEditPostId(null);
-                  dispatch(getBoardThunk());
+                  dispatch(getBoardThunk(category));
                 }}
               />
             </Card.Body>
@@ -152,7 +152,7 @@ const PostList = ({ category = "free" }) => {
                   <PostEditor
                     onSuccess={() => {
                       setWrite(false);
-                      dispatch(getBoardThunk());
+                      dispatch(getBoardThunk(category));
                     }}
                   />
                 </Card.Body>
@@ -219,68 +219,85 @@ const PostList = ({ category = "free" }) => {
 
           {/* 1000px 이하일때 */}
           <div className={`${styles.posts} ${styles.cardView}`}>
-            {boards.map((board) => (
-              <Card
-                key={board.id}
-                className={`${styles.postCard} ${
-                  board.isPinned ? styles.pinned : ""
-                }`}
-                onClick={() => handlePostClick(board.id)}
-              >
-                <Card.Body>
-                  <div className={styles.postHeader}>
-                    {board.isPinned && (
-                      <Badge bg="danger">
-                        <i className="fas fa-thumbtack me-1"></i>공지
-                      </Badge>
-                    )}
-                    <div className="postMeta ms-auto">
-                      <div className={styles.postTime}>
-                        {formatTimeAgo(board.createdAt)}
+            {boards && boards.length > 0 ? (
+              boards.map((board) => (
+                <Card
+                  key={board.id}
+                  className={`${styles.postCard} ${
+                    board.isPinned ? styles.pinned : ""
+                  }`}
+                  onClick={() => handlePostClick(board.id)}
+                >
+                  <Card.Body>
+                    <div className={styles.postHeader}>
+                      {board.isPinned && (
+                        <Badge bg="danger">
+                          <i className="fas fa-thumbtack me-1"></i>공지
+                        </Badge>
+                      )}
+                      <div className="postMeta ms-auto">
+                        <div className={styles.postTime}>
+                          {formatTimeAgo(board.createdAt)}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <h5 className={styles.postTitle}>{board.title}</h5>
+                    <h5 className={styles.postTitle}>{board.title}</h5>
 
-                  {board.content && (
-                    <p className={styles.postContent}>{board.content}</p>
-                  )}
-
-                  <div className={styles.postFooter}>
-                    <div className={styles.authorInfo}>
-                      <img
-                        src="./vite.svg"
-                        alt={board.user_id ? `사용자${board.user_id}` : "익명"}
-                        className={styles.authorImage}
-                        onError={(e) => {
-                          e.target.src = "./vite.svg";
+                    {/* 게시글 내용 미리보기 내용 */}
+                    {board.content && (
+                      <div
+                        className={styles.postContent}
+                        // React에서 HTML 문자열을 직접 DOM에 삽입할 때 사용하는 속성
+                        // 보안상 위험할 수 있어 이름 앞에 dangerously가 붙음.
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            board.content.length > 100
+                              ? board.content.substring(0, 200) + "..."
+                              : board.content,
                         }}
                       />
-                      <div className={styles.authorName}>
-                        {board.user_id ? `사용자${board.user_id}` : "익명"}
-                        {getLevelBadge("Bronze")}
+                    )}
+
+                    <div className={styles.postFooter}>
+                      <div className={styles.authorInfo}>
+                        <img
+                          src="./vite.svg"
+                          alt={
+                            board.user_id ? `사용자${board.user_id}` : "익명"
+                          }
+                          className={styles.authorImage}
+                          onError={(e) => {
+                            e.target.src = "./vite.svg";
+                          }}
+                        />
+                        <div className={styles.authorName}>
+                          {board.user_id ? `사용자${board.user_id}` : "익명"}
+                          {getLevelBadge("Bronze")}
+                        </div>
+                      </div>
+
+                      <div className={styles.postStats}>
+                        <span className={styles.stat}>
+                          <i className="fas fa-eye me-1"></i>
+                          {(board.view_count || 0).toLocaleString()}
+                        </span>
+                        <span className={styles.stat}>
+                          <i className="fas fa-heart me-1"></i>
+                          {board.like_count || 0}
+                        </span>
+                        <span className={styles.stat}>
+                          <i className="fas fa-comment me-1"></i>
+                          {board.comment_count || 0}
+                        </span>
                       </div>
                     </div>
-
-                    <div className={styles.postStats}>
-                      <span className={styles.stat}>
-                        <i className="fas fa-eye me-1"></i>
-                        {(board.view_count || 0).toLocaleString()}
-                      </span>
-                      <span className={styles.stat}>
-                        <i className="fas fa-heart me-1"></i>
-                        {board.like_count || 0}
-                      </span>
-                      <span className={styles.stat}>
-                        <i className="fas fa-comment me-1"></i>
-                        {board.comment_count || 0}
-                      </span>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            ))}
+                  </Card.Body>
+                </Card>
+              ))
+            ) : (
+              <div>게시글이 없습니다.</div>
+            )}
           </div>
 
           {totalPages > 1 && (
