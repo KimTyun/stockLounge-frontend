@@ -330,6 +330,11 @@ td.tdwrap {
    max-width: 300px;
 }
 
+td.tdwrap > a {
+   color: inherit;
+   font-size: inherit;
+}
+
 .historyTable col:nth-of-type(1) {
    width: 20%;
 }
@@ -338,6 +343,10 @@ td.tdwrap {
 }
 .historyTable col:nth-of-type(3) {
    width: 20%;
+}
+
+.noneTableData {
+   padding: 10vw;
 }
 
 /* 반응형 */
