@@ -33,7 +33,7 @@ const ExchangeTab = () => {
                      </p>
                   </Col>
                   <Col md={4} className="text-end">
-                     <Button variant={data.reward.point < 1000 ? 'secondary' : 'primary'} size="lg" disabled={data.reward.point < 1000} className={`${styles.exchangeBtn} disabled`}>
+                     <Button variant={data.reward?.point < 1000 ? 'secondary' : 'primary'} size="lg" disabled={data.reward?.point < 1000} className={`${styles.exchangeBtn} disabled`}>
                         코인으로 교환
                      </Button>
                   </Col>
@@ -62,7 +62,7 @@ const ExchangeTab = () => {
                            <div className={styles.pointsRequired}>
                               <strong>{item.points.toLocaleString()}P 필요</strong>
                            </div>
-                           <Button variant={data.reward.point < item.points ? 'secondary' : 'primary'} size="sm" disabled={data.reward.point < item.points} className={styles.exchangeItemBtn} block>
+                           <Button variant={data.reward?.point < item.points ? 'secondary' : 'primary'} size="sm" disabled={data.reward?.point < item.points} className={styles.exchangeItemBtn} block>
                               교환하기
                            </Button>
                         </Card.Body>

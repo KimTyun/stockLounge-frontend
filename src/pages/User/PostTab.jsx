@@ -119,7 +119,7 @@ const PostTab = () => {
                <h4>작성글 목록</h4>
             </Card.Header>
             <Card.Body className={styles.historyBody}>
-               {data.posts?.posts.length === 0 ? (
+               {data.posts?.posts?.length === 0 ? (
                   <div className={styles.noneTableData}>
                      <p>아직 작성한 게시글이 없습니다.</p>
                   </div>
@@ -166,7 +166,7 @@ const PostTab = () => {
                <h4>작성 댓글 목록</h4>
             </Card.Header>
             <Card.Body className={styles.historyBody}>
-               {data.comments?.comments.length === 0 ? (
+               {data.comments?.comments?.length === 0 ? (
                   <div className={styles.noneTableData}>
                      <p>아직 작성한 댓글이 없습니다.</p>
                   </div>
