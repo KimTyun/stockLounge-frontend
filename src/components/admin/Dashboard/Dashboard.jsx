@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col, Card, Table, Badge, Button } from 'react-bootstrap'
 import styles from '../../../styles/components/admin/admin-common.module.css'
 import { getBoardThunk } from '../../../features/boardSlice'
-import { getUser } from '../../../features/UserSlice'
+import { getUsersThunk } from '../../../features/userSlice'
 
 const Dashboard = () => {
    const dispatch = useDispatch()
    const { users = [], boards = [], loading, error } = useSelector((state) => state.admin)
 
    useEffect(() => {
-      dispatch(getUser())
+      dispatch(getUsersThunk())
       dispatch(getBoardThunk())
    }, [dispatch])
 

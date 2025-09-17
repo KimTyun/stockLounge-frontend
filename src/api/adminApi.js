@@ -22,6 +22,7 @@ export const getUsers = async () => {
       throw error
    }
 }
+// 특정 사용자 관리
 export const getUserById = async (userId) => {
    try {
       const response = await axiosApi.get(`/admin/user/${userId}`)
@@ -31,6 +32,7 @@ export const getUserById = async (userId) => {
       throw error
    }
 }
+// 사용자 제재처리 관리
 export const updateUserBanStatus = async (userId, isBanned) => {
    try {
       const response = await axiosApi.put(`/admin/user/${userId}/ban`, { is_ban: isBanned })
@@ -40,6 +42,7 @@ export const updateUserBanStatus = async (userId, isBanned) => {
       throw error
    }
 }
+// 사용자 삭제
 export const deleteUser = async (userId) => {
    try {
       const response = await axiosApi.delete(`/admin/user/${userId}`)
@@ -60,6 +63,7 @@ export const getBoards = async () => {
       throw error
    }
 }
+// 게시판 삭제
 export const deleteBoard = async (boardId) => {
    try {
       const response = await axiosApi.delete(`/admin/boards/${boardId}`)
@@ -70,7 +74,7 @@ export const deleteBoard = async (boardId) => {
    }
 }
 
-// 사이트 설정 (getSiteSettings, updateSiteSettings)
+// 사이트 설정
 export const getSiteSettings = async () => {
    try {
       const response = await axiosApi.get(`/admin/settings`)
@@ -80,6 +84,7 @@ export const getSiteSettings = async () => {
       throw error
    }
 }
+// 사이트 설정 수정
 export const updateSiteSettings = async (settings) => {
    try {
       const response = await axiosApi.put(`/admin/settings`, settings)
@@ -90,7 +95,7 @@ export const updateSiteSettings = async (settings) => {
    }
 }
 
-// 금지어 관리 (getBanWords, addBanWord, deleteBanWord)
+// 금지어 관리
 export const getBanWords = async () => {
    try {
       const response = await axiosApi.get(`/admin/ban-words`)
@@ -100,15 +105,13 @@ export const getBanWords = async () => {
       throw error
    }
 }
+// 금지어 생성
 export const addBanWord = async (word) => {
-   try {
-      const response = await axiosApi.post(`/admin/ban-words`, { word })
-      return response.data
-   } catch (error) {
-      if (env === 'development') console.error(error)
-      throw error
-   }
+   const response = await axiosApi.post('/admin/ban-words', { word })
+   return response.data
 }
+
+// 금지어 삭제
 export const deleteBanWord = async (wordId) => {
    try {
       const response = await axiosApi.delete(`/admin/ban-words/${wordId}`)
@@ -119,28 +122,46 @@ export const deleteBanWord = async (wordId) => {
    }
 }
 
-// 교환품 관리 (addReward, updateReward, deleteReward)
-export const addReward = async (rewardData) => {
+// 교환품 관리
+export const getProducts = async () => {
    try {
-      const response = await axiosApi.post(`/admin/rewards`, rewardData)
+      const response = await axiosApi.get(`/admin/products`)
       return response.data
    } catch (error) {
       if (env === 'development') console.error(error)
       throw error
    }
 }
-export const updateReward = async (rewardId, rewardData) => {
+
+// 교환품 추가
+export const addProduct = async (ProductData) => {
    try {
-      const response = await axiosApi.put(`/admin/rewards/${rewardId}`, rewardData)
+      const response = await axiosApi.post(`/admin/products`, ProductData, {
+         headers: {
+            'Content-Type': 'multipart/form-data',
+         },
+      })
       return response.data
    } catch (error) {
       if (env === 'development') console.error(error)
       throw error
    }
 }
-export const deleteReward = async (rewardId) => {
+
+// 교환품 수정
+export const updateProduct = async (ProductId, ProductData) => {
    try {
-      const response = await axiosApi.delete(`/admin/rewards/${rewardId}`)
+      const response = await axiosApi.put(`/admin/products/${ProductId}`, ProductData)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+// 교환품 삭제
+export const deleteProduct = async (ProductId) => {
+   try {
+      const response = await axiosApi.delete(`/admin/products/${ProductId}`)
       return response.data
    } catch (error) {
       if (env === 'development') console.error(error)

@@ -35,7 +35,7 @@ export const deleteBoardThunk = createAsyncThunk('admin/deleteBoard', async (boa
 export const getSiteSettingsThunk = createAsyncThunk('admin/getSiteSettings', async (_, { rejectWithValue }) => {
    try {
       const response = await adminApi.getSiteSettings()
-      return response
+      return response.data ?? response
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -51,17 +51,17 @@ export const updateSiteSettingsThunk = createAsyncThunk('admin/updateSiteSetting
    }
 })
 
-// 금칙어 관리
+// 금지어 관리
 export const getBanWordsThunk = createAsyncThunk('admin/getBanWords', async (_, { rejectWithValue }) => {
    try {
       const response = await adminApi.getBanWords()
-      return response
+      return response.data ?? response
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
 })
 
-// 금칙어 생성
+// 금지어 생성
 export const addBanWordThunk = createAsyncThunk('admin/addBanWord', async (word, { rejectWithValue }) => {
    try {
       const response = await adminApi.addBanWord(word)
@@ -71,7 +71,7 @@ export const addBanWordThunk = createAsyncThunk('admin/addBanWord', async (word,
    }
 })
 
-// 금칙어 삭제
+// 금지어 삭제
 export const deleteBanWordThunk = createAsyncThunk('admin/deleteBanWord', async (wordId, { rejectWithValue }) => {
    try {
       await adminApi.deleteBanWord(wordId)
@@ -81,10 +81,20 @@ export const deleteBanWordThunk = createAsyncThunk('admin/deleteBanWord', async 
    }
 })
 
-// 교환품 생성
-export const addRewardThunk = createAsyncThunk('admin/addReward', async (rewardData, { rejectWithValue }) => {
+// 교환품 목록
+export const getProductsThunk = createAsyncThunk('admin/getProducts', async (_, { rejectWithValue }) => {
    try {
-      const response = await adminApi.addReward(rewardData)
+      const response = await adminApi.getProducts()
+      return response
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
+// 교환품 생성
+export const addProductThunk = createAsyncThunk('admin/addProduct', async (productData, { rejectWithValue }) => {
+   try {
+      const response = await adminApi.addProduct(productData)
       return response
    } catch (error) {
       return rejectWithValue(error.response?.data)
@@ -92,9 +102,9 @@ export const addRewardThunk = createAsyncThunk('admin/addReward', async (rewardD
 })
 
 // 교환품 수정
-export const updateRewardThunk = createAsyncThunk('admin/updateReward', async ({ rewardId, rewardData }, { rejectWithValue }) => {
+export const updateProductThunk = createAsyncThunk('admin/updateProduct', async ({ productId, productData }, { rejectWithValue }) => {
    try {
-      const response = await adminApi.updateReward(rewardId, rewardData)
+      const response = await adminApi.updateProduct(productId, productData)
       return response
    } catch (error) {
       return rejectWithValue(error.response?.data)
@@ -102,10 +112,10 @@ export const updateRewardThunk = createAsyncThunk('admin/updateReward', async ({
 })
 
 // 교환품 삭제
-export const deleteRewardThunk = createAsyncThunk('admin/deleteReward', async (rewardId, { rejectWithValue }) => {
+export const deleteProductThunk = createAsyncThunk('admin/deleteProduct', async (productId, { rejectWithValue }) => {
    try {
-      await adminApi.deleteReward(rewardId)
-      return rewardId
+      await adminApi.deleteProduct(productId)
+      return productId
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -116,31 +126,20 @@ const adminSlice = createSlice({
    initialState: {
       users: [],
       boards: [],
-      settings: null,
+      settings: {},
       banWords: [],
-      rewards: [],
-      loading: false,
+      products: [],
+      loading: {
+         users: false,
+         boards: false,
+         settings: false,
+         banWords: false,
+         products: false,
+      },
       error: null,
-      token: null,
    },
    reducers: {
       clearError: (state) => {
-         state.error = null
-      },
-
-      loginSuccess: (state, action) => {
-         state.token = action.payload
-         state.loading = false
-         state.error = null
-      },
-      logout: (state) => {
-         state.token = null
-         state.users = []
-         state.boards = []
-         state.settings = null
-         state.banWords = []
-         state.rewards = []
-         state.loading = false
          state.error = null
       },
    },
@@ -148,11 +147,11 @@ const adminSlice = createSlice({
       builder
          // 사용자 제재
          .addCase(updateUserStatusThunk.pending, (state) => {
-            state.loading = true
+            state.loading.users = true
             state.error = null
          })
          .addCase(updateUserStatusThunk.fulfilled, (state, action) => {
-            state.loading = false
+            state.loading.users = false
             const { userId, isBanned } = action.payload
             const userIndex = state.users.findIndex((user) => user.id === userId)
             if (userIndex !== -1) {
@@ -160,138 +159,167 @@ const adminSlice = createSlice({
             }
          })
          .addCase(updateUserStatusThunk.rejected, (state, action) => {
-            state.loading = false
+            state.loading.users = false
             state.error = action.payload?.message || '사용자를 제재하지 못했습니다.'
          })
 
          // 게시판 삭제
          .addCase(deleteBoardThunk.pending, (state) => {
-            state.loading = true
+            state.loading.boards = true
             state.error = null
          })
          .addCase(deleteBoardThunk.fulfilled, (state, action) => {
-            state.loading = false
+            state.loading.boards = false
             state.boards = state.boards.filter((board) => board.id !== action.payload)
          })
          .addCase(deleteBoardThunk.rejected, (state, action) => {
-            state.loading = false
+            state.loading.boards = false
             state.error = action.payload?.message || '게시판을 삭제하지 못했습니다.'
          })
 
          // 사이트 설정
          .addCase(getSiteSettingsThunk.pending, (state) => {
-            state.loading = true
-            state.error = null
+            state.loading.settings = true
          })
          .addCase(getSiteSettingsThunk.fulfilled, (state, action) => {
-            state.loading = false
+            state.loading.settings = false
             state.settings = action.payload
          })
          .addCase(getSiteSettingsThunk.rejected, (state, action) => {
-            state.loading = false
+            state.loading.settings = false
             state.error = action.payload?.message || '사이트 설정을 불러오지 못했습니다.'
          })
 
          // 사이트 설정 수정
          .addCase(updateSiteSettingsThunk.pending, (state) => {
-            state.loading = true
+            state.loading.settings = true
             state.error = null
          })
          .addCase(updateSiteSettingsThunk.fulfilled, (state, action) => {
-            state.loading = false
+            state.loading.settings = false
             state.settings = action.payload
          })
          .addCase(updateSiteSettingsThunk.rejected, (state, action) => {
-            state.loading = false
+            state.loading.settings = false
             state.error = action.payload?.message || '사이트 설정을 수정하지 못했습니다.'
          })
 
-         // 금칙어 조회
+         // 금지어 조회
          .addCase(getBanWordsThunk.pending, (state) => {
-            state.loading = true
-            state.error = null
+            state.loading.banWords = true
          })
          .addCase(getBanWordsThunk.fulfilled, (state, action) => {
-            state.loading = false
-            state.banWords = action.payload
+            state.loading.banWords = false
+            state.banWords = Array.isArray(action.payload) ? action.payload : []
          })
          .addCase(getBanWordsThunk.rejected, (state, action) => {
-            state.loading = false
-            state.error = action.payload?.message || '금칙어를 조회하지 못했습니다.'
+            state.loading.banWords = false
+            state.error = action.payload?.message || '금지어를 조회하지 못했습니다.'
          })
 
-         // 금칙어 생성
-         .addCase(addBanWordThunk.pending, (state) => {
-            state.loading = true
+         // 금지어 생성
+         .addCase(addBanWordThunk.pending, (state, action) => {
+            state.loading.banWords = false
+            if (action.payload) {
+               state.banWords.unshift(action.payload)
+            }
             state.error = null
          })
          .addCase(addBanWordThunk.fulfilled, (state, action) => {
-            state.loading = false
-            state.banWords.push(action.payload)
+            state.loading.banWords = false
+            if (action.payload) {
+               state.banWords.unshift(action.payload)
+            }
          })
          .addCase(addBanWordThunk.rejected, (state, action) => {
-            state.loading = false
-            state.error = action.payload?.message || '금칙어를 추가하지 못했습니다.'
+            state.loading.banWords = false
+            state.error = action.payload?.message || '금지어를 추가하지 못했습니다.'
          })
 
-         // 금칙어 삭제
+         // 금지어 삭제
          .addCase(deleteBanWordThunk.pending, (state) => {
-            state.loading = true
+            state.loading.banWords = true
             state.error = null
          })
          .addCase(deleteBanWordThunk.fulfilled, (state, action) => {
-            state.loading = false
+            state.loading.banWords = false
             state.banWords = state.banWords.filter((word) => word.id !== action.payload)
          })
          .addCase(deleteBanWordThunk.rejected, (state, action) => {
-            state.loading = false
-            state.error = action.payload?.message || '금칙어를 삭제하지 못했습니다.'
+            state.loading.banWords = false
+            state.error = action.payload?.message || '금지어를 삭제하지 못했습니다.'
+         })
+
+         // 교환품 목록
+         .addCase(getProductsThunk.pending, (state) => {
+            state.loading.products = true
+            state.error = null
+         })
+         .addCase(getProductsThunk.fulfilled, (state, action) => {
+            state.loading.products = false
+            if (action.payload && action.payload.products) {
+               state.products = action.payload.products.map((product) => ({
+                  ...product,
+                  points: product.price,
+               }))
+            } else {
+               state.products = []
+            }
+         })
+         .addCase(getProductsThunk.rejected, (state, action) => {
+            state.loading.products = false
+            state.error = action.payload?.message || '교환품 목록을 불러오지 못했습니다.'
          })
 
          // 교환품 추가
-         .addCase(addRewardThunk.pending, (state) => {
-            state.loading = true
+         .addCase(addProductThunk.pending, (state) => {
+            state.loading.products = true
             state.error = null
          })
-         .addCase(addRewardThunk.fulfilled, (state, action) => {
-            state.loading = false
-            state.rewards.push(action.payload)
+         .addCase(addProductThunk.fulfilled, (state, action) => {
+            state.loading.products = false
+            const newProduct = {
+               ...action.payload.product,
+               points: action.payload.product.price,
+            }
+            state.products.push(newProduct)
          })
-         .addCase(addRewardThunk.rejected, (state, action) => {
-            state.loading = false
+         .addCase(addProductThunk.rejected, (state, action) => {
+            state.loading.products = false
             state.error = action.payload?.message || '교환품을 추가하지 못했습니다.'
          })
 
          // 교환품 수정
-         .addCase(updateRewardThunk.pending, (state) => {
-            state.loading = true
+         .addCase(updateProductThunk.pending, (state) => {
+            state.loading.products = true
             state.error = null
          })
-         .addCase(updateRewardThunk.fulfilled, (state, action) => {
-            state.loading = false
-            const updatedReward = action.payload
-            const rewardIndex = state.rewards.findIndex((reward) => reward.id === updatedReward.id)
-            if (rewardIndex !== -1) {
-               state.rewards[rewardIndex] = updatedReward
+         .addCase(updateProductThunk.fulfilled, (state, action) => {
+            state.loading.products = false
+            const updatedProduct = action.payload.product
+            const productIndex = state.products.findIndex((product) => product.id === updatedProduct.id)
+            if (productIndex !== -1) {
+               state.products[productIndex] = updatedProduct
             }
          })
-         .addCase(updateRewardThunk.rejected, (state, action) => {
-            state.loading = false
+         .addCase(updateProductThunk.rejected, (state, action) => {
+            state.loading.products = false
             state.error = action.payload?.message || '교환품을 수정하지 못했습니다.'
          })
 
          // 교환품 삭제
-         .addCase(deleteRewardThunk.pending, (state) => {
-            state.loading = true
+         .addCase(deleteProductThunk.pending, (state) => {
+            state.loading.products = true
             state.error = null
          })
-         .addCase(deleteRewardThunk.fulfilled, (state, action) => {
-            state.loading = false
-            state.rewards = state.rewards.filter((reward) => reward.id !== action.payload)
+         .addCase(deleteProductThunk.fulfilled, (state, action) => {
+            state.loading.products = false
+            const deletedId = action.payload?.deletedId || action.payload
+            state.products = state.products.filter((product) => product.id !== deletedId)
          })
-         .addCase(deleteRewardThunk.rejected, (state, action) => {
-            state.loading = false
-            state.error = action.payload?.message || '교환품을 수정하지 못했습니다.'
+         .addCase(deleteProductThunk.rejected, (state, action) => {
+            state.loading.products = false
+            state.error = action.payload?.message || '교환품을 삭제하지 못했습니다.'
          })
    },
 })

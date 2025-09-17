@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal, Alert, Spinner } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
+import { getUsersThunk } from '../../../features/userSlice'
 import { updateUserStatusThunk, deleteUserThunk } from '../../../features/adminSlice'
 import styles from '../../../styles/pages/Admin.module.css'
 
@@ -15,7 +16,7 @@ const UserManagement = () => {
    const [sortBy, setSortBy] = useState('joinDate')
 
    useEffect(() => {
-      dispatch(getUsers())
+      dispatch(getUsersThunk())
    }, [dispatch])
 
    const getStatusBadge = (status) => {
