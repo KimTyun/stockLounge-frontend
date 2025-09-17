@@ -209,7 +209,7 @@ const PostList = ({ category = "free" }) => {
                       {board.like_count || 0}
                     </div>
                     <div className={styles.dateColumn}>
-                      {formatTimeAgo(board.created_at)}
+                      {formatTimeAgo(board.createdAt)}
                     </div>
                   </li>
                 ))
