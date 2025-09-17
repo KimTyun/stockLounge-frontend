@@ -32,7 +32,7 @@ export const getUserById = async (userId) => {
       throw error
    }
 }
-// 사용자 제재처리 관리
+// 사용자 제재 처리 관리
 export const updateUserBanStatus = async (userId, isBanned) => {
    try {
       const response = await axiosApi.put(`/admin/user/${userId}/ban`, { is_ban: isBanned })
@@ -84,10 +84,11 @@ export const getSiteSettings = async () => {
       throw error
    }
 }
+
 // 사이트 설정 수정
-export const updateSiteSettings = async (settings) => {
+export const updateSiteSettings = async (settingsData) => {
    try {
-      const response = await axiosApi.put(`/admin/settings`, settings)
+      const response = await axiosApi.put(`/admin/settings`, settingsData)
       return response.data
    } catch (error) {
       if (env === 'development') console.error(error)
@@ -95,7 +96,7 @@ export const updateSiteSettings = async (settings) => {
    }
 }
 
-// 금지어 관리
+// 금지어 조회
 export const getBanWords = async () => {
    try {
       const response = await axiosApi.get(`/admin/ban-words`)
@@ -105,16 +106,22 @@ export const getBanWords = async () => {
       throw error
    }
 }
-// 금지어 생성
-export const addBanWord = async (word) => {
-   const response = await axiosApi.post('/admin/ban-words', { word })
-   return response.data
+
+// 금지어 추가
+export const addBanWord = async (banWordData) => {
+   try {
+      const response = await axiosApi.post(`/admin/ban-words`, banWordData)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
 }
 
 // 금지어 삭제
-export const deleteBanWord = async (wordId) => {
+export const deleteBanWord = async (banWordId) => {
    try {
-      const response = await axiosApi.delete(`/admin/ban-words/${wordId}`)
+      const response = await axiosApi.delete(`/admin/ban-words/${banWordId}`)
       return response.data
    } catch (error) {
       if (env === 'development') console.error(error)

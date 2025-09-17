@@ -55,27 +55,28 @@ export const updateSiteSettingsThunk = createAsyncThunk('admin/updateSiteSetting
 export const getBanWordsThunk = createAsyncThunk('admin/getBanWords', async (_, { rejectWithValue }) => {
    try {
       const response = await adminApi.getBanWords()
-      return response.data ?? response
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
 })
 
 // 금지어 생성
-export const addBanWordThunk = createAsyncThunk('admin/addBanWord', async (word, { rejectWithValue }) => {
+export const addBanWordThunk = createAsyncThunk('admin/addBanWord', async (banWordData, { dispatch, rejectWithValue }) => {
    try {
-      const response = await adminApi.addBanWord(word)
-      return response
+      const response = await adminApi.addBanWord(banWordData)
+      dispatch(getBanWordsThunk())
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
 })
 
 // 금지어 삭제
-export const deleteBanWordThunk = createAsyncThunk('admin/deleteBanWord', async (wordId, { rejectWithValue }) => {
+export const deleteBanWordThunk = createAsyncThunk('admin/deleteBanWord', async (banWordId, { rejectWithValue }) => {
    try {
-      await adminApi.deleteBanWord(wordId)
-      return wordId
+      await adminApi.deleteBanWord(banWordId)
+      return banWordId
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -128,6 +129,8 @@ const adminSlice = createSlice({
       boards: [],
       settings: {},
       banWords: [],
+      banWordsLoading: false,
+      banWordsError: null,
       products: [],
       loading: {
          users: false,
@@ -206,48 +209,43 @@ const adminSlice = createSlice({
 
          // 금지어 조회
          .addCase(getBanWordsThunk.pending, (state) => {
-            state.loading.banWords = true
+            state.banWordsLoading = true
+            state.banWordsError = null
          })
          .addCase(getBanWordsThunk.fulfilled, (state, action) => {
-            state.loading.banWords = false
-            state.banWords = Array.isArray(action.payload) ? action.payload : []
+            state.banWordsLoading = false
+            state.banWords = action.payload
          })
          .addCase(getBanWordsThunk.rejected, (state, action) => {
-            state.loading.banWords = false
-            state.error = action.payload?.message || '금지어를 조회하지 못했습니다.'
+            state.banWordsLoading = false
+            state.banWordsError = action.payload
          })
 
          // 금지어 생성
-         .addCase(addBanWordThunk.pending, (state, action) => {
-            state.loading.banWords = false
-            if (action.payload) {
-               state.banWords.unshift(action.payload)
-            }
-            state.error = null
+         .addCase(addBanWordThunk.pending, (state) => {
+            state.banWordsLoading = true
+            state.banWordsError = null
          })
          .addCase(addBanWordThunk.fulfilled, (state, action) => {
-            state.loading.banWords = false
-            if (action.payload) {
-               state.banWords.unshift(action.payload)
-            }
+            state.banWordsLoading = false
          })
          .addCase(addBanWordThunk.rejected, (state, action) => {
-            state.loading.banWords = false
-            state.error = action.payload?.message || '금지어를 추가하지 못했습니다.'
+            state.banWordsLoading = false
+            state.banWordsError = action.payload
          })
 
          // 금지어 삭제
          .addCase(deleteBanWordThunk.pending, (state) => {
-            state.loading.banWords = true
-            state.error = null
+            state.banWordsLoading = true
+            state.banWordsError = null
          })
          .addCase(deleteBanWordThunk.fulfilled, (state, action) => {
-            state.loading.banWords = false
+            state.banWordsLoading = false
             state.banWords = state.banWords.filter((word) => word.id !== action.payload)
          })
          .addCase(deleteBanWordThunk.rejected, (state, action) => {
-            state.loading.banWords = false
-            state.error = action.payload?.message || '금지어를 삭제하지 못했습니다.'
+            state.banWordsLoading = false
+            state.banWordsError = action.payload
          })
 
          // 교환품 목록
@@ -257,8 +255,8 @@ const adminSlice = createSlice({
          })
          .addCase(getProductsThunk.fulfilled, (state, action) => {
             state.loading.products = false
-            if (action.payload && action.payload.products) {
-               state.products = action.payload.products.map((product) => ({
+            if (action.payload && action.payload.data) {
+               state.products = action.payload.data.map((product) => ({
                   ...product,
                   points: product.price,
                }))

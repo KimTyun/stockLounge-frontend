@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col, Card, Form, Button, Alert, Table, Spinner } from 'react-bootstrap'
 import { getSiteSettingsThunk, updateSiteSettingsThunk, getBanWordsThunk, addBanWordThunk, deleteBanWordThunk, getProductsThunk, addProductThunk, deleteProductThunk } from '../../../features/adminSlice'
 import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const SiteManagement = () => {
    const dispatch = useDispatch()
-   const { settings: initialSettings, banWords, products, loading } = useSelector((state) => state.admin)
+   const { settings, products, loading } = useSelector((state) => state.admin)
+   const { banWords, banWordsLoading, banWordsError } = useSelector((state) => state.admin)
 
-   useEffect(() => {
-      // Redux 스토어에서 설정을 불러와 로컬 상태에 저장
-      if (initialSettings) {
-         setSettings(initialSettings)
-      }
-   }, [initialSettings])
+   const [newBanWord, setNewBanWord] = useState('')
+   const [newBanDescription, setNewBanDescription] = useState('')
+   const [siteSettings, setSiteSettings] = useState({})
+   const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '' })
+   const [productImage, setProductImage] = useState(null)
+   const [showAlert, setShowAlert] = useState(false)
+   const [alertMessage, setAlertMessage] = useState('')
+   const [alertType, setAlertType] = useState('success')
 
    useEffect(() => {
       dispatch(getSiteSettingsThunk())
@@ -21,116 +24,149 @@ const SiteManagement = () => {
       dispatch(getProductsThunk())
    }, [dispatch])
 
-   const [newBanWord, setNewBanWord] = useState('')
-   const [newProduct, setNewProduct] = useState({ name: '', points: 0, stock: 0 })
-   const [settings, setSettings] = useState({})
-   const [showAlert, setShowAlert] = useState(false)
-   const [alertMessage, setAlertMessage] = useState('')
-   const [alertType, setAlertType] = useState('success')
-   const [productImage, setProductImage] = useState(null)
+   useEffect(() => {
+      if (settings) {
+         setSiteSettings(settings)
+      }
+   }, [settings])
+
+   useEffect(() => {
+      if (banWordsError) {
+         setAlertMessage(banWordsError.message || '오류가 발생했습니다.')
+         setAlertType('danger')
+         setShowAlert(true)
+         setTimeout(() => setShowAlert(false), 3000)
+      }
+   }, [banWordsError])
 
    const handleSettingChange = (key, value) => {
-      setSettings((prev) => ({
+      setSiteSettings((prev) => ({
          ...prev,
          [key]: value,
       }))
    }
 
-   // 사이트 설정 저장
-   const handleSaveSettings = () => {
-      // settings 상태 객체를 통째로 Thunk에 전달
-      dispatch(updateSiteSettingsThunk(settings))
-      setAlertMessage('설정이 성공적으로 저장되었습니다.')
-      setAlertType('success')
+   const showAlertMessage = (message, type) => {
+      setAlertMessage(message)
+      setAlertType(type)
       setShowAlert(true)
       setTimeout(() => setShowAlert(false), 3000)
    }
 
+   // 사이트 설정 저장
+   const handleSaveSettings = () => {
+      dispatch(updateSiteSettingsThunk(siteSettings))
+         .unwrap()
+         .then(() => {
+            showAlertMessage('설정이 성공적으로 저장되었습니다.', 'success')
+         })
+         .catch((error) => {
+            showAlertMessage(`설정 저장 실패: ${error.message}`, 'danger')
+         })
+   }
+
    // 금지어 추가
-   const handleAddBanWord = () => {
-      if (newBanWord.trim()) {
-         // Thunk에 추가할 금지어(문자열)를 전달
-         dispatch(addBanWordThunk(newBanWord.trim()))
-            .unwrap()
-            .then(() => {
-               setNewBanWord('')
-               setAlertMessage('금지어가 추가되었습니다.')
-               setAlertType('success')
-               setShowAlert(true)
-               setTimeout(() => setShowAlert(false), 3000)
-            })
-            .catch((error) => {
-               setAlertMessage(`금지어 추가 실패: ${error.message}`)
-               setAlertType('danger')
-               setShowAlert(true)
-            })
+   const handleAddBanWord = async () => {
+      if (!newBanWord.trim()) {
+         setAlertMessage('금지어를 입력해주세요.')
+         setAlertType('warning')
+         setShowAlert(true)
+         setTimeout(() => setShowAlert(false), 3000)
+         return
+      }
+
+      // 금지어 중복 체크
+      if (banWords.some((item) => item.pattern === newBanWord.trim())) {
+         setAlertMessage('이미 등록된 금지어입니다.')
+         setAlertType('warning')
+         setShowAlert(true)
+         setTimeout(() => setShowAlert(false), 3000)
+         return
+      }
+
+      try {
+         const banWordData = {
+            pattern: newBanWord.trim(),
+            description: newBanDescription.trim() || null,
+         }
+
+         await dispatch(addBanWordThunk(banWordData)).unwrap()
+
+         setNewBanWord('')
+         setNewBanDescription('')
+         setAlertMessage('금지어가 추가되었습니다.')
+         setAlertType('success')
+         setShowAlert(true)
+         setTimeout(() => setShowAlert(false), 3000)
+      } catch (error) {
+         setAlertMessage(error.message || '금지어 추가에 실패했습니다.')
+         setAlertType('danger')
+         setShowAlert(true)
+         setTimeout(() => setShowAlert(false), 3000)
       }
    }
 
    // 금지어 삭제
-   const handleRemoveBanWord = (wordId) => {
-      dispatch(deleteBanWordThunk(wordId))
-         .unwrap()
-         .then(() => {
-            setAlertMessage('금지어가 삭제되었습니다.')
-            setAlertType('info')
-            setShowAlert(true)
-            setTimeout(() => setShowAlert(false), 3000)
-         })
-         .catch((error) => {
-            setAlertMessage(`금지어 삭제 실패: ${error.message}`)
-            setAlertType('danger')
-            setShowAlert(true)
-         })
+   const handleRemoveBanWord = async (banWordId) => {
+      if (!window.confirm('정말로 이 금지어를 삭제하시겠습니까?')) {
+         return
+      }
+
+      try {
+         await dispatch(deleteBanWordThunk(banWordId)).unwrap()
+
+         setAlertMessage('금지어가 삭제되었습니다.')
+         setAlertType('info')
+         setShowAlert(true)
+         setTimeout(() => setShowAlert(false), 3000)
+      } catch (error) {
+         setAlertMessage(error.message || '금지어 삭제에 실패했습니다.')
+         setAlertType('danger')
+         setShowAlert(true)
+         setTimeout(() => setShowAlert(false), 3000)
+      }
    }
 
    // 교환품 추가
    const handleAddProduct = () => {
-      if (!newProduct.name || !newProduct.points || !newProduct.stock || !productImage) {
-         alert('모든 필드를 입력하고 이미지를 선택하세요.')
+      if (!newProduct.name || !newProduct.price || !newProduct.stock || !productImage) {
+         showAlertMessage('모든 필드를 입력하고 이미지를 선택하세요.', 'warning')
          return
       }
       const formData = new FormData()
       formData.append('name', newProduct.name)
-      formData.append('points', newProduct.points)
+      formData.append('price', newProduct.price)
       formData.append('stock', newProduct.stock)
       formData.append('product_img', productImage)
 
       dispatch(addProductThunk(formData))
          .unwrap()
          .then(() => {
-            // 성공 시 입력 필드 초기화
-            setNewProduct({ name: '', points: '', stock: '' })
+            setNewProduct({ name: '', price: '', stock: '' })
             setProductImage(null)
+            showAlertMessage('상품이 추가되었습니다.', 'success')
          })
          .catch((err) => {
-            console.error('Failed to add product:', err)
+            console.error('   :', err)
+            showAlertMessage(`상품 추가 실패: ${err.message}`, 'danger')
          })
    }
-
-   useEffect(() => {
-      dispatch(getProductsThunk())
-   }, [dispatch])
 
    // 교환품 삭제
    const handleDeleteProduct = (idToRemove) => {
-      // idToRemove를 Thunk에 전달하여 삭제 요청
       dispatch(deleteProductThunk(idToRemove))
          .unwrap()
          .then(() => {
-            setAlertMessage('상품이 삭제되었습니다.')
-            setAlertType('info')
-            setShowAlert(true)
-            setTimeout(() => setShowAlert(false), 3000)
+            showAlertMessage('상품이 삭제되었습니다.', 'info')
          })
          .catch((error) => {
-            setAlertMessage(`상품 삭제 실패: ${error.message}`)
-            setAlertType('danger')
-            setShowAlert(true)
+            showAlertMessage(`상품 삭제 실패: ${error.message}`, 'danger')
          })
    }
 
-   if (loading.settings || loading.banWords || loading.products) {
+   const isLoading = loading.settings || loading.banWords || loading.products
+
+   if (isLoading) {
       return (
          <div className="text-center py-5">
             <Spinner animation="border" role="status">
@@ -163,26 +199,26 @@ const SiteManagement = () => {
                   <Col md={6}>
                      <Form.Group className="mb-3">
                         <Form.Label>사이트 이름</Form.Label>
-                        <Form.Control type="text" value={settings.siteName} onChange={(e) => handleSettingChange('siteName', e.target.value)} />
+                        <Form.Control type="text" value={siteSettings?.siteName || ''} onChange={(e) => handleSettingChange('siteName', e.target.value)} />
                      </Form.Group>
                   </Col>
                   <Col md={6}>
                      <Form.Group className="mb-3">
                         <Form.Label>사이트 설명</Form.Label>
-                        <Form.Control type="text" value={settings.siteDescription} onChange={(e) => handleSettingChange('siteDescription', e.target.value)} />
+                        <Form.Control type="text" value={siteSettings?.siteDescription || ''} onChange={(e) => handleSettingChange('siteDescription', e.target.value)} />
                      </Form.Group>
                   </Col>
                </Row>
                <Row>
                   <Col md={6}>
                      <Form.Group className="mb-3">
-                        <Form.Check type="switch" id="maintenance-mode" label="유지보수 모드" checked={settings.maintenanceMode} onChange={(e) => handleSettingChange('maintenanceMode', e.target.checked)} />
+                        <Form.Check type="switch" id="maintenance-mode" label="유지보수 모드" checked={!!siteSettings?.maintenanceMode} onChange={(e) => handleSettingChange('maintenanceMode', e.target.checked)} />
                         <Form.Text className="text-muted">활성화 시 사이트에 접근할 수 없습니다.</Form.Text>
                      </Form.Group>
                   </Col>
                   <Col md={6}>
                      <Form.Group className="mb-3">
-                        <Form.Check type="switch" id="allow-registration" label="회원가입 허용" checked={settings.allowRegistration} onChange={(e) => handleSettingChange('allowRegistration', e.target.checked)} />
+                        <Form.Check type="switch" id="allow-registration" label="회원가입 허용" checked={!!siteSettings?.allowRegistration} onChange={(e) => handleSettingChange('allowRegistration', e.target.checked)} />
                         <Form.Text className="text-muted">비활성화 시 새로운 회원가입이 불가능합니다.</Form.Text>
                      </Form.Group>
                   </Col>
@@ -203,26 +239,26 @@ const SiteManagement = () => {
                   <Col md={3}>
                      <Form.Group className="mb-3">
                         <Form.Label>게시글 작성 포인트</Form.Label>
-                        <Form.Control type="number" value={settings.pointsPerPost} onChange={(e) => handleSettingChange('pointsPerPost', parseInt(e.target.value))} min="0" />
+                        <Form.Control type="number" value={siteSettings?.pointsPerPost || 0} onChange={(e) => handleSettingChange('pointsPerPost', parseInt(e.target.value))} min="0" />
                      </Form.Group>
                   </Col>
                   <Col md={3}>
                      <Form.Group className="mb-3">
                         <Form.Label>댓글 작성 포인트</Form.Label>
-                        <Form.Control type="number" value={settings.pointsPerComment} onChange={(e) => handleSettingChange('pointsPerComment', parseInt(e.target.value))} min="0" />
+                        <Form.Control type="number" value={siteSettings?.pointsPerComment || 0} onChange={(e) => handleSettingChange('pointsPerComment', parseInt(e.target.value))} min="0" />
                      </Form.Group>
                   </Col>
                   <Col md={3}>
                      <Form.Group className="mb-3">
                         <Form.Label>추천 받기 포인트</Form.Label>
-                        <Form.Control type="number" value={settings.pointsPerLike} onChange={(e) => handleSettingChange('pointsPerLike', parseInt(e.target.value))} min="0" />
+                        <Form.Control type="number" value={siteSettings?.pointsPerLike || 0} onChange={(e) => handleSettingChange('pointsPerLike', parseInt(e.target.value))} min="0" />
                      </Form.Group>
                   </Col>
                   <Col md={3}>
                      <Form.Group className="mb-3">
                         <Form.Label>코인 교환 비율</Form.Label>
-                        <Form.Control type="number" value={settings.coinExchangeRate} onChange={(e) => handleSettingChange('coinExchangeRate', parseInt(e.target.value))} min="1" />
-                        <Form.Text className="text-muted">{settings.coinExchangeRate}포인트 = 1코인</Form.Text>
+                        <Form.Control type="number" value={siteSettings?.coinExchangeRate || 1} onChange={(e) => handleSettingChange('coinExchangeRate', parseInt(e.target.value))} min="1" />
+                        <Form.Text className="text-muted">{siteSettings?.coinExchangeRate || 1}포인트 = 1코인</Form.Text>
                      </Form.Group>
                   </Col>
                </Row>
@@ -242,14 +278,14 @@ const SiteManagement = () => {
                   <Col md={6}>
                      <Form.Group className="mb-3">
                         <Form.Label>일일 게시글 작성 제한</Form.Label>
-                        <Form.Control type="number" value={settings.maxPostsPerDay} onChange={(e) => handleSettingChange('maxPostsPerDay', parseInt(e.target.value))} min="1" />
+                        <Form.Control type="number" value={siteSettings?.maxPostsPerDay || 0} onChange={(e) => handleSettingChange('maxPostsPerDay', parseInt(e.target.value))} min="1" />
                         <Form.Text className="text-muted">회원이 하루에 작성할 수 있는 최대 게시글 수</Form.Text>
                      </Form.Group>
                   </Col>
                   <Col md={6}>
                      <Form.Group className="mb-3">
                         <Form.Label>일일 댓글 작성 제한</Form.Label>
-                        <Form.Control type="number" value={settings.maxCommentsPerDay} onChange={(e) => handleSettingChange('maxCommentsPerDay', parseInt(e.target.value))} min="1" />
+                        <Form.Control type="number" value={siteSettings?.maxCommentsPerDay || 0} onChange={(e) => handleSettingChange('maxCommentsPerDay', parseInt(e.target.value))} min="1" />
                         <Form.Text className="text-muted">회원이 하루에 작성할 수 있는 최대 댓글 수</Form.Text>
                      </Form.Group>
                   </Col>
@@ -258,13 +294,13 @@ const SiteManagement = () => {
                <Row>
                   <Col md={6}>
                      <Form.Group className="mb-3">
-                        <Form.Check type="switch" id="email-verification" label="이메일 인증 필수" checked={settings.requireEmailVerification} onChange={(e) => handleSettingChange('requireEmailVerification', e.target.checked)} />
+                        <Form.Check type="switch" id="email-verification" label="이메일 인증 필수" checked={!!siteSettings?.requireEmailVerification} onChange={(e) => handleSettingChange('requireEmailVerification', e.target.checked)} />
                         <Form.Text className="text-muted">회원가입 시 이메일 인증을 필수로 합니다.</Form.Text>
                      </Form.Group>
                   </Col>
                   <Col md={6}>
                      <Form.Group className="mb-3">
-                        <Form.Check type="switch" id="social-login" label="소셜 로그인 허용" checked={settings.enableSocialLogin} onChange={(e) => handleSettingChange('enableSocialLogin', e.target.checked)} />
+                        <Form.Check type="switch" id="social-login" label="소셜 로그인 허용" checked={!!siteSettings?.enableSocialLogin} onChange={(e) => handleSettingChange('enableSocialLogin', e.target.checked)} />
                         <Form.Text className="text-muted">구글, 카카오 소셜 로그인을 허용합니다.</Form.Text>
                      </Form.Group>
                   </Col>
@@ -282,50 +318,59 @@ const SiteManagement = () => {
             </div>
             <Card.Body>
                <Row className="mb-4">
-                  <Col md={8}>
+                  <Col md={9}>
                      <Form.Control type="text" placeholder="추가할 금지어를 입력하세요" value={newBanWord} onChange={(e) => setNewBanWord(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAddBanWord()} />
                   </Col>
-                  <Col md={4}>
-                     <Button variant="primary" onClick={handleAddBanWord} className="w-100">
-                        금지어 추가
+                  <Col md={3}>
+                     <Button variant="primary" onClick={handleAddBanWord} className="w-100" disabled={banWordsLoading}>
+                        {banWordsLoading ? <Spinner size="sm" /> : '금지어 추가'}
                      </Button>
                   </Col>
                </Row>
 
                <div className="mb-3">
-                  <strong>현재 등록된 금지어 ({banWords?.length || 0}개)</strong>
+                  <strong>현재 등록된 금지어 ({banWords.length}개)</strong>
                </div>
-               <Table responsive className={styles.adminTable}>
-                  <thead>
-                     <tr>
-                        <th>금지어</th>
-                        <th>관리</th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     {banWords && banWords.length > 0 ? (
-                        banWords.map((item, index) => (
+
+               {banWordsLoading ? (
+                  <div className="text-center py-4">
+                     <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                     </Spinner>
+                  </div>
+               ) : (
+                  <Table responsive className={styles.adminTable}>
+                     <thead>
+                        <tr>
+                           <th>번호</th>
+                           <th>금지어</th>
+                           <th>관리</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {banWords.map((item, index) => (
                            <tr key={item.id}>
+                              <td>{index + 1}</td>
                               <td>
                                  <strong>{item.pattern}</strong>
                               </td>
                               <td>
-                                 <Button variant="outline-danger" size="sm" onClick={() => handleRemoveBanWord(item.id)}>
+                                 <Button variant="outline-danger" size="sm" onClick={() => handleRemoveBanWord(item.id)} disabled={banWordsLoading}>
                                     <i className="fas fa-trash"></i> 삭제
                                  </Button>
                               </td>
                            </tr>
-                        ))
-                     ) : (
-                        <tr>
-                           <td colSpan="3" className="text-center">
-                              <i className="fas fa-ban fa-2x text-muted mb-2"></i>
-                              <p className="text-muted mb-0">등록된 금지어가 없습니다.</p>
-                           </td>
-                        </tr>
-                     )}
-                  </tbody>
-               </Table>
+                        ))}
+                     </tbody>
+                  </Table>
+               )}
+
+               {!banWordsLoading && banWords.length === 0 && (
+                  <div className="text-center py-4">
+                     <i className="fas fa-ban fa-3x text-muted mb-3"></i>
+                     <p className="text-muted">등록된 금지어가 없습니다.</p>
+                  </div>
+               )}
             </Card.Body>
          </Card>
 
@@ -353,7 +398,7 @@ const SiteManagement = () => {
                      </Col>
                      <Col md={3}>
                         <Form.Label>필요 포인트</Form.Label>
-                        <Form.Control type="number" placeholder="포인트" value={newProduct.points} onChange={(e) => setNewProduct((prev) => ({ ...prev, points: parseInt(e.target.value) }))} min="0" />
+                        <Form.Control type="number" placeholder="포인트" value={newProduct.price} onChange={(e) => setNewProduct((prev) => ({ ...prev, price: parseInt(e.target.value) }))} min="0" />
                      </Col>
                      <Col md={3}>
                         <Form.Label>재고</Form.Label>
@@ -364,58 +409,64 @@ const SiteManagement = () => {
                         <Form.Control type="file" onChange={(e) => setProductImage(e.target.files[0])} accept="image/*" />
                      </Col>
                      <Col md={12} className="mt-3">
-                        <Button variant="primary" type="submit" className="w-100">
+                        <Button variant="primary" type="submit" className="w-100" disabled={loading.products}>
                            상품 추가
                         </Button>
                      </Col>
                   </Row>
                </Form>
                <div className="mb-3">
-                  <strong>등록된 교환 상품({products.length}개)</strong>
+                  <strong>등록된 교환 상품({products?.length || 0}개)</strong>
                </div>
-               <Table responsive className={styles.adminTable}>
-                  <thead>
-                     <tr>
-                        <th>ID</th>
-                        <th>상품명</th>
-                        <th>필요 포인트</th>
-                        <th>재고 수량</th>
-                        <th>이미지</th>
-                        <th>관리</th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     {products.length > 0 ? (
-                        products.map((item) => (
-                           <tr key={item.id}>
-                              <td>{item.id}</td>
-                              <td>{item.name}</td>
-                              <td>{item.points}</td>
-                              <td>{item.stock}</td>
-                              <td>{item.product_img && <img src={`${import.meta.env.VITE_API_URL}${item.product_img}`} alt={item.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />}</td>
-                              <td>
-                                 <Button variant="danger" onClick={() => handleDeleteProduct(item.id)}>
-                                    <i className="fas fa-trash"></i> 삭제
-                                 </Button>
+               {loading.products ? (
+                  <div className="d-flex justify-content-center my-3">
+                     <Spinner animation="border" variant="primary" />
+                  </div>
+               ) : (
+                  <Table responsive className={styles.adminTable}>
+                     <thead>
+                        <tr>
+                           <th>ID</th>
+                           <th>상품명</th>
+                           <th>필요 포인트</th>
+                           <th>재고 수량</th>
+                           <th>이미지</th>
+                           <th>관리</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {products?.length > 0 ? (
+                           products.map((item) => (
+                              <tr key={item.id}>
+                                 <td>{item.id}</td>
+                                 <td>{item.name}</td>
+                                 <td>{item.price}</td>
+                                 <td>{item.stock}</td>
+                                 <td>{item.product_img && <img src={`${import.meta.env.VITE_API_URL}${item.product_img}`} alt={item.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />}</td>
+                                 <td>
+                                    <Button variant="danger" onClick={() => handleDeleteProduct(item.id)} disabled={loading.products}>
+                                       <i className="fas fa-trash"></i> 삭제
+                                    </Button>
+                                 </td>
+                              </tr>
+                           ))
+                        ) : (
+                           <tr>
+                              <td colSpan="6" className="text-center">
+                                 <i className="fas fa-gift fa-3x text-muted mb-3"></i>
+                                 <p className="text-muted">등록된 상품이 없습니다.</p>
                               </td>
                            </tr>
-                        ))
-                     ) : (
-                        <tr>
-                           <td colSpan="6" className="text-center">
-                              <i className="fas fa-gift fa-3x text-muted mb-3"></i>
-                              <p className="text-muted">등록된 상품이 없습니다.</p>
-                           </td>
-                        </tr>
-                     )}
-                  </tbody>
-               </Table>
+                        )}
+                     </tbody>
+                  </Table>
+               )}
             </Card.Body>
          </Card>
 
          {/* 저장 버튼 */}
          <div className="text-center">
-            <Button variant="primary" size="lg" onClick={handleSaveSettings}>
+            <Button variant="primary" size="lg" onClick={handleSaveSettings} disabled={loading.settings}>
                <i className="fas fa-save me-2"></i>
                설정 저장
             </Button>
