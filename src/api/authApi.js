@@ -15,7 +15,7 @@ export const checkAuthStatus = async () => {
 // 로그아웃
 export const logout = async () => {
    try {
-      const response = await axiosApi.get('/auth/logout')
+      const response = await axiosApi.post('/auth/logout')
       return response.data
    } catch (error) {
       if (env === 'development') console.error(error)

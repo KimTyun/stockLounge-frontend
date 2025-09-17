@@ -148,7 +148,7 @@ const User = () => {
                      {activeTab === 'info' && <InfoTab />}
                      {activeTab === 'edit' && <EditTab userData={userData} />}
                      {activeTab === 'exchange' && <ExchangeTab userData={userData} exchangeItems={exchangeItems} />}
-                     {activeTab === 'post' && <PostTab postPage={50} commentPage={80} posts={pointHistory} comments={pointHistory} />}
+                     {activeTab === 'post' && <PostTab postPage={1} commentPage={1} posts={pointHistory} comments={pointHistory} />}
                   </div>
                </Col>
             </Row>
