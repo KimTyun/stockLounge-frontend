@@ -159,7 +159,7 @@ const commentSlice = createSlice({
       .addCase(likeCommentThunk.rejected, (state, action) => {
         state.loading = false
         state.error =
-          action.payload?.message || "서버 문제로 게시글을 수정하지 못했습니다."
+          action.payload?.message || "서버 문제로 댓글을 수정하지 못했습니다."
       })
   },
 })
