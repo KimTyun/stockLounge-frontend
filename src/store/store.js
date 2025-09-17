@@ -4,6 +4,7 @@ import boardSlice from '../features/boardSlice.js'
 import coinSlice from '../features/coinSlice.js'
 import userSlice from '../features/userSlice.js'
 import adminSlice from '../features/adminSlice.js'
+import authSlice from '../features/authSlice.js'
 
 const store = configureStore({
    reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
       board: boardSlice,
       user: userSlice,
       admin: adminSlice,
+      auth: authSlice,
    },
 })
 

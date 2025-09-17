@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseURL = import.meta.env.VITE_UPBIT_URI
+const baseURL = import.meta.env.VITE_UPBIT_URL
 const env = import.meta.env.VITE_ENV
 const upbitApi = axios.create({
    baseURL,

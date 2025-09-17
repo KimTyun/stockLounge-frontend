@@ -1,13 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Container, Row, Col, Nav } from 'react-bootstrap'
 import styles from '../../styles/pages/User.module.css'
 import InfoTab from './InfoTab'
 import EditTab from './EditTab'
 import ExchangeTab from './ExchangeTab'
 import PostTab from './PostTab'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 const User = () => {
    const [activeTab, setActiveTab] = useState('info')
+
+   const navigate = useNavigate()
+   const { isLoggedIn } = useSelector((state) => state.auth)
+
+   //로그인 체크
+   useEffect(() => {
+      if (isLoggedIn === null) return
+
+      if (!isLoggedIn) {
+         navigate('/')
+      }
+   }, [navigate, isLoggedIn])
 
    // 임시 사용자 데이터
    const userData = {
@@ -131,7 +145,7 @@ const User = () => {
             <Row>
                <Col>
                   <div className={styles.userContent}>
-                     {activeTab === 'info' && <InfoTab userData={userData} pointHistory={pointHistory} totalpage={100} />}
+                     {activeTab === 'info' && <InfoTab />}
                      {activeTab === 'edit' && <EditTab userData={userData} />}
                      {activeTab === 'exchange' && <ExchangeTab userData={userData} exchangeItems={exchangeItems} />}
                      {activeTab === 'post' && <PostTab postPage={50} commentPage={80} posts={pointHistory} comments={pointHistory} />}
