@@ -32,7 +32,7 @@ function App() {
          <Layout>
             <Routes>
                <Route path={ROUTES.HOME} element={<LandingPage />} />
-               <Route path={ROUTES.HOME} element={<Home />} />
+               <Route path={ROUTES.MAIN} element={<Home />} />
                <Route path={ROUTES.BOARD} element={<Board />} />
                <Route path={ROUTES.BOARD_WRITE} element={<PostEditor />}></Route>
                <Route path={ROUTES.BOARD_DETAIL} element={<PostDetail />}></Route>

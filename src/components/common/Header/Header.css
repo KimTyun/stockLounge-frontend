@@ -1,273 +1,237 @@
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(26, 26, 26, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-color);
-  z-index: 1000;
-  transition: all 0.3s ease;
+   position: sticky;
+   top: 0;
+   width: 100%;
+   background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+   backdrop-filter: blur(12px);
+   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+   z-index: 1000;
+   transition: all 0.3s ease;
 }
 
 .header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 0;
-  gap: 20px;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   padding: 8px 0;
+}
+
+.header-left {
+   display: flex;
+   align-items: center;
+   gap: 30px;
+}
+
+.header-right {
+   display: flex;
+   align-items: center;
+   gap: 15px;
 }
 
 /* 로고 */
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: var(--primary-color);
-  font-weight: 700;
-  font-size: 1.5rem;
-  transition: all 0.3s ease;
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   text-decoration: none;
+   color: #ffffff;
+   font-weight: 700;
+   font-size: 1.4rem;
+   transition: all 0.3s ease;
 }
 
 .logo:hover {
-  transform: scale(1.05);
+   transform: scale(1.1);
+   filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
 }
 
 /* 네비게이션 */
 .nav {
-  display: flex;
-  align-items: center;
-  gap: 30px;
+   display: flex;
+   align-items: center;
+   gap: 30px;
 }
 
-.nav-link {
-  text-decoration: none;
-  color: var(--text-secondary);
-  font-weight: 500;
-  transition: all 0.3s ease;
-  position: relative;
-  padding: 8px 0;
+a.nav-link {
+   text-decoration: none;
+   color: rgba(255, 255, 255, 0.75); /* 기본 상태를 약간 투명하게 변경 */
+   font-weight: 600;
+   font-size: 1.1rem;
+   transition: all 0.3s ease;
+   position: relative;
+   padding: 8px 0;
 }
 
-.nav-link:hover {
-  color: var(--primary-color);
+/* 활성화되거나 마우스를 올렸을 때의 스타일 */
+a.nav-link.active,
+a.nav-link:hover {
+   color: #ffffff; /* 완전한 흰색으로 강조 */
 }
 
-.nav-link::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--primary-color);
-  transition: width 0.3s ease;
+a.nav-link::after {
+   content: '';
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   width: 0;
+   height: 2px;
+   background: #ffffff;
+   transition: width 0.3s ease;
 }
 
-.nav-link:hover::after {
-  width: 100%;
+/* 활성화되거나 마우스를 올렸을 때 밑줄 표시 */
+a.nav-link.active::after,
+a.nav-link:hover::after {
+   width: 100%;
 }
 
-/* 검색 폼 */
-.search-form {
-  flex: 1;
-  max-width: 400px;
-}
-
-.search-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  color: var(--text-secondary);
-  z-index: 1;
-}
-
-.search-input {
-  width: 100%;
-  padding: 12px 12px 12px 45px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 25px;
-  color: var(--text-primary);
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.1);
-}
-
-.search-input::placeholder {
-  color: var(--text-secondary);
-}
-
-/* 사용자 메뉴 */
 .user-menu {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+   display: flex;
+   align-items: center;
+   gap: 15px;
 }
 
-.user-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: all 0.3s ease;
+a.user-btn {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: 40px;
+   height: 40px;
+   background: rgba(255, 255, 255, 0.1);
+   border: 1px solid transparent;
+   border-radius: 50%;
+   color: rgba(255, 255, 255, 0.9);
+   text-decoration: none;
+   transition: all 0.3s ease;
 }
 
-.user-btn:hover {
-  color: var(--primary-color);
-  border-color: var(--primary-color);
-  transform: scale(1.05);
+a.user-btn:hover {
+   color: #ffffff;
+   background: rgba(255, 255, 255, 0.2);
+   transform: scale(1.05);
 }
 
-.rewards-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  color: var(--text-primary);
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
+a.rewards-btn {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   padding: 8px 16px;
+   background: rgba(255, 255, 255, 0.1);
+   border: 1px solid transparent;
+   border-radius: 20px;
+   color: #ffffff;
+   text-decoration: none;
+   font-weight: 600;
+   transition: all 0.3s ease;
 }
 
-.rewards-btn:hover {
-  background: var(--primary-color);
-  color: #000;
-  transform: translateY(-2px);
+a.rewards-btn:hover {
+   background: #ffffff;
+   color: #4f46e5; /* 그라데이션 시작 색상 */
+   transform: translateY(-2px);
 }
 
 .coin-icon {
-  font-size: 16px;
+   font-size: 16px;
 }
 
 /* 모바일 메뉴 버튼 */
 .mobile-menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+   display: none;
+   background: none;
+   border: none;
+   color: rgba(255, 255, 255, 0.85);
+   cursor: pointer;
+   padding: 8px;
+   border-radius: 6px;
+   transition: all 0.3s ease;
 }
 
 .mobile-menu-btn:hover {
-  color: var(--primary-color);
-  background: var(--card-bg);
+   color: #ffffff;
+   background: rgba(255, 255, 255, 0.2);
 }
 
 /* 모바일 메뉴 */
 .mobile-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: var(--dark-bg);
-  border-top: 1px solid var(--border-color);
-  padding: 20px;
-  animation: slideDown 0.3s ease-out;
+   display: none;
+   position: absolute;
+   top: 100%;
+   left: 0;
+   right: 0;
+   background: #4f46e5; /* 모바일 메뉴 배경은 그라데이션의 시작 색상 */
+   border-top: 1px solid rgba(255, 255, 255, 0.2);
+   padding: 20px;
+   animation: slideDown 0.3s ease-out;
 }
 
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+   from {
+      opacity: 0;
+      transform: translateY(-10px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
 }
 
-.mobile-nav-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 15px 0;
-  color: var(--text-secondary);
-  text-decoration: none;
-  border-bottom: 1px solid var(--border-color);
-  transition: all 0.3s ease;
+a.mobile-nav-link {
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   padding: 12px 10px; /* 패딩 조정 */
+   color: rgba(255, 255, 255, 0.75); /* 기본 상태를 약간 투명하게 */
+   text-decoration: none;
+   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+   transition: all 0.3s ease;
+   font-weight: 600;
+   font-size: 1.1rem;
+   border-radius: 6px; /* 부드러운 모서리 추가 */
 }
 
-.mobile-nav-link:hover {
-  color: var(--primary-color);
+a.mobile-nav-link:hover {
+   color: #ffffff;
+   background: rgba(255, 255, 255, 0.1); /* 호버 시 배경색 추가 */
+}
+
+/* 활성화된 모바일 링크 스타일 */
+a.mobile-nav-link.active {
+   color: #ffffff;
+   background: rgba(255, 255, 255, 0.15); /* 활성 상태에 배경색을 주어 구분 */
 }
 
 .mobile-nav-link:last-child {
-  border-bottom: none;
+   border-bottom: none;
 }
 
 .mobile-user-menu {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color);
+   margin-top: 20px;
+   padding-top: 20px;
+   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* 반응형 */
 @media (max-width: 768px) {
-  .nav {
-    display: none;
-  }
+   .nav {
+      display: none;
+   }
 
-  .search-form {
-    max-width: 200px;
-  }
+   .user-menu {
+      display: none;
+   }
 
-  .user-menu {
-    display: none;
-  }
-
-  .mobile-menu-btn {
-    display: block;
-  }
-
-  .mobile-menu {
-    display: block;
-  }
-
-  .nav-open {
-    display: none;
-  }
+   .mobile-menu-btn {
+      display: block;
+   }
 }
 
 @media (max-width: 480px) {
-  .header-content {
-    padding: 12px 0;
-  }
+   .header-content {
+      padding: 8px 0;
+   }
 
-  .search-form {
-    max-width: 150px;
-  }
-
-  .search-input {
-    font-size: 12px;
-    padding: 10px 10px 10px 40px;
-  }
-
-  .logo {
-    font-size: 1.3rem;
-  }
+   .logo {
+      font-size: 1.3rem;
+   }
 }

@@ -1,42 +1,51 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+   max-width: 100%; /* 화면 전체 너비를 사용하도록 변경 */
+   margin: 0 auto;
+   padding: 0; /* 불필요한 패딩 제거. 각 페이지나 레이아웃에서 관리합니다. */
+   /* text-align: center; 제거. 전역 중앙 정렬은 레이아웃을 깨뜨릴 수 있습니다. */
+   /* 바뀐 css는 주석 달아놓았습니다. 문제가 있으시면 slack에 채팅 남겨주세요. */
+}
+
+/* 공통 컨테이너: 콘텐츠의 최대 너비를 제한하고 중앙에 배치합니다. */
+.container {
+   width: 100%;
+   max-width: 1280px;
+   margin: 0 auto;
+   padding: 0 2rem;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+   height: 6em;
+   padding: 1.5em;
+   will-change: filter;
+   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+   filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+   from {
+      transform: rotate(0deg);
+   }
+   to {
+      transform: rotate(360deg);
+   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+   a:nth-of-type(2) .logo {
+      animation: logo-spin infinite 20s linear;
+   }
 }
 
 .card {
-  padding: 2em;
+   padding: 2em;
 }
 
 .read-the-docs {
-  color: #888;
+   color: #888;
 }
