@@ -3,6 +3,9 @@
    padding: 2rem 0;
    background-color: #f8f9fa;
 }
+.noneItem {
+   padding: 10vw;
+}
 
 .userHeader {
    margin-bottom: 2rem;
