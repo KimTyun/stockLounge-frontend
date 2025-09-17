@@ -1,43 +1,36 @@
-import { Link } from 'react-router-dom'
-import { TrendingUp, Twitter, Instagram, Youtube } from 'lucide-react'
-import './Footer.css'
+import { Container, Row, Col } from 'react-bootstrap';
+import styles from '../../../styles/components/common/Footer.module.css';
 
 const Footer = () => {
-   return (
-      <footer className="footer">
-         <div className="container">
-            <div className="footer-top">
-               <div className="footer-logo">
-                  <TrendingUp size={28} />
-                  <span>STOCKLOUNGE</span>
-               </div>
-               <div className="footer-links">
-                  <Link to="/about">API문서</Link>
-                  <Link to="/contact">고객지원</Link>
-                  <Link to="/terms">사이트 이용약관</Link>
-                  <Link to="/privacy">개인정보처리방침</Link>
-               </div>
-               <div className="social-links">
-                  <a href="#" aria-label="Twitter">
-                     <Twitter size={22} />
-                  </a>
-                  <a href="#" aria-label="Instagram">
-                     <Instagram size={22} />
-                  </a>
-                  <a href="#" aria-label="Youtube">
-                     <Youtube size={22} />
-                  </a>
-               </div>
+  return (
+    <footer className={styles.footer}>
+      <Container>
+        <Row>
+          <Col md={6}>
+            <div className={styles.brand}>
+              <h5>StockRounge</h5>
+              <p>코인 커뮤니티 플랫폼</p>
             </div>
-            <div className="footer-bottom">
-               <p>&copy; 2025 STOCKLOUNGE. All rights reserved.</p>
-               <p>투자에 대한 책임은 투자자 본인에게 있으며, 투자 결정은 신중하게 하시기 바랍니다..</p>
-               <p>이메일:support@stocklounge.com</p>
-               <p>고객센터: 02-1234-5678</p>
+          </Col>
+          <Col md={6} className="text-end">
+            <div className={styles.links}>
+              <a href="/terms">이용약관</a>
+              <a href="/privacy">개인정보처리방침</a>
+              <a href="/contact">문의하기</a>
             </div>
-         </div>
-      </footer>
-   )
-}
+          </Col>
+        </Row>
+        <hr />
+        <Row>
+          <Col className="text-center">
+            <p className={styles.copyright}>
+              &copy; 2025 StockRounge. All rights reserved.
+            </p>
+          </Col>
+        </Row>
+      </Container>
+    </footer>
+  );
+};
 
-export default Footer
+export default Footer;
