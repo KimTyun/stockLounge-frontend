@@ -182,8 +182,8 @@ const InfoTab = () => {
                                        </Badge>
                                     </td>
                                     <td className={styles.tdwrap}>{history.reason}</td>
-                                    <td className={history.type === '획득' ? styles.gainPoints : styles.lossPoints}>{history.change}</td>
-                                    <td className={styles.historyDate}>{dayjs(history.createdAt).format('YY.MM.DD H:m:s')}</td>
+                                    <td className={history.change > 0 ? styles.gainPoints : styles.lossPoints}>{history.change}</td>
+                                    <td className={styles.historyDate}>{dayjs(history.createdAt).format('YY.MM.DD H:mm:ss')}</td>
                                  </tr>
                               ))}
                            </tbody>
