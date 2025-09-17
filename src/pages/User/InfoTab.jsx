@@ -51,6 +51,16 @@ const InfoTab = () => {
          setNicknameErr('공백을 포함할 수 없습니다.')
          return
       }
+      const trimmedNickname = newNickname.trim()
+      if (trimmedNickname.length === 0) {
+         setNicknameErr('닉네임을 입력해주세요.')
+         return
+      }
+      if (trimmedNickname.length < 2) {
+         setNicknameErr('닉네임은 최소 2자 이상이어야 합니다.')
+         return
+      }
+
       dispatch(updateMeThunk({ name: newNickname }))
          .unwrap()
          .then(() => {
