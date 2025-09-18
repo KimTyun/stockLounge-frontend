@@ -8,6 +8,7 @@ import {
   deleteCommentThunk,
   likeCommentThunk,
 } from "../../../features/commentSlice"
+import { reportCommentThunk } from "../../../features/reportSlice"
 
 const CommentList = ({ postId }) => {
   const [sortBy] = useState("latest")
@@ -139,7 +140,19 @@ const CommentList = ({ postId }) => {
               >
                 <i className='fas fa-trash me-2'></i>삭제
               </Dropdown.Item>
-              <Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => {
+                  const reason = prompt('신고 사유를 입력해주세요:')
+                  if (reason && reason.trim()) {
+                    dispatch(reportCommentThunk({
+                      commentId: comment.id,
+                      userId: 1, // 실제로는 로그인한 사용자 ID
+                      reason: reason.trim()
+                    }))
+                    alert('신고가 접수되었습니다. 검토 후 처리하겠습니다.')
+                  }
+                }}
+              >
                 <i className='fas fa-flag me-2'></i>신고
               </Dropdown.Item>
             </Dropdown.Menu>

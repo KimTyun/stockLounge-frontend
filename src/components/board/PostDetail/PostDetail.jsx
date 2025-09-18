@@ -5,6 +5,7 @@ import CommentList from '../CommentList'
 import styles from '../../../styles/pages/Board_fixed.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteBoardThunk, getBoardByIdThunk, likeBoardThunk } from '../../../features/boardSlice'
+import { reportBoardThunk } from '../../../features/reportSlice'
 
 const PostDetail = ({ boardId, onBackToList, onEdit }) => {
    const navigate = useNavigate()
@@ -25,9 +26,21 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
       }
    }
 
-   const handleReport = () => {
-      if (window.confirm('이 게시글을 신고하시겠습니까?')) {
-         alert('신고가 접수되었습니다. 검토 후 처리하겠습니다.')
+   const handleReport = async () => {
+      const reason = prompt('신고 사유를 입력해주세요:')
+      if (reason && reason.trim()) {
+         try {
+            await dispatch(reportBoardThunk({
+               boardId: boardId,
+               userId: 1, // 실제로는 로그인한 사용자 ID
+               reason: reason.trim()
+            }))
+            // 신고 후 게시글 정보 다시 가져오기
+            dispatch(getBoardByIdThunk(boardId))
+            alert('신고가 접수되었습니다. 검토 후 처리하겠습니다.')
+         } catch (error) {
+            alert('신고 접수에 실패했습니다.')
+         }
       }
    }
 
