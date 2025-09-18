@@ -4,7 +4,7 @@ import LandingPage from './pages/Home/LandingPage'
 import Home from './pages/Home'
 import Board from './pages/Board'
 import PostEditor from './components/board/PostEditor/PostEditor'
-import PostDetail from './components/board/PostDetail/PostDetail'
+import PostDetailPage from './pages/Board/PostDetailPage'
 import Chart from './pages/Chart'
 import News from './pages/News'
 import User from './pages/User'
@@ -35,7 +35,7 @@ function App() {
                <Route path={ROUTES.HOME} element={<Home />} />
                <Route path={ROUTES.BOARD} element={<Board />} />
                <Route path={ROUTES.BOARD_WRITE} element={<PostEditor />}></Route>
-               <Route path={ROUTES.BOARD_DETAIL} element={<PostDetail />}></Route>
+               <Route path={ROUTES.BOARD_DETAIL} element={<PostDetailPage />}></Route>
                <Route path={ROUTES.CHART} element={<Chart />} />
                <Route path={ROUTES.NEWS} element={<News />} />
                <Route path={ROUTES.USER_INFO} element={<User />} />
