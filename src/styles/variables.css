@@ -1,27 +1,52 @@
 :root {
-  /* 메인 컬러 */
-  --primary-color: #5E94CA;
-  --secondary-color: #F7FAFC;
-  
-  /* 텍스트 컬러 */
-  --text-primary: #333333;
-  --text-secondary: #666666;
-  --text-muted: #999999;
-  
-  /* 상태 컬러 */
-  --success-color: #28a745;
-  --danger-color: #dc3545;
-  --warning-color: #ffc107;
-  --info-color: #17a2b8;
-  
-  /* 소셜 로그인 컬러 */
-  --google-color: #4285F4;
-  --kakao-color: #FAD900;
-  --terms-color: #4D7399;
-  
-  /* 레이아웃 */
-  --header-height: 70px;
-  --border-radius: 8px;
-  --box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  --box-shadow-hover: 0 4px 16px rgba(0,0,0,0.15);
+   /* Dark Theme Palette */
+   /* Core palette (user requested) */
+   --palette-1: #57acdc; /* sky blue */
+   --palette-2: #60c689; /* green */
+   --palette-3: #e91e63; /* pink/magenta */
+   /* NOTE: user provided #272ABO is invalid hex (contains 'O'); use fallback */
+   --palette-4: #272ab0; /* corrected deep indigo */
+   --palette-5: #276bb0; /* deep blue */
+
+   /* Map primary/secondary to palette choices with sensible fallbacks */
+   --primary-color: var(--palette-5, #276bb0);
+   --secondary-color: var(--palette-1, #57acdc);
+
+   /* Page background (light theme) */
+   --bg-gradient-start: #ffffff; /* white */
+   --bg-gradient-end: #ffffff; /* white */
+   --background-primary: #ffffff; /* page background */
+   --background-secondary: #f6f7fb; /* light grey */
+   --background-tertiary: #ffffff; /* card background */
+
+   /* Text Colors */
+   /* Text Colors - use requested palette while ensuring contrast */
+   --text-primary: #213547; /* default page text (dark) */
+   --text-secondary: #60c689; /* use green as accent for links/important */
+   --text-accent: #57acdc; /* sky blue accent */
+   --text-strong: #0b1a2b; /* strong title color */
+   --text-muted: rgba(33, 53, 71, 0.55);
+
+   /* header / button defaults */
+   --header-text: var(--text-strong);
+   --button-icon-color: var(--text-strong);
+
+   /* accessibility helpers (manual): color to use on accent backgrounds */
+   --accent-on-primary: #ffffff; /* assume accents are used on dark elements */
+   --primary-on-accent: #ffffff;
+
+   --accent-color: #f08a4b; /* warm accent/orange */
+
+   /* State Colors */
+   --success-color: #28a745;
+   --danger-color: #dc3545;
+   --warning-color: #ffc107;
+   --info-color: #17a2b8;
+
+   /* Layout */
+   --header-height: 78px;
+   --border-radius: 10px;
+   --border-color: rgba(18, 25, 41, 0.06);
+   --box-shadow: 0 6px 18px rgba(18, 25, 41, 0.06);
+   --box-shadow-hover: 0 8px 22px rgba(18, 25, 41, 0.08);
 }

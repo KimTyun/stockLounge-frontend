@@ -13,7 +13,7 @@ import DOMPurify from 'dompurify'
 
 const Chart = () => {
    const dispatch = useDispatch()
-   const { news, loading, error } = useSelector((s) => s.news)
+   const { news } = useSelector((s) => s.news)
    const { coins, coinList } = useSelector((s) => s.coin)
    const [coinData, setCoinData] = useState(null)
    // 첫 번째 세션: 선택된 코인 상태
