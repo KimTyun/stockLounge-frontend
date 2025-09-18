@@ -1,15 +1,14 @@
-import axios from "axios"
+import axios from 'axios'
 
 const baseURL = import.meta.env.VITE_API_URL
 
 const axiosApi = axios.create({
-
-  baseURL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  withCredentials: true,
-
+   baseURL,
+   headers: {
+      'Content-Type': 'application/json',
+   },
+   withCredentials: true,
+})
 
 // 요청 인터셉터 (인증 토큰 추가)
 axiosApi.interceptors.request.use(

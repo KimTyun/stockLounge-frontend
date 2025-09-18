@@ -142,6 +142,61 @@ export const deleteProductThunk = createAsyncThunk('admin/deleteProduct', async 
    }
 })
 
+// // 여기부터 통계
+
+// 전체 통계 데이터 가져오기
+export const getStatisticsThunk = createAsyncThunk('admin/getStatistics', async (period = 'week', { rejectWithValue }) => {
+   try {
+      const response = await adminApi.getStatistics(period)
+      return {
+         period,
+         data: response.data,
+      }
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '통계 데이터를 불러오는데 실패했습니다.')
+   }
+})
+
+// 인기 게시글 가져오기 (별도 API가 필요한 경우)
+export const getPopularPostsThunk = createAsyncThunk('admin/getPopularPosts', async (period = 'week', { rejectWithValue }) => {
+   try {
+      const response = await adminApi.getPopularPosts(period)
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '인기 게시글 데이터를 불러오는데 실패했습니다.')
+   }
+})
+
+// 활성 사용자 가져오기 (별도 API가 필요한 경우)
+export const getActiveUsersThunk = createAsyncThunk('admin/getActiveUsers', async (period = 'week', { rejectWithValue }) => {
+   try {
+      const response = await adminApi.getActiveUsers(period)
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '활성 사용자 데이터를 불러오는데 실패했습니다.')
+   }
+})
+
+// 카테고리별 통계 가져오기 (별도 API가 필요한 경우)
+export const getCategoryStatsThunk = createAsyncThunk('admin/getCategoryStats', async (period = 'week', { rejectWithValue }) => {
+   try {
+      const response = await adminApi.getCategoryStats(period)
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '카테고리별 통계 데이터를 불러오는데 실패했습니다.')
+   }
+})
+
+// 시간대별 통계 가져오기 (별도 API가 필요한 경우)
+export const getHourlyStatsThunk = createAsyncThunk('admin/getHourlyStats', async (period = 'week', { rejectWithValue }) => {
+   try {
+      const response = await adminApi.getHourlyStats(period)
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '시간대별 통계 데이터를 불러오는데 실패했습니다.')
+   }
+})
+
 const adminSlice = createSlice({
    name: 'admin',
    initialState: {
@@ -160,6 +215,19 @@ const adminSlice = createSlice({
          products: false,
       },
       error: null,
+      // 통계 관련 상태들
+      statistics: null,
+      popularPosts: [],
+      activeUsers: [],
+      categoryStats: [],
+      hourlyStats: [],
+
+      // 개별 로딩 상태들
+      statisticsLoading: false,
+      popularPostsLoading: false,
+      activeUsersLoading: false,
+      categoryStatsLoading: false,
+      hourlyStatsLoading: false,
    },
    reducers: {
       clearError: (state) => {
@@ -288,7 +356,7 @@ const adminSlice = createSlice({
             state.banWordsLoading = true
             state.banWordsError = null
          })
-         .addCase(addBanWordThunk.fulfilled, (state, action) => {
+         .addCase(addBanWordThunk.fulfilled, (state) => {
             state.banWordsLoading = false
          })
          .addCase(addBanWordThunk.rejected, (state, action) => {

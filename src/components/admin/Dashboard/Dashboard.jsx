@@ -7,7 +7,7 @@ import { getUsersThunk } from '../../../features/userSlice'
 
 const Dashboard = () => {
    const dispatch = useDispatch()
-   const { users = [], boards = [], loading, error, settings } = useSelector((state) => state.admin)
+   const { users = [], boards = [], error, settings } = useSelector((state) => state.admin)
    const { users: usersLoading, boards: boardsLoading } = useSelector((state) => state.admin.loading)
    const [siteSettings, setSiteSettings] = useState({})
 
