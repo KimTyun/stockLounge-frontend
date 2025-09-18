@@ -5,6 +5,7 @@ import styles from '../../../styles/components/board/CommentList.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCommentByIdThunk, deleteCommentThunk, likeCommentThunk } from '../../../features/commentSlice'
 import { reportCommentThunk } from '../../../features/reportSlice'
+import { getMeThunk } from '../../../features/userSlice'
 
 const CommentList = ({ postId }) => {
    const [sortBy] = useState('latest')
@@ -12,7 +13,13 @@ const CommentList = ({ postId }) => {
 
    const dispatch = useDispatch()
    const { comments: rawComments, loading, error } = useSelector((state) => state.comment)
+   const { user } = useSelector((state) => state.user)
 
+   useEffect(() => {
+      if (!user) {
+         dispatch(getMeThunk())
+      }
+   }, [dispatch, user])
    // 댓글 데이터 로드
    useEffect(() => {
       if (postId && typeof postId === 'number') {
@@ -60,8 +67,8 @@ const CommentList = ({ postId }) => {
       setReplyingTo(null)
    }
 
-   const renderComment = (comment, isReply = false) => (
-      <div key={comment.id} className={`${styles.comment} ${isReply ? styles.reply : ''}`}>
+   const renderComment = (comment) => (
+      <div key={comment.id} className={`${styles.comment}`}>
          <div className={styles.commentHeader}>
             <div className={styles.authorInfo}>
                <img
@@ -90,68 +97,79 @@ const CommentList = ({ postId }) => {
 
          <div className={styles.commentActions}>
             <div className={styles.actionButtons}>
-               <Dropdown className={styles.commentMenu}>
-                  <Dropdown.Toggle variant="link" className={styles.menuButton}>
-                     <i className="fas fa-ellipsis-v"></i>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                     <Dropdown.Item
-                        className="text-danger"
-                        onClick={() => {
-                           if (!postId || typeof postId !== 'number') {
-                              alert('올바른 게시글 정보가 없습니다.')
-                              return
-                           }
-                           if (window.confirm('이 댓글을 삭제하시겠습니까?')) {
-                              console.log('Deleting comment with boardId:', postId, 'commentId:', comment.id)
-                              dispatch(
-                                 deleteCommentThunk({
-                                    boardId: postId,
-                                    commentId: comment.id,
-                                 })
-                              )
-                           }
-                        }}
-                     >
-                        <i className="fas fa-trash me-2"></i>삭제
-                     </Dropdown.Item>
-                     <Dropdown.Item
-                        onClick={() => {
-                           const reason = prompt('신고 사유를 입력해주세요:')
-                           if (reason && reason.trim()) {
-                              dispatch(
-                                 reportCommentThunk({
-                                    commentId: comment.id,
-                                    userId: 1, // 실제로는 로그인한 사용자 ID
-                                    reason: reason.trim(),
-                                 })
-                              )
-                              alert('신고가 접수되었습니다. 검토 후 처리하겠습니다.')
-                           }
-                        }}
-                     >
-                        <i className="fas fa-flag me-2"></i>신고
-                     </Dropdown.Item>
-                  </Dropdown.Menu>
-               </Dropdown>
-            </div>
-            <div className={styles.stats}>
-               <span className={styles.likes}>
-                  <i className="fas fa-heart me-1"></i>
+               {user && (
                   <Button
                      variant="link"
-                     className={styles.likeButton}
-                     onClick={async () => {
-                        await dispatch(
-                           likeCommentThunk({
-                              commentId: comment.id,
-                              userId: comment.author.id,
-                           })
-                        )
+                     className={styles.menuButton}
+                     onClick={() => {
+                        const reason = prompt('신고 사유를 입력해주세요:')
+                        if (reason && reason.trim()) {
+                           dispatch(
+                              reportCommentThunk({
+                                 commentId: comment.id,
+                                 userId: 1, // 실제 로그인된 사용자 ID로 교체 필요
+                                 reason: reason.trim(),
+                              })
+                           )
+                           alert('신고가 접수되었습니다. 검토 후 처리하겠습니다.')
+                        }
                      }}
                   >
-                     {comment.like_count}
+                     <i className="fas fa-flag me-1"></i>신고
                   </Button>
+               )}
+
+               {user && user.id == comment.author.id ? (
+                  <Button
+                     variant="link"
+                     className={`${styles.menuButton} text-danger`}
+                     onClick={() => {
+                        if (!postId || typeof postId !== 'number') {
+                           alert('올바른 게시글 정보가 없습니다.')
+                           return
+                        }
+                        if (window.confirm('이 댓글을 삭제하시겠습니까?')) {
+                           console.log('Deleting comment with boardId:', postId, 'commentId:', comment.id)
+                           dispatch(
+                              deleteCommentThunk({
+                                 boardId: postId,
+                                 commentId: comment.id,
+                              })
+                           )
+                        }
+                     }}
+                  >
+                     <i className="fas fa-trash me-1"></i>삭제
+                  </Button>
+               ) : (
+                  ''
+               )}
+            </div>
+
+            <div className={styles.stats}>
+               <span className={styles.likes}>
+                  {user ? (
+                     <Button
+                        variant="link"
+                        className={styles.likeButton}
+                        onClick={async () => {
+                           await dispatch(
+                              likeCommentThunk({
+                                 commentId: comment.id,
+                                 userId: comment.author.id,
+                              })
+                           )
+                        }}
+                     >
+                        <i className="fas fa-heart me-1"></i>
+                        {comment.like_count}
+                     </Button>
+                  ) : (
+                     <div className={styles.likeButton}>
+                        <i className="fas fa-heart me-1"></i>
+                        {comment.like_count}
+                     </div>
+                  )}
                </span>
                {comment.reports > 0 && (
                   <span className={styles.reports}>
@@ -167,8 +185,6 @@ const CommentList = ({ postId }) => {
                <CommentForm postId={postId} parentId={comment.id} onCommentAdded={handleCommentAdded} onCancel={() => setReplyingTo(null)} />
             </div>
          )}
-
-         {!isReply && comment.replies && comment.replies.length > 0 && <div className={styles.replies}>{comment.replies.map((reply) => renderComment(reply, true))}</div>}
       </div>
    )
 

@@ -19,7 +19,9 @@ const PostList = ({ category = 'free' }) => {
 
    useEffect(() => {
       dispatch(getBoardThunk(category))
-      dispatch(getMeThunk())
+      if (user) {
+         dispatch(getMeThunk())
+      }
    }, [dispatch, category])
 
    const handlePostClick = (id) => {

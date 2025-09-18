@@ -185,10 +185,8 @@ const PostEditor = React.forwardRef(({ onSuccess, editPostId, defaultCategory = 
    if (!user) {
       return (
          <div className="text-center py-5">
-            <div className="spinner-border text-primary" role="status">
-               <span className="visually-hidden">Loading...</span>
-            </div>
-            <p className="mt-3">사용자 정보를 불러오는 중...</p>
+            <p className="mt-3">로그인 후 이용 가능한 서비스입니다.</p>
+            {/* 나중에 로그인 페이지 생기면 글로 이동 */}
          </div>
       )
    }
