@@ -8,6 +8,7 @@ const axiosApi = axios.create({
       'Content-Type': 'application/json',
    },
    withCredentials: true,
+   timeout: 10000,
 })
 
 // 요청 인터셉터 (인증 토큰 추가)

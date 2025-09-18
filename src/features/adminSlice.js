@@ -1,6 +1,16 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import * as adminApi from '../api/adminApi'
 
+// 사용자 목록
+export const getUsersThunk = createAsyncThunk('admin/getUsers', async (_, { rejectWithValue }) => {
+   try {
+      const response = await adminApi.getUsers()
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
 // 사용자 제재 갱신
 export const updateUserStatusThunk = createAsyncThunk('admin/updateUserBanStatus', async ({ userId, isBanned }, { rejectWithValue }) => {
    try {
@@ -16,6 +26,16 @@ export const deleteUserThunk = createAsyncThunk('admin/deleteUser', async (userI
    try {
       await adminApi.deleteUser(userId)
       return userId
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
+// 게시판 목록
+export const getBoardThunk = createAsyncThunk('admin/getBoards', async (_, { rejectWithValue }) => {
+   try {
+      const response = await adminApi.getBoards()
+      return response.data ?? response
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -148,6 +168,19 @@ const adminSlice = createSlice({
    },
    extraReducers: (builder) => {
       builder
+         // 사용자 목록
+         .addCase(getUsersThunk.pending, (state) => {
+            state.loading.users = true
+            state.error = null
+         })
+         .addCase(getUsersThunk.fulfilled, (state, action) => {
+            state.loading.users = false
+            state.users = action.payload
+         })
+         .addCase(getUsersThunk.rejected, (state, action) => {
+            state.loading.users = false
+            state.error = action.payload?.message || '사용자 목록을 불러오지 못했습니다.'
+         })
          // 사용자 제재
          .addCase(updateUserStatusThunk.pending, (state) => {
             state.loading.users = true
@@ -164,6 +197,35 @@ const adminSlice = createSlice({
          .addCase(updateUserStatusThunk.rejected, (state, action) => {
             state.loading.users = false
             state.error = action.payload?.message || '사용자를 제재하지 못했습니다.'
+         })
+
+         // 사용자 제재
+         .addCase(deleteUserThunk.pending, (state) => {
+            state.loading.users = true
+            state.error = null
+         })
+         .addCase(deleteUserThunk.fulfilled, (state, action) => {
+            const deletedUserId = action.meta.arg
+            state.users = state.users.filter((user) => user.id !== deletedUserId)
+            state.loading.users = false
+         })
+         .addCase(deleteUserThunk.rejected, (state, action) => {
+            state.loading.users = false
+            state.error = action.payload?.message || '사용자 삭제에 실패했습니다.'
+         })
+
+         // 게시판 목록
+         .addCase(getBoardThunk.pending, (state) => {
+            state.loading.boards = true
+            state.error = null
+         })
+         .addCase(getBoardThunk.fulfilled, (state, action) => {
+            state.loading.boards = false
+            state.boards = action.payload || []
+         })
+         .addCase(getBoardThunk.rejected, (state, action) => {
+            state.loading.boards = false
+            state.error = action.payload?.message || '게시판 목록을 불러오지 못했습니다.'
          })
 
          // 게시판 삭제
@@ -200,7 +262,7 @@ const adminSlice = createSlice({
          })
          .addCase(updateSiteSettingsThunk.fulfilled, (state, action) => {
             state.loading.settings = false
-            state.settings = action.payload
+            state.settings = { ...state.settings, ...action.payload }
          })
          .addCase(updateSiteSettingsThunk.rejected, (state, action) => {
             state.loading.settings = false
@@ -214,7 +276,7 @@ const adminSlice = createSlice({
          })
          .addCase(getBanWordsThunk.fulfilled, (state, action) => {
             state.banWordsLoading = false
-            state.banWords = action.payload
+            state.banWords = Array.isArray(action.payload) ? action.payload : action.payload?.data || []
          })
          .addCase(getBanWordsThunk.rejected, (state, action) => {
             state.banWordsLoading = false
@@ -255,8 +317,9 @@ const adminSlice = createSlice({
          })
          .addCase(getProductsThunk.fulfilled, (state, action) => {
             state.loading.products = false
-            if (action.payload && action.payload.data) {
-               state.products = action.payload.data.map((product) => ({
+            const payloadData = action.payload?.data || action.payload
+            if (Array.isArray(payloadData)) {
+               state.products = payloadData.map((product) => ({
                   ...product,
                   points: product.price,
                }))
@@ -280,7 +343,7 @@ const adminSlice = createSlice({
                ...action.payload.product,
                points: action.payload.product.price,
             }
-            state.products.push(newProduct)
+            state.products = [...state.products, newProduct]
          })
          .addCase(addProductThunk.rejected, (state, action) => {
             state.loading.products = false

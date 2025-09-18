@@ -10,8 +10,7 @@ const SiteManagement = () => {
    const { banWords, banWordsLoading, banWordsError } = useSelector((state) => state.admin)
 
    const [newBanWord, setNewBanWord] = useState('')
-   const [newBanDescription, setNewBanDescription] = useState('')
-   const [siteSettings, setSiteSettings] = useState({})
+   const [siteSettings, setSiteSettings] = useState(settings || {})
    const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '' })
    const [productImage, setProductImage] = useState(null)
    const [showAlert, setShowAlert] = useState(false)
@@ -25,12 +24,6 @@ const SiteManagement = () => {
    }, [dispatch])
 
    useEffect(() => {
-      if (settings) {
-         setSiteSettings(settings)
-      }
-   }, [settings])
-
-   useEffect(() => {
       if (banWordsError) {
          setAlertMessage(banWordsError.message || '오류가 발생했습니다.')
          setAlertType('danger')
@@ -38,13 +31,6 @@ const SiteManagement = () => {
          setTimeout(() => setShowAlert(false), 3000)
       }
    }, [banWordsError])
-
-   const handleSettingChange = (key, value) => {
-      setSiteSettings((prev) => ({
-         ...prev,
-         [key]: value,
-      }))
-   }
 
    const showAlertMessage = (message, type) => {
       setAlertMessage(message)
@@ -55,7 +41,7 @@ const SiteManagement = () => {
 
    // 사이트 설정 저장
    const handleSaveSettings = () => {
-      dispatch(updateSiteSettingsThunk(siteSettings))
+      dispatch(updateSiteSettingsThunk(settings))
          .unwrap()
          .then(() => {
             showAlertMessage('설정이 성공적으로 저장되었습니다.', 'success')
@@ -63,6 +49,14 @@ const SiteManagement = () => {
          .catch((error) => {
             showAlertMessage(`설정 저장 실패: ${error.message}`, 'danger')
          })
+   }
+   const handleSettingChange = (e) => {
+      const { name, value, type, checked } = e.target
+      const finalValue = type === 'checkbox' ? checked : value
+      setSiteSettings((prev) => ({
+         ...prev,
+         [name]: finalValue,
+      }))
    }
 
    // 금지어 추가
@@ -83,17 +77,14 @@ const SiteManagement = () => {
          setTimeout(() => setShowAlert(false), 3000)
          return
       }
-
       try {
          const banWordData = {
             pattern: newBanWord.trim(),
-            description: newBanDescription.trim() || null,
          }
-
+         console.log('전송될 금지어 데이터:', banWordData)
          await dispatch(addBanWordThunk(banWordData)).unwrap()
 
          setNewBanWord('')
-         setNewBanDescription('')
          setAlertMessage('금지어가 추가되었습니다.')
          setAlertType('success')
          setShowAlert(true)
@@ -199,26 +190,26 @@ const SiteManagement = () => {
                   <Col md={6}>
                      <Form.Group className="mb-3">
                         <Form.Label>사이트 이름</Form.Label>
-                        <Form.Control type="text" value={siteSettings?.siteName || ''} onChange={(e) => handleSettingChange('siteName', e.target.value)} />
+                        <Form.Control type="text" name="siteName" value={siteSettings?.siteName || ''} onChange={handleSettingChange} />
                      </Form.Group>
                   </Col>
                   <Col md={6}>
                      <Form.Group className="mb-3">
                         <Form.Label>사이트 설명</Form.Label>
-                        <Form.Control type="text" value={siteSettings?.siteDescription || ''} onChange={(e) => handleSettingChange('siteDescription', e.target.value)} />
+                        <Form.Control type="text" name="siteDescription" value={siteSettings?.siteDescription || ''} onChange={handleSettingChange} />
                      </Form.Group>
                   </Col>
                </Row>
                <Row>
                   <Col md={6}>
                      <Form.Group className="mb-3">
-                        <Form.Check type="switch" id="maintenance-mode" label="유지보수 모드" checked={!!siteSettings?.maintenanceMode} onChange={(e) => handleSettingChange('maintenanceMode', e.target.checked)} />
+                        <Form.Check type="switch" id="maintenance-mode" name="maintenanceMode" label="유지보수 모드" checked={!!siteSettings?.maintenanceMode} onChange={handleSettingChange} />
                         <Form.Text className="text-muted">활성화 시 사이트에 접근할 수 없습니다.</Form.Text>
                      </Form.Group>
                   </Col>
                   <Col md={6}>
                      <Form.Group className="mb-3">
-                        <Form.Check type="switch" id="allow-registration" label="회원가입 허용" checked={!!siteSettings?.allowRegistration} onChange={(e) => handleSettingChange('allowRegistration', e.target.checked)} />
+                        <Form.Check type="switch" id="allow-registration" name="allowRegistration" label="회원가입 허용" checked={!!siteSettings?.allowRegistration} onChange={handleSettingChange} />
                         <Form.Text className="text-muted">비활성화 시 새로운 회원가입이 불가능합니다.</Form.Text>
                      </Form.Group>
                   </Col>
@@ -239,25 +230,25 @@ const SiteManagement = () => {
                   <Col md={3}>
                      <Form.Group className="mb-3">
                         <Form.Label>게시글 작성 포인트</Form.Label>
-                        <Form.Control type="number" value={siteSettings?.pointsPerPost || 0} onChange={(e) => handleSettingChange('pointsPerPost', parseInt(e.target.value))} min="0" />
+                        <Form.Control type="number" name="pointsPerPost" value={siteSettings?.pointsPerPost || 0} onChange={handleSettingChange} min="0" />
                      </Form.Group>
                   </Col>
                   <Col md={3}>
                      <Form.Group className="mb-3">
                         <Form.Label>댓글 작성 포인트</Form.Label>
-                        <Form.Control type="number" value={siteSettings?.pointsPerComment || 0} onChange={(e) => handleSettingChange('pointsPerComment', parseInt(e.target.value))} min="0" />
+                        <Form.Control type="number" name="pointsPerComment" value={siteSettings?.pointsPerComment || 0} onChange={handleSettingChange} min="0" />
                      </Form.Group>
                   </Col>
                   <Col md={3}>
                      <Form.Group className="mb-3">
                         <Form.Label>추천 받기 포인트</Form.Label>
-                        <Form.Control type="number" value={siteSettings?.pointsPerLike || 0} onChange={(e) => handleSettingChange('pointsPerLike', parseInt(e.target.value))} min="0" />
+                        <Form.Control type="number" name="pointsPerLike" value={siteSettings?.pointsPerLike || 0} onChange={handleSettingChange} min="0" />
                      </Form.Group>
                   </Col>
                   <Col md={3}>
                      <Form.Group className="mb-3">
                         <Form.Label>코인 교환 비율</Form.Label>
-                        <Form.Control type="number" value={siteSettings?.coinExchangeRate || 1} onChange={(e) => handleSettingChange('coinExchangeRate', parseInt(e.target.value))} min="1" />
+                        <Form.Control type="number" name="coinExchangeRate" value={siteSettings?.coinExchangeRate || 1} onChange={handleSettingChange} min="1" />
                         <Form.Text className="text-muted">{siteSettings?.coinExchangeRate || 1}포인트 = 1코인</Form.Text>
                      </Form.Group>
                   </Col>
@@ -278,30 +269,15 @@ const SiteManagement = () => {
                   <Col md={6}>
                      <Form.Group className="mb-3">
                         <Form.Label>일일 게시글 작성 제한</Form.Label>
-                        <Form.Control type="number" value={siteSettings?.maxPostsPerDay || 0} onChange={(e) => handleSettingChange('maxPostsPerDay', parseInt(e.target.value))} min="1" />
+                        <Form.Control type="number" name="maxPostsPerDay" value={siteSettings?.maxPostsPerDay || 0} onChange={handleSettingChange} min="1" />
                         <Form.Text className="text-muted">회원이 하루에 작성할 수 있는 최대 게시글 수</Form.Text>
                      </Form.Group>
                   </Col>
                   <Col md={6}>
                      <Form.Group className="mb-3">
                         <Form.Label>일일 댓글 작성 제한</Form.Label>
-                        <Form.Control type="number" value={siteSettings?.maxCommentsPerDay || 0} onChange={(e) => handleSettingChange('maxCommentsPerDay', parseInt(e.target.value))} min="1" />
+                        <Form.Control type="number" name="maxCommentsPerDay" value={siteSettings?.maxCommentsPerDay || 0} onChange={handleSettingChange} min="1" />
                         <Form.Text className="text-muted">회원이 하루에 작성할 수 있는 최대 댓글 수</Form.Text>
-                     </Form.Group>
-                  </Col>
-               </Row>
-
-               <Row>
-                  <Col md={6}>
-                     <Form.Group className="mb-3">
-                        <Form.Check type="switch" id="email-verification" label="이메일 인증 필수" checked={!!siteSettings?.requireEmailVerification} onChange={(e) => handleSettingChange('requireEmailVerification', e.target.checked)} />
-                        <Form.Text className="text-muted">회원가입 시 이메일 인증을 필수로 합니다.</Form.Text>
-                     </Form.Group>
-                  </Col>
-                  <Col md={6}>
-                     <Form.Group className="mb-3">
-                        <Form.Check type="switch" id="social-login" label="소셜 로그인 허용" checked={!!siteSettings?.enableSocialLogin} onChange={(e) => handleSettingChange('enableSocialLogin', e.target.checked)} />
-                        <Form.Text className="text-muted">구글, 카카오 소셜 로그인을 허용합니다.</Form.Text>
                      </Form.Group>
                   </Col>
                </Row>
@@ -329,7 +305,7 @@ const SiteManagement = () => {
                </Row>
 
                <div className="mb-3">
-                  <strong>현재 등록된 금지어 ({banWords.length}개)</strong>
+                  <strong>현재 등록된 금지어 ({banWords?.length || 0}개)</strong>
                </div>
 
                {banWordsLoading ? (
@@ -435,7 +411,7 @@ const SiteManagement = () => {
                         </tr>
                      </thead>
                      <tbody>
-                        {products?.length > 0 ? (
+                        {products.length > 0 ? (
                            products.map((item) => (
                               <tr key={item.id}>
                                  <td>{item.id}</td>

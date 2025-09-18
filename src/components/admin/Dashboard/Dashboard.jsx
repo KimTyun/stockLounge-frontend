@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col, Card, Table, Badge, Button } from 'react-bootstrap'
 import styles from '../../../styles/components/admin/admin-common.module.css'
@@ -7,7 +7,11 @@ import { getUsersThunk } from '../../../features/userSlice'
 
 const Dashboard = () => {
    const dispatch = useDispatch()
-   const { users = [], boards = [], loading, error } = useSelector((state) => state.admin)
+   const { users = [], boards = [], loading, error, settings } = useSelector((state) => state.admin)
+   const { users: usersLoading, boards: boardsLoading } = useSelector((state) => state.admin.loading)
+   const [siteSettings, setSiteSettings] = useState({})
+
+   const isLoading = usersLoading || boardsLoading
 
    useEffect(() => {
       dispatch(getUsersThunk())
@@ -17,6 +21,12 @@ const Dashboard = () => {
    const formatNumber = (num) => {
       return num ? num.toLocaleString() : '0'
    }
+
+   useEffect(() => {
+      if (settings) {
+         setSiteSettings(settings)
+      }
+   }, [settings])
 
    const renderStatCard = (title, value, icon, colorClass) => (
       <Col lg={6} md={6} className="mb-4">
@@ -56,7 +66,7 @@ const Dashboard = () => {
    }
 
    // 로딩이나 에러 처리
-   if (loading) {
+   if (isLoading) {
       return (
          <div className="d-flex justify-content-center align-items-center" style={{ height: '70vh' }}>
             <div className="spinner-border text-primary" role="status">

@@ -12,7 +12,7 @@ export const getDashboardData = async () => {
    }
 }
 
-// 사용자 관리
+// 사용자 조회
 export const getUsers = async () => {
    try {
       const response = await axiosApi.get(`/admin/users`)
@@ -110,6 +110,9 @@ export const getBanWords = async () => {
 // 금지어 추가
 export const addBanWord = async (banWordData) => {
    try {
+      const params = new URLSearchParams()
+      params.append('pattern', banWordData.pattern)
+      params.append('description', banWordData.description)
       const response = await axiosApi.post(`/admin/ban-words`, banWordData)
       return response.data
    } catch (error) {
