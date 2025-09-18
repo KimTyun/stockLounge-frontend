@@ -30,11 +30,13 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
       const reason = prompt('신고 사유를 입력해주세요:')
       if (reason && reason.trim()) {
          try {
-            await dispatch(reportBoardThunk({
-               boardId: boardId,
-               userId: 1, // 실제로는 로그인한 사용자 ID
-               reason: reason.trim()
-            }))
+            await dispatch(
+               reportBoardThunk({
+                  boardId: boardId,
+                  userId: 1, // 실제로는 로그인한 사용자 ID
+                  reason: reason.trim(),
+               })
+            )
             // 신고 후 게시글 정보 다시 가져오기
             dispatch(getBoardByIdThunk(boardId))
             alert('신고가 접수되었습니다. 검토 후 처리하겠습니다.')
