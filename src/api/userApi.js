@@ -35,7 +35,7 @@ export const getMe = async () => {
 }
 
 //내정보 수정하기
-export const updateMe = async ({ name, pw, age }) => {
+export const updateMe = async ({ name, pw = null, age = null } = {}) => {
    try {
       const response = await axiosApi.put(`/users/me`, { name, pw, age })
       return response.data
