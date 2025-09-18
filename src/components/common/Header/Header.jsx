@@ -1,86 +1,203 @@
-import { useState } from 'react';
-import { Navbar, Nav, Container, Button } from 'react-bootstrap';
-import LoginModal from '../../auth/LoginModal';
-import styles from '../../../styles/components/common/Header.module.css';
+import { useState, useEffect, useRef } from 'react'
+import { Navbar, Nav, Container, Button, Toast } from 'react-bootstrap'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { ROUTES } from '../../../config/routes'
+import styles from '../../../styles/components/common/Header.module.css'
+import { useSelector, useDispatch } from 'react-redux'
+import { logoutThunk } from '../../../features/authSlice'
 
 const Header = () => {
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+   const navigate = useNavigate()
+   const dispatch = useDispatch()
+   const auth = useSelector((state) => state.auth)
+   const isLoggedIn = Boolean(auth?.isLoggedIn)
+   const user = auth?.user
+   const [mobileOpen, setMobileOpen] = useState(false)
+   const [showProfileMenu, setShowProfileMenu] = useState(false)
+   const [showLoginToast, setShowLoginToast] = useState(false)
+   const prevIsLoggedIn = useRef(isLoggedIn)
 
-  const handleLoginClick = () => {
-    setShowLoginModal(true);
-  };
+   const handleLoginClick = () => {
+      navigate(ROUTES.LOGIN)
+      setMobileOpen(false)
+   }
 
-  const handleCloseModal = () => {
-    setShowLoginModal(false);
-  };
+   const handleLogout = async () => {
+      try {
+         await dispatch(logoutThunk()).unwrap()
+      } catch (error) {
+         console.error('Logout failed:', error)
+      }
+      setMobileOpen(false)
+      navigate(ROUTES.HOME)
+   }
 
-  return (
-    <>
-      <Navbar 
-        bg="light" 
-        expand="lg" 
-        fixed="top" 
-        className={styles.navbar}
-        style={{ backgroundColor: '#F7FAFC' }}
-      >
-        <Container>
-          <Navbar.Brand href="/" className={styles.brand}>
-            StockRounge
-          </Navbar.Brand>
-          
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link href="/">메인</Nav.Link>
-              <Nav.Link href="/board">게시판</Nav.Link>
-              <Nav.Link href="/chart">차트</Nav.Link>
-              <Nav.Link href="/news">뉴스</Nav.Link>
-              <Nav.Link href="/user">내정보</Nav.Link>
-            </Nav>
-            
-            <Nav>
-              {!isLoggedIn ? (
-                <div className={styles.authButtons}>
-                  <Button 
-                    variant="outline-primary" 
-                    className={styles.loginBtn}
-                    onClick={handleLoginClick}
+   useEffect(() => {
+      if (!prevIsLoggedIn.current && isLoggedIn) {
+         setShowLoginToast(true)
+         setTimeout(() => setShowLoginToast(false), 3000)
+      }
+      prevIsLoggedIn.current = isLoggedIn
+   }, [isLoggedIn])
+
+   return (
+      <>
+         <Navbar variant="dark" expand="lg" fixed="top" className={`${styles.navbar} ${styles.navbarGradient} ${styles.desktopNavWrapper}`}>
+            <Container className={styles.navInner}>
+               <Navbar.Brand as={NavLink} to={ROUTES.HOME} className={styles.brand}>
+                  STOCKLOUNGE
+               </Navbar.Brand>
+
+               <button className={styles.hamburger} aria-label="메뉴" onClick={() => setMobileOpen((s) => !s)}>
+                  <span className={styles.hamburgerBar} />
+                  <span className={styles.hamburgerBar} />
+                  <span className={styles.hamburgerBar} />
+               </button>
+               <div className={styles.desktopNav}>
+                  <Nav style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
+                     <Nav.Link as={NavLink} to={ROUTES.MAIN} className={styles.navItem}>
+                        메인
+                     </Nav.Link>
+
+                     <Nav.Link as={NavLink} to={ROUTES.BOARD} className={styles.navItem}>
+                        게시판
+                     </Nav.Link>
+                     <Nav.Link as={NavLink} to={ROUTES.CHART} className={styles.navItem}>
+                        차트
+                     </Nav.Link>
+                     <Nav.Link as={NavLink} to={ROUTES.NEWS} className={styles.navItem}>
+                        뉴스
+                     </Nav.Link>
+                     <Nav.Link as={NavLink} to={ROUTES.USER_INFO} className={styles.navItem}>
+                        내정보
+                     </Nav.Link>
+                  </Nav>
+
+                  <div className={styles.authArea}>
+                     {!isLoggedIn ? (
+                        <div className={styles.authButtons}>
+                           <button className={`${styles.iconBtn} ${styles.loginIconBtn}`} onClick={handleLoginClick} aria-label="로그인">
+                              <i className="fa-solid fa-right-to-bracket" aria-hidden style={{ fontSize: 18 }}></i>
+                           </button>
+
+                           <NavLink to={ROUTES.REGISTER} className={`${styles.iconBtn} ${styles.registerIconBtn}`} aria-label="회원가입">
+                              <i className="fa-solid fa-user-plus" aria-hidden style={{ fontSize: 18 }}></i>
+                           </NavLink>
+                        </div>
+                     ) : (
+                        <div className={styles.userInfo}>
+                           <div className={styles.profileWrap}>
+                              <img src={user?.profile_img || '/default-profile.png'} alt="프로필" className={styles.profileImage} onClick={() => setShowProfileMenu((s) => !s)} />
+                              <span className={styles.nickname}>{user?.nickname || '사용자'}</span>
+                              {showProfileMenu && (
+                                 <div className={styles.profileDropdown}>
+                                    <Button variant="link" as={NavLink} to={ROUTES.USER_INFO} onClick={() => setShowProfileMenu(false)}>
+                                       내 정보
+                                    </Button>
+                                    <Button variant="link" onClick={handleLogout}>
+                                       로그아웃
+                                    </Button>
+                                 </div>
+                              )}
+                           </div>
+                        </div>
+                     )}
+                  </div>
+               </div>
+            </Container>
+
+            <div className={`${styles.mobileMenu} ${mobileOpen ? styles.open : ''}`}>
+               <nav className={styles.mobileNav}>
+                  <a
+                     onClick={() => {
+                        setMobileOpen(false)
+                        navigate(ROUTES.MAIN)
+                     }}
+                     className={styles.mobileLink}
                   >
-                    로그인
-                  </Button>
-                  <Button 
-                    variant="primary" 
-                    className={styles.registerBtn}
-                    style={{ backgroundColor: '#5E94CA', borderColor: '#5E94CA' }}
+                     메인
+                  </a>
+                  <a
+                     onClick={() => {
+                        setMobileOpen(false)
+                        navigate(ROUTES.BOARD)
+                     }}
+                     className={styles.mobileLink}
                   >
-                    회원가입
-                  </Button>
-                </div>
-              ) : (
-                <div className={styles.userInfo}>
-                  <img 
-                    src="/default-profile.png" 
-                    alt="프로필" 
-                    className={styles.profileImage}
-                  />
-                  <span className={styles.nickname}>사용자닉네임</span>
-                  <i className={styles.notificationIcon}>🔔</i>
-                </div>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+                     게시판
+                  </a>
+                  <a
+                     onClick={() => {
+                        setMobileOpen(false)
+                        navigate(ROUTES.CHART)
+                     }}
+                     className={styles.mobileLink}
+                  >
+                     차트
+                  </a>
+                  <a
+                     onClick={() => {
+                        setMobileOpen(false)
+                        navigate(ROUTES.NEWS)
+                     }}
+                     className={styles.mobileLink}
+                  >
+                     뉴스
+                  </a>
+                  <a
+                     onClick={() => {
+                        setMobileOpen(false)
+                        navigate(ROUTES.USER_INFO)
+                     }}
+                     className={styles.mobileLink}
+                  >
+                     내정보
+                  </a>
 
-      <LoginModal 
-        show={showLoginModal} 
-        onHide={handleCloseModal}
-        onLogin={() => setIsLoggedIn(true)}
-      />
-    </>
-  );
-};
+                  <div className={styles.mobileAuthArea}>
+                     {!isLoggedIn ? (
+                        <>
+                           <button
+                              className={`${styles.iconBtn} ${styles.loginIconBtn}`}
+                              onClick={() => {
+                                 handleLoginClick()
+                                 setMobileOpen(false)
+                              }}
+                              aria-label="로그인"
+                           >
+                              <i className="fa-solid fa-right-to-bracket" aria-hidden style={{ fontSize: 18 }}></i>
+                           </button>
+                           <NavLink to={ROUTES.REGISTER} className={`${styles.iconBtn} ${styles.registerIconBtn}`} onClick={() => setMobileOpen(false)} aria-label="회원가입">
+                              <i className="fa-solid fa-user-plus" aria-hidden style={{ fontSize: 18 }}></i>
+                           </NavLink>
+                        </>
+                     ) : (
+                        <>
+                           <div className={styles.userInfoMobile}>
+                              <img src={user?.profile_img || '/default-profile.png'} alt="프로필" className={styles.profileImage} />
+                              <div>
+                                 <div className={styles.nickname}>{user?.nickname || '사용자'}</div>
+                                 <Button variant="link" className={styles.logoutBtn} onClick={handleLogout}>
+                                    로그아웃
+                                 </Button>
+                              </div>
+                           </div>
+                        </>
+                     )}
+                  </div>
+               </nav>
+            </div>
+         </Navbar>
+         <div className={styles.toastContainer} aria-live="polite" aria-atomic="true">
+            <Toast onClose={() => setShowLoginToast(false)} show={showLoginToast} delay={3000} autohide>
+               <Toast.Header>
+                  <strong className="me-auto">STOCKLOUNGE</strong>
+               </Toast.Header>
+               <Toast.Body>로그인되었습니다.</Toast.Body>
+            </Toast>
+         </div>
+      </>
+   )
+}
 
-export default Header;
+export default Header
