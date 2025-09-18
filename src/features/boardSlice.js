@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getBoard, writeBoard, getBoardById, deleteBoard, updateBoard } from '../api/boardApi'
+import { getBoard, writeBoard, getBoardById, deleteBoard, updateBoard, likeBoard } from '../api/boardApi'
 
 /**
  * 게시글 리스트 가져오기
  */
-export const getBoardThunk = createAsyncThunk('board/list', async (_, { rejectWithValue }) => {
+export const getBoardThunk = createAsyncThunk('board/list', async (category, { rejectWithValue }) => {
    try {
-      const response = await getBoard()
+      const response = await getBoard(category)
       return response
    } catch (error) {
       return rejectWithValue(error.response?.data)
@@ -58,6 +58,18 @@ export const updateBoardThunk = createAsyncThunk('board/updateBoard', async (dat
    try {
       const { id, data: boardData } = data
       await updateBoard(id, boardData)
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
+/**
+ * 게시글 좋아요, id로 특정 게시글 구분,
+ */
+export const likeBoardThunk = createAsyncThunk('board/likeBoard', async (id, { rejectWithValue }) => {
+   try {
+      const response = await likeBoard(id)
+      return response
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -117,7 +129,7 @@ const boardSlice = createSlice({
             state.loadingDetail = true
             state.error = null
          })
-         .addCase(deleteBoardThunk.fulfilled, (state, action) => {
+         .addCase(deleteBoardThunk.fulfilled, (state) => {
             state.loadingDetail = false
          })
          .addCase(deleteBoardThunk.rejected, (state, action) => {
@@ -128,10 +140,30 @@ const boardSlice = createSlice({
             state.loadingDetail = true
             state.error = null
          })
-         .addCase(updateBoardThunk.fulfilled, (state, action) => {
+         .addCase(updateBoardThunk.fulfilled, (state) => {
             state.loadingDetail = false
          })
          .addCase(updateBoardThunk.rejected, (state, action) => {
+            state.loadingDetail = false
+            state.error = action.payload?.message || '서버 문제로 게시글을 수정하지 못했습니다.'
+         })
+         .addCase(likeBoardThunk.pending, (state) => {
+            state.loadingDetail = true
+            state.error = null
+         })
+         .addCase(likeBoardThunk.fulfilled, (state, action) => {
+            state.loadingDetail = false
+
+            // 좋아요 누를시 반응 업데이트
+            const updated = action.payload.data
+            if (!updated) return
+            if (state.board && state.board.id === updated.boardId) {
+               state.board.like_count = updated.like_count
+               state.board.isLiked = updated.isLiked
+            }
+            state.boards = state.boards.map((board) => (board.id === updated.boardId ? { ...board, like_count: updated.like_count, isLiked: updated.isLiked } : board))
+         })
+         .addCase(likeBoardThunk.rejected, (state, action) => {
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 수정하지 못했습니다.'
          })

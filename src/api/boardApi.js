@@ -2,9 +2,13 @@ import axiosApi from '.'
 const env = import.meta.env.VITE_ENV
 
 // 게시글 리스트 가져오기
-export const getBoard = async () => {
+export const getBoard = async (category) => {
    try {
-      const response = await axiosApi.get('/board')
+      const response = await axiosApi.get('/board', {
+         params: {
+            category: category,
+         },
+      })
       return response.data
    } catch (error) {
       if (env === 'development') console.error(error)
@@ -58,6 +62,19 @@ export const updateBoard = async (id, boardData) => {
          headers: {
             'Content-Type': 'multipart/form-data',
          },
+      })
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+// 게시글 추천
+export const likeBoard = async (id, userId = null) => {
+   try {
+      const response = await axiosApi.post(`/board/${id}/like`, {
+         user_id: userId,
       })
       return response.data
    } catch (error) {

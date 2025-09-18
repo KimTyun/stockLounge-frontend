@@ -1,24 +1,17 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Container, Row, Col, Card, Button, Badge, Dropdown } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import CommentList from '../CommentList'
-import CommentForm from '../CommentForm'
 import styles from '../../../styles/pages/Board_fixed.module.css'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteBoardThunk, getBoardByIdThunk } from '../../../features/boardSlice'
+import { deleteBoardThunk, getBoardByIdThunk, likeBoardThunk } from '../../../features/boardSlice'
+import { reportBoardThunk } from '../../../features/reportSlice'
 
 const PostDetail = ({ boardId, onBackToList, onEdit }) => {
    const navigate = useNavigate()
 
    const dispatch = useDispatch()
    const { board, loadingDetail, error } = useSelector((state) => state.board)
-
-   useEffect(() => {
-      // 게시글 상세 정보를 가져오는 로직
-      if (boardId) {
-         dispatch(getBoardByIdThunk(boardId))
-      }
-   }, [dispatch, boardId])
 
    const handleEdit = () => {
       onEdit(boardId)
@@ -33,9 +26,23 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
       }
    }
 
-   const handleReport = () => {
-      if (window.confirm('이 게시글을 신고하시겠습니까?')) {
-         alert('신고가 접수되었습니다. 검토 후 처리하겠습니다.')
+   const handleReport = async () => {
+      const reason = prompt('신고 사유를 입력해주세요:')
+      if (reason && reason.trim()) {
+         try {
+            await dispatch(
+               reportBoardThunk({
+                  boardId: boardId,
+                  userId: 1, // 실제로는 로그인한 사용자 ID
+                  reason: reason.trim(),
+               })
+            )
+            // 신고 후 게시글 정보 다시 가져오기
+            dispatch(getBoardByIdThunk(boardId))
+            alert('신고가 접수되었습니다. 검토 후 처리하겠습니다.')
+         } catch (error) {
+            alert('신고 접수에 실패했습니다.')
+         }
       }
    }
 
@@ -50,6 +57,19 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
          minute: '2-digit',
       })
    }
+
+   const onClickBoardHeart = () => {
+      if (boardId) {
+         dispatch(likeBoardThunk(boardId))
+      }
+   }
+
+   useEffect(() => {
+      // 게시글 상세 정보를 가져오는 로직
+      if (boardId) {
+         dispatch(getBoardByIdThunk(boardId))
+      }
+   }, [dispatch, boardId])
 
    if (loadingDetail) {
       return (
@@ -168,7 +188,7 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                                  <i className="fas fa-eye me-1"></i>조회 {(board.view_count || 0).toLocaleString()}
                               </span>
                               <span>
-                                 <i className="fas fa-heart me-1"></i>추천 {board.like_count || 0}
+                                 <i className="fas fa-heart me-1 likes"></i>추천 {board.like_count || 0}
                               </span>
                               <span>
                                  <i className="fas fa-flag me-1"></i>신고 {board.report_count || 0}
@@ -199,21 +219,14 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                      </Card.Body>
                   </Card>
 
-                  {/* 액션 버튼들 */}
+                  {/* 좋아요 버튼 */}
                   <Card className={styles.actionCard}>
                      <Card.Body>
                         <div className={styles.actionButtons}>
-                           <Button>{board.like_count || 0}</Button>
-
-                           <Button variant="outline-secondary">
-                              <i className="fas fa-share"></i>
-                              공유
-                           </Button>
-
-                           <Button variant="outline-secondary">
-                              <i className="fas fa-bookmark"></i>
-                              북마크
-                           </Button>
+                           <span className={styles.likes}>
+                              <i className="fas fa-heart me-1 my-red-icon"></i>
+                           </span>
+                           <Button onClick={onClickBoardHeart}>{board.like_count || 0}</Button>
                         </div>
                      </Card.Body>
                   </Card>
@@ -225,10 +238,7 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                            <i className="fas fa-comments me-2"></i>댓글
                         </h5>
                      </Card.Header>
-                     <Card.Body>
-                        <CommentForm postId={board.id} />
-                        <CommentList postId={board.id} />
-                     </Card.Body>
+                     <Card.Body>{boardId && <CommentList postId={boardId} />}</Card.Body>
                   </Card>
 
                   <div className={styles.postNavigation}>
