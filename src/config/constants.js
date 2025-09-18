@@ -1,23 +1,23 @@
 // API 기본 설정
-export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001/api'
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 // Upbit API 설정
 export const UPBIT_API = {
    BASE_URL: 'https://api.upbit.com/v1',
-   ACCESS_KEY: process.env.REACT_APP_UPBIT_ACCESS_KEY || 'PvLr4WBQY7Pehn1CULQ6nBM2y5qN9K3u9Hi8zXj7',
-   SECRET_KEY: process.env.REACT_APP_UPBIT_SECRET_KEY || 'knetB2oJ3zjEFchcqGYzheceyjph7K5wNi22SQe2',
+   ACCESS_KEY: import.meta.env.VITE_UPBIT_ACCESS_KEY || '',
+   SECRET_KEY: import.meta.env.VITE_UPBIT_SECRET_KEY || '',
    WEBSOCKET_URL: 'wss://api.upbit.com/websocket/v1',
 }
 
 // 소셜 로그인 설정
 export const SOCIAL_LOGIN = {
    GOOGLE: {
-      CLIENT_ID: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
-      REDIRECT_URI: process.env.REACT_APP_GOOGLE_REDIRECT_URI || '',
+      CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
+      REDIRECT_URI: import.meta.env.VITE_GOOGLE_REDIRECT_URI || '',
    },
    KAKAO: {
-      CLIENT_ID: process.env.REACT_APP_KAKAO_CLIENT_ID || '',
-      REDIRECT_URI: process.env.REACT_APP_KAKAO_REDIRECT_URI || '',
+      CLIENT_ID: import.meta.env.VITE_KAKAO_CLIENT_ID || '',
+      REDIRECT_URI: import.meta.env.VITE_KAKAO_REDIRECT_URI || '',
    },
 }
 

@@ -45,23 +45,23 @@ const authSlice = createSlice({
             state.user = action.payload.data
             state.isLoggedIn = action.payload.isLoggedIn
          })
-         .addCase(checkAuthStatusThunk.rejected, (state, action) => {
+         .addCase(checkAuthStatusThunk.rejected, (state) => {
             state.loading = false
-            state.error = action.payload?.message || '서버 문제로 로그인 확인에 실패하였습니다.'
+            state.error = '서버 문제로 로그인 확인에 실패하였습니다.'
          })
 
          .addCase(logoutThunk.pending, (state) => {
             state.loading = true
             state.error = null
          })
-         .addCase(logoutThunk.fulfilled, (state, action) => {
+         .addCase(logoutThunk.fulfilled, (state) => {
             state.loading = false
             state.user = null
             state.isLoggedIn = false
          })
-         .addCase(logoutThunk.rejected, (state, action) => {
+         .addCase(logoutThunk.rejected, (state) => {
             state.loading = false
-            state.error = action.payload?.message || '서버 문제로 로그인 확인에 실패하였습니다.'
+            state.error = '서버 문제로 로그인 확인에 실패하였습니다.'
          })
    },
 })
