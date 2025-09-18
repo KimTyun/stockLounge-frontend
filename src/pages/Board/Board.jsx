@@ -17,6 +17,18 @@ import { getMarketAllThunk, getTickerAllThunk } from "../../features/coinSlice"
 
 const Board = () => {
   const [activeCategory, setActiveCategory] = useState("free")
+  const dispatch = useDispatch()
+  const { coins, coinList } = useSelector((s) => s.coin)
+  
+  const [selectedCoin, setSelectedCoin] = useState({
+    id: 'KRW-BTC',
+    symbol: 'BTC',
+    name: '비트코인',
+    price: 0,
+    change24h: 0,
+    volume24h: 0,
+    rank: 1,
+  })
 
   const categories = [
     { key: "free", label: "자유토론" },
@@ -29,12 +41,49 @@ const Board = () => {
     { key: "analysis", label: "분석" },
   ]
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (coins.length > 0 && coinList.length > 0) {
+        return
+      }
+
+      let conlist = coinList
+      let result = coins
+
+      if (coinList.length === 0) {
+        conlist = await dispatch(getMarketAllThunk()).unwrap()
+      }
+      if (coins.length === 0) {
+        result = await dispatch(getTickerAllThunk(10)).unwrap()
+      }
+
+      if (result.length > 0 && conlist.length > 0) {
+        const mapped = result.map((coin, index) => {
+          const marketInfo = conlist.find((e) => e.market === coin.market)
+          return {
+            id: coin.market,
+            symbol: coin.market.split('-')[1],
+            name: marketInfo?.korean_name || coin.market.split('-')[1],
+            price: coin.trade_price,
+            change24h: coin.signed_change_rate,
+            volume24h: coin.acc_trade_volume_24h,
+            rank: index + 1,
+          }
+        })
+
+        setSelectedCoin(mapped[0])
+      }
+    }
+
+    fetchData().catch(() => {})
+  }, [coins, coinList, dispatch])
+
   return (
     <div>
       {/* 섹션1: 코인 차트 영역 */}
       <section className={styles.chartSection}>
         <Container>
-          <CandleChart coin={{ name: "BTC" }} />
+          <CandleChart coin={selectedCoin} />
         </Container>
       </section>
       <section className={styles.boardSection}>

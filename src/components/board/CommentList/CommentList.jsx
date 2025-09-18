@@ -25,7 +25,7 @@ const CommentList = ({ postId }) => {
 
   useEffect(() => {
     if (!user) {
-      dispatch(getMeThunk())
+      dispatch(getMeThunk()).catch(() => {})
     }
   }, [dispatch])
   // 댓글 데이터 로드
@@ -127,6 +127,7 @@ const CommentList = ({ postId }) => {
                   dispatch(
                     reportCommentThunk({
                       commentId: comment.id,
+                      userId: user.id,
                       reason: reason.trim(),
                     })
                   )
@@ -180,7 +181,7 @@ const CommentList = ({ postId }) => {
                   await dispatch(
                     likeCommentThunk({
                       commentId: comment.id,
-                      userId: comment.author.id,
+                      userId: user.id,
                     })
                   )
                 }}

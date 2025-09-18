@@ -134,7 +134,6 @@
    color: #dc3545;
 }
 
-<<<<<<< HEAD
 .commentActions {
   display: flex;
   align-items: center;
@@ -142,25 +141,22 @@
 
 .stats {
   margin-left: auto;
-  /* 오른쪽 끝으로 밀어버림 */
   display: flex;
   gap: 0.75rem;
-  /* 좋아요/신고 간격 */
   align-items: center;
 }
-
 
 .likes>.likeButton>i {
   color: red;
   margin-left: auto;
-=======
+}
+
 .actionButton.liked:hover {
    color: #dc3545;
 }
 
 .replies {
    margin-top: 1rem;
->>>>>>> 7321d8370e54bfa1df880807e867552de766ac61
 }
 
 .replyForm {
