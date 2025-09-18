@@ -21,7 +21,7 @@ import {
   getBoardByIdThunk,
 } from "../../../features/boardSlice";
 
-const PostEditor = React.forwardRef(({ onSuccess, editPostId }, ref) => {
+const PostEditor = React.forwardRef(({ onSuccess, editPostId, defaultCategory = "free" }, ref) => {
   const localQuillRef = React.useRef(null);
   const quillRef = ref || localQuillRef;
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ const PostEditor = React.forwardRef(({ onSuccess, editPostId }, ref) => {
 
   const [formData, setFormData] = useState({
     title: "",
-    category: "free",
+    category: defaultCategory,
     content: "",
   });
 
@@ -99,7 +99,7 @@ const PostEditor = React.forwardRef(({ onSuccess, editPostId }, ref) => {
 
       // 기존 이미지가 있다면 미리보기 설정
       if (board.board_img) {
-        setImgUrl(`${import.meta.env.VITE_API_URI}/uploads/${board.board_img}`);
+        setImgUrl(`${import.meta.env.VITE_API_URL}/uploads/${board.board_img}`);
       }
     }
   }, [isEditMode, board]);
