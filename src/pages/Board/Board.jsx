@@ -1,4 +1,3 @@
-<<<<<<<<< Temporary merge branch 1
 import React, { useEffect, useState } from 'react'
 import CandleChart from '../../components/chart/CandleChart'
 import { Container, Row, Col, Nav, Tab, Dropdown, ButtonGroup } from 'react-bootstrap'
@@ -9,29 +8,64 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getMarketAllThunk, getTickerAllThunk } from '../../features/coinSlice'
 
 const Board = () => {
+   const [activeCategory, setActiveCategory] = useState('free')
    const dispatch = useDispatch()
    const { coins, coinList } = useSelector((s) => s.coin)
 
-   const [selectedCoin, setSelectedCoin] = useState(null)
+   const [selectedCoin, setSelectedCoin] = useState({
+      id: 'KRW-BTC',
+      symbol: 'BTC',
+      name: '비트코인',
+      price: 0,
+      change24h: 0,
+      volume24h: 0,
+      rank: 1,
+   })
+
    const [period, setPeriod] = useState('days')
    const [coinCategories, setCoinCategories] = useState([])
-   const [activeCategory, setActiveCategory] = useState('free')
+
+   const categories = [
+      { key: 'free', label: '자유토론' },
+      { key: 'bitcoin', label: '비트코인' },
+      { key: 'ethereum', label: '이더리움' },
+      { key: 'ripple', label: '리플' },
+      { key: 'nft', label: 'NFT' },
+      { key: 'defi', label: 'DeFi' },
+      { key: 'news', label: '뉴스' },
+      { key: 'analysis', label: '분석' },
+   ]
 
    useEffect(() => {
       const fetchData = async () => {
-         if (coins.length === 0 || coinList.length === 0) {
-            const conlist = await dispatch(getMarketAllThunk()).unwrap()
-            const result = await dispatch(getTickerAllThunk(30)).unwrap()
+         // 이미 데이터가 있고 카테고리도 설정되어 있으면 건너뛰기
+         if (coins.length > 0 && coinList.length > 0 && coinCategories.length > 0) {
+            return
+         }
 
-            const mapped = result.map((coin, index) => ({
-               id: coin.market,
-               symbol: coin.market.split('-')[1],
-               name: conlist.find((e) => e.market === coin.market)?.korean_name ?? '',
-               price: coin.trade_price,
-               change24h: coin.signed_change_rate,
-               volume24h: coin.acc_trade_volume_24h,
-               rank: index + 1,
-            }))
+         let conlist = coinList
+         let result = coins
+
+         if (coinList.length === 0) {
+            conlist = await dispatch(getMarketAllThunk()).unwrap()
+         }
+         if (coins.length === 0) {
+            result = await dispatch(getTickerAllThunk(10)).unwrap()
+         }
+
+         if (result.length > 0 && conlist.length > 0) {
+            const mapped = result.map((coin, index) => {
+               const marketInfo = conlist.find((e) => e.market === coin.market)
+               return {
+                  id: coin.market,
+                  symbol: coin.market.split('-')[1],
+                  name: marketInfo?.korean_name || coin.market.split('-')[1],
+                  price: coin.trade_price,
+                  change24h: coin.signed_change_rate,
+                  volume24h: coin.acc_trade_volume_24h,
+                  rank: index + 1,
+               }
+            })
 
             setSelectedCoin(mapped[0])
 
@@ -45,23 +79,11 @@ const Board = () => {
       }
 
       fetchData()
-   }, [coins, coinList, dispatch])
-
-   if (!selectedCoin) return <div>Loading...</div>
-
-   const categories = [
-      { key: 'free', label: '자유토론' },
-      { key: 'bitcoin', label: '비트코인' },
-      { key: 'ethereum', label: '이더리움' },
-      { key: 'ripple', label: '리플' },
-      { key: 'nft', label: 'NFT' },
-      { key: 'defi', label: 'DeFi' },
-      { key: 'news', label: '뉴스' },
-      { key: 'analysis', label: '분석' },
-   ]
+   }, [coins, coinList, dispatch, coinCategories.length])
 
    return (
       <div>
+         {/* 섹션1: 코인 차트 영역 */}
          <section>
             <Row>
                <Col>
@@ -102,13 +124,12 @@ const Board = () => {
                <Dropdown.Menu>
                   {coinCategories.map((category) => (
                      <Dropdown.Item key={category.key} onClick={() => setSelectedCoin(category.coinData)}>
-                        {category.label}
+                        {category.label || category.coinData?.symbol || '코인'}
                      </Dropdown.Item>
                   ))}
                </Dropdown.Menu>
             </Dropdown>
          </section>
-
          <section className={styles.boardSection}>
             <Container>
                <div className={styles.boardHeader}>
@@ -116,7 +137,7 @@ const Board = () => {
                   <p className={styles.boardDescription}>다양한 투자 정보와 의견을 나누는 공간입니다.</p>
                </div>
 
-               <Tab.Container activeKey={activeCategory} onSelect={(k) => setActiveCategory(k)}>
+               <Tab.Container id="board-categories" activeKey={activeCategory} onSelect={(k) => setActiveCategory(k)}>
                   <Nav variant="pills" className={styles.categoryTabs}>
                      {categories.map((category) => (
                         <Nav.Item key={category.key}>
@@ -137,65 +158,6 @@ const Board = () => {
          </section>
       </div>
    )
-}
-
-=========
-import React, { useState } from 'react'
-import CandleChart from '../../components/chart/CandleChart'
-import { Container, Nav, Tab } from 'react-bootstrap'
-import PostList from '../../components/board/PostList'
-import styles from '../../styles/pages/Board_fixed.module.css'
-
-const Board = () => {
-   const [activeCategory, setActiveCategory] = useState('free')
-
-   const categories = [
-      { key: 'free', label: '자유토론' },
-      { key: 'bitcoin', label: '비트코인' },
-      { key: 'ethereum', label: '이더리움' },
-      { key: 'ripple', label: '리플' },
-      { key: 'nft', label: 'NFT' },
-      { key: 'defi', label: 'DeFi' },
-      { key: 'news', label: '뉴스' },
-      { key: 'analysis', label: '분석' },
-   ]
-
-   return (
-      <div>
-         {/* 섹션1: 코인 차트 영역 */}
-         <section className={styles.chartSection}>
-            <Container>
-               <CandleChart coin={{ name: 'BTC' }} />
-            </Container>
-         </section>
-         <section className={styles.boardSection}>
-            <Container>
-               <div className={styles.boardHeader}>
-                  <h1 className={styles.boardTitle}>커뮤니티</h1>
-                  <p className={styles.boardDescription}>다양한 투자 정보와 의견을 나누는 공간입니다.</p>
-               </div>
-
-               <Tab.Container id="board-categories" activeKey={activeCategory} onSelect={(k) => setActiveCategory(k)}>
-                  <Nav variant="pills" className={styles.categoryTabs}>
-                     {categories.map((category) => (
-                        <Nav.Item key={category.key}>
-                           <Nav.Link eventKey={category.key} className={styles.categoryTab}>
-                              {category.label}
-                           </Nav.Link>
-                        </Nav.Item>
-                     ))}
-                  </Nav>
-
-            <Tab.Content className={styles.tabContent}>
-              <Tab.Pane eventKey={activeCategory}>
-                <PostList category={activeCategory} />
-              </Tab.Pane>
-            </Tab.Content>
-          </Tab.Container>
-        </Container>
-      </section>
-    </div>
-  )
 }
 
 export default Board
