@@ -132,7 +132,7 @@ export const deleteBanWord = async (banWordId) => {
    }
 }
 
-// 교환품 관리
+// 상품 관리
 export const getProducts = async () => {
    try {
       const response = await axiosApi.get(`/admin/products`)
@@ -143,7 +143,7 @@ export const getProducts = async () => {
    }
 }
 
-// 교환품 추가
+// 상품 추가
 export const addProduct = async (ProductData) => {
    try {
       const response = await axiosApi.post(`/admin/products`, ProductData, {
@@ -158,7 +158,7 @@ export const addProduct = async (ProductData) => {
    }
 }
 
-// 교환품 수정
+// 상품 수정
 export const updateProduct = async (ProductId, ProductData) => {
    try {
       const response = await axiosApi.put(`/admin/products/${ProductId}`, ProductData)
@@ -168,10 +168,54 @@ export const updateProduct = async (ProductId, ProductData) => {
       throw error
    }
 }
-// 교환품 삭제
+// 상품 삭제
 export const deleteProduct = async (ProductId) => {
    try {
       const response = await axiosApi.delete(`/admin/products/${ProductId}`)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+//상품 유형 관리
+export const getProductLists = async () => {
+   try {
+      const response = await axiosApi.get('/admin/product-lists')
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+// 상품 유형 생성
+export const addProductList = async (listData) => {
+   try {
+      const response = await axiosApi.post('/admin/product-lists', listData)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+// 상품 유형 수정
+export const updateProductList = async (listId, listData) => {
+   try {
+      const response = await axiosApi.put(`/admin/product-lists/${listId}`, listData)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+// 상품 유형 삭제
+export const deleteProductList = async (listId) => {
+   try {
+      const response = await axiosApi.delete(`/admin/product-lists/${listId}`)
       return response.data
    } catch (error) {
       if (env === 'development') console.error(error)
@@ -185,6 +229,15 @@ export const deleteProduct = async (ProductId) => {
 export const getStatistics = async (period = 'week') => {
    try {
       const response = await axiosApi.get(`/admin/statistics?period=${period}`)
+
+      // 응답 데이터 구조 확인
+      console.log('API Response:', response.data)
+
+      // response.data가 있는지 확인하고 반환
+      if (!response.data) {
+         throw new Error('No data received from server')
+      }
+
       return response.data
    } catch (error) {
       if (env === 'development') console.error('getStatistics API Error:', error)

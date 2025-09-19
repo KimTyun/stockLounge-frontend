@@ -20,25 +20,38 @@ const UserManagement = () => {
    const [currentPage, setCurrentPage] = useState(1)
    const itemsPerPage = 10
 
+   // 알림 상태
+   const [showAlert, setShowAlert] = useState(false)
+   const [alertMessage, setAlertMessage] = useState('')
+   const [alertType, setAlertType] = useState('danger')
+
+   // 알림 표시 유틸리티 함수
+   const showTimedAlert = (message, type = 'danger') => {
+      setAlertMessage(message)
+      setAlertType(type)
+      setShowAlert(true)
+      setTimeout(() => setShowAlert(false), 3000)
+   }
+
+   // Redux의 error 상태가 변경될 때 알림을 표시
    useEffect(() => {
-      dispatch(getUsersThunk({ limit: itemsPerPage, page: currentPage })) // currentPage를 사용하도록 수정
+      if (error && error.users) {
+         showTimedAlert(error.users)
+      }
+   }, [error])
+
+   useEffect(() => {
+      dispatch(getUsersThunk({ limit: itemsPerPage, page: currentPage }))
    }, [dispatch, currentPage])
 
    const getStatusBadge = (user) => {
-      // 백엔드에서 밴 여부만 가져옴
       const status = user.is_ban ? 'banned' : 'active'
-
       const variants = {
          active: 'success',
-         pending: 'warning',
-         inactive: 'secondary',
          banned: 'danger',
       }
-
       const labels = {
          active: '활성',
-         pending: '승인대기',
-         inactive: '비활성',
          banned: '정지',
       }
 
@@ -49,7 +62,6 @@ const UserManagement = () => {
       )
    }
 
-   // 사용자 관리
    const handleUserAction = (user, action) => {
       setSelectedUser(user)
       if (action === 'view') {
@@ -71,7 +83,6 @@ const UserManagement = () => {
 
    const filteredUsers = (users || []).filter((user) => {
       const matchesSearch = user.nickname.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      // is_ban 필드 기반으로 필터링
       const matchesStatus = filterStatus === 'all' || (filterStatus === 'banned' ? user.is_ban : !user.is_ban)
       return matchesSearch && matchesStatus
    })
@@ -168,7 +179,6 @@ const UserManagement = () => {
                            </tr>
                         </tbody>
                      </Table>
-
                      {selectedUser.warnings > 0 && (
                         <Alert variant="warning">
                            <i className="fas fa-exclamation-triangle me-2"></i>이 사용자는 {selectedUser.warnings}회의 경고를 받았습니다.
@@ -182,7 +192,7 @@ const UserManagement = () => {
             <Button variant="secondary" onClick={() => setShowModal(false)}>
                닫기
             </Button>
-            {selectedUser && selectedUser.status === 'active' && (
+            {selectedUser && !selectedUser.is_ban && (
                <Button
                   variant="warning"
                   onClick={() => {
@@ -193,7 +203,7 @@ const UserManagement = () => {
                   계정 정지
                </Button>
             )}
-            {selectedUser && selectedUser.status === 'banned' && (
+            {selectedUser && selectedUser.is_ban && (
                <Button
                   variant="success"
                   onClick={() => {
@@ -207,6 +217,7 @@ const UserManagement = () => {
          </Modal.Footer>
       </Modal>
    )
+
    const totalPages = Math.ceil((users || []).length / itemsPerPage)
    return (
       <div>
@@ -218,7 +229,11 @@ const UserManagement = () => {
                </h4>
             </div>
             <Card.Body>
-               {/* 검색 및 필터 */}
+               {showAlert && (
+                  <Alert variant={alertType} className="mb-4">
+                     {alertMessage}
+                  </Alert>
+               )}
                <Row className="mb-4">
                   <Col md={4}>
                      <InputGroup>
@@ -232,8 +247,6 @@ const UserManagement = () => {
                      <Form.Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
                         <option value="all">전체 상태</option>
                         <option value="active">활성</option>
-                        <option value="pending">승인대기</option>
-                        <option value="inactive">비활성</option>
                         <option value="banned">정지</option>
                      </Form.Select>
                   </Col>
@@ -249,8 +262,6 @@ const UserManagement = () => {
                      <div className="text-muted">총 {(users || []).length}명</div>
                   </Col>
                </Row>
-
-               {/* 로딩, 에러, 데이터 없음 상태 처리 */}
                {usersLoading ? (
                   <div className="text-center py-5">
                      <Spinner animation="border" role="status" className="mb-3">
@@ -258,18 +269,12 @@ const UserManagement = () => {
                      </Spinner>
                      <p className="text-muted">사용자 정보를 불러오는 중입니다...</p>
                   </div>
-               ) : error ? (
-                  <Alert variant="danger" className="text-center">
-                     <i className="fas fa-exclamation-circle me-2"></i>
-                     {error}
-                  </Alert>
                ) : sortedUsers.length === 0 ? (
                   <div className="text-center py-4">
                      <i className="fas fa-users fa-3x text-muted mb-3"></i>
                      <p className="text-muted">검색 조건에 맞는 사용자가 없습니다.</p>
                   </div>
                ) : (
-                  /* 사용자 목록 테이블 */
                   <div className={styles.tableContainer}>
                      <Table responsive className={styles.adminTable}>
                         <thead>
@@ -293,9 +298,7 @@ const UserManagement = () => {
                                  <td>{user.joinDate}</td>
                                  <td>{user.lastLogin}</td>
                                  <td>{user.Reward?.point.toLocaleString() || '0'}P</td>
-                                 <td>
-                                    <span className={user.warnings > 0 ? 'text-danger' : 'text-success'}>{user.warnings}</span>
-                                 </td>
+                                 <td>{getStatusBadge(user)}</td>
                                  <td>
                                     <Button variant="outline-primary" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handleUserAction(user, 'view')}>
                                        <i className="fas fa-eye"></i>
@@ -321,8 +324,7 @@ const UserManagement = () => {
                )}
             </Card.Body>
          </Card>
-
-         <UserDetailModal show={showModal} onHide={() => setShowModal(false)} />
+         {showModal && <UserDetailModal />}
       </div>
    )
 }
