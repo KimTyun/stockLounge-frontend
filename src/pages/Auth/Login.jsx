@@ -12,13 +12,10 @@ const LoginPage = () => {
    const { isLoggedIn } = useSelector((state) => state.auth)
    const navigate = useNavigate()
 
-   // 소셜 로그인 성공 후 콜백 함수
    const handleLoginSuccess = () => {
-      // 로그인 성공 후, 최신 인증 상태를 다시 확인하여 유저 정보를 가져옴
       dispatch(checkAuthStatusThunk())
    }
 
-   // 로그인 상태가 변경되면 메인 페이지로 이동
    useEffect(() => {
       if (isLoggedIn) {
          navigate(ROUTES.MAIN)

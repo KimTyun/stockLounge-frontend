@@ -13,23 +13,13 @@ const SocialLogin = ({ provider, onSuccess, className }) => {
       }
 
       if (!apiBase) {
-         console.error('VITE_API_BASE_URL 환경 변수가 설정되지 않았습니다.')
+         console.error('VITE_API_BASE_URI 환경 변수가 설정되지 않았습니다.')
          alert('로그인 설정에 오류가 발생했습니다. 관리자에게 문의하세요.')
          return
       }
 
       if (authUrl) {
-         const w = 600
-         const h = 700
-         const left = window.screenX + (window.outerWidth - w) / 2
-         const top = window.screenY + (window.outerHeight - h) / 2
-         const popup = window.open(authUrl, 'oauth_popup', `width=${w},height=${h},left=${left},top=${top}`)
-
-         if (!popup) {
-            window.location.href = authUrl
-            return
-         }
-
+         const popup = window.open(authUrl, 'oauth_popup', 'width=600,height=700')
          const timer = setInterval(() => {
             if (popup.closed) {
                clearInterval(timer)
