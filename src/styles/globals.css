@@ -11,7 +11,7 @@ body {
    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
-   background-color: #ffffff;
+   background-color: var(--background-primary);
    color: var(--text-primary);
    line-height: 1.6;
 }
@@ -22,7 +22,8 @@ li {
 ul {
    padding-left: 0;
 }
-/* 반응형 기본 설정 */
+
+/* Responsive Base */
 .container-fluid {
    padding-left: 15px;
    padding-right: 15px;
@@ -42,13 +43,13 @@ ul {
    }
 }
 
-/* 스크롤바 스타일링 */
+/* Scrollbar */
 ::-webkit-scrollbar {
    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-   background: #f1f1f1;
+   background: var(--background-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -57,10 +58,10 @@ ul {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-   background: #4a7ba7;
+   background: var(--secondary-color);
 }
 
-/* 링크 기본 스타일 */
+/* Links */
 a {
    color: var(--primary-color);
    text-decoration: none;
@@ -68,11 +69,11 @@ a {
 }
 
 a:hover {
-   color: #4a7ba7;
+   color: var(--secondary-color);
    text-decoration: none;
 }
 
-/* 버튼 기본 스타일 */
+/* Buttons */
 .btn {
    border-radius: var(--border-radius);
    font-weight: 500;
@@ -82,26 +83,29 @@ a:hover {
 .btn-primary {
    background-color: var(--primary-color);
    border-color: var(--primary-color);
+   color: var(--text-primary);
 }
 
 .btn-primary:hover {
-   background-color: #4a7ba7;
-   border-color: #4a7ba7;
+   background-color: var(--secondary-color);
+   border-color: var(--secondary-color);
 }
 
-/* 카드 기본 스타일 */
+/* Cards */
 .card {
-   border: none;
+   background-color: var(--background-tertiary);
+   border: 1px solid var(--border-color);
    border-radius: var(--border-radius);
    box-shadow: var(--box-shadow);
-   transition: box-shadow 0.3s ease;
+   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .card:hover {
    box-shadow: var(--box-shadow-hover);
+   transform: translateY(-2px);
 }
 
-/* 유틸리티 클래스 */
+/* Utility */
 .text-primary-custom {
    color: var(--primary-color) !important;
 }
@@ -114,7 +118,7 @@ a:hover {
    background-color: var(--secondary-color) !important;
 }
 
-/* 반응형 텍스트 */
+/* Responsive Text */
 @media (max-width: 575.98px) {
    h1 {
       font-size: 1.75rem;
@@ -127,7 +131,7 @@ a:hover {
    }
 }
 
-/* 애니메이션 */
+/* Animation */
 @keyframes fadeIn {
    from {
       opacity: 0;
@@ -143,11 +147,11 @@ a:hover {
    animation: fadeIn 0.5s ease-in-out;
 }
 
-/* 로딩 스피너 */
+/* Loading Spinner */
 .spinner {
    width: 40px;
    height: 40px;
-   border: 4px solid #f3f3f3;
+   border: 4px solid var(--background-tertiary);
    border-top: 4px solid var(--primary-color);
    border-radius: 50%;
    animation: spin 1s linear infinite;
@@ -160,4 +164,66 @@ a:hover {
    100% {
       transform: rotate(360deg);
    }
+}
+
+/* Badge Overrides */
+.badge {
+  padding: 0.4em 0.6em;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge.bg-primary {
+  background-color: var(--primary-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.badge.bg-secondary {
+  background-color: var(--background-tertiary) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color);
+}
+
+.badge.bg-success {
+  background-color: var(--success-color) !important;
+  color: #fff !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--danger-color) !important;
+  color: #fff !important;
+}
+
+.badge.bg-warning {
+  background-color: var(--warning-color) !important;
+  color: #000 !important;
+}
+
+.badge.bg-info {
+  background-color: var(--info-color) !important;
+  color: #fff !important;
+}
+
+/* Pagination Overrides */
+.pagination .page-item .page-link {
+  background-color: var(--background-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.pagination .page-item .page-link:hover {
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-primary);
+}
+
+.pagination .page-item.disabled .page-link {
+  background-color: transparent;
+  border-color: var(--border-color);
+  color: var(--text-muted);
 }
