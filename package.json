@@ -14,7 +14,6 @@
       "apexcharts": "^5.3.5",
       "axios": "^1.11.0",
       "bootstrap": "^5.3.8",
-      "chart.js": "^4.5.0",
       "dayjs": "^1.11.18",
       "dompurify": "^3.2.6",
       "dotenv": "^17.2.2",

@@ -71,6 +71,16 @@ export const updateSiteSettingsThunk = createAsyncThunk('admin/updateSiteSetting
    }
 })
 
+// 포인트 시스템
+export const updateUserRewardThunk = createAsyncThunk('admin/updateUserReward', async ({ userId, points, type }, { rejectWithValue }) => {
+   try {
+      const response = await adminApi.updateReward(userId, points, type)
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
 // 금지어 관리
 export const getBanWordsThunk = createAsyncThunk('admin/getBanWords', async (_, { rejectWithValue }) => {
    try {
@@ -142,11 +152,11 @@ export const deleteProductThunk = createAsyncThunk('admin/deleteProduct', async 
    }
 })
 
-//상품 유형 관리
+// 상품 유형 관리
 export const getProductListsThunk = createAsyncThunk('admin/getProductLists', async (_, { rejectWithValue }) => {
    try {
       const response = await adminApi.getProductLists()
-      return response.data
+      return response
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -336,6 +346,23 @@ const adminSlice = createSlice({
             state.error = action.payload?.message || '사이트 설정을 수정하지 못했습니다.'
          })
 
+         // 포인트 시스템
+         .addCase(updateUserRewardThunk.pending, (state) => {
+            state.loading.rewards = true
+            state.error.rewards = null
+         })
+         .addCase(updateUserRewardThunk.fulfilled, (state, action) => {
+            state.loading.rewards = false
+            const userIndex = state.users.findIndex((user) => user.id === action.payload.userId)
+            if (userIndex !== -1) {
+               state.users[userIndex].Reward = { point: action.payload.newPoints }
+            }
+         })
+         .addCase(updateUserRewardThunk.rejected, (state, action) => {
+            state.loading.rewards = false
+            state.error.rewards = action.payload?.message || '포인트 업데이트에 실패했습니다.'
+         })
+
          // 금지어 조회
          .addCase(getBanWordsThunk.pending, (state) => {
             state.banWordsLoading = true
@@ -449,22 +476,28 @@ const adminSlice = createSlice({
             state.loading.products = false
             state.error = action.payload?.message || '상품을 삭제하지 못했습니다.'
          })
-         //상품 유형 관리
+
+         // 상품 유형 관리
          .addCase(getProductListsThunk.pending, (state) => {
             state.loading.productLists = true
+            state.error = state.error || {}
+            state.error.productLists = null
          })
          .addCase(getProductListsThunk.fulfilled, (state, action) => {
             state.loading.productLists = false
-            state.productLists = action.payload
+            state.productLists = action.payload || []
          })
          .addCase(getProductListsThunk.rejected, (state, action) => {
             state.loading.productLists = false
+            state.productLists = []
+            state.error = state.error || {}
             state.error.productLists = action.payload?.message || '상품 유형을 불러오지 못했습니다.'
          })
 
          // 상품 유형 생성
          .addCase(addProductListThunk.pending, (state) => {
             state.loading.productLists = true
+            state.error = state.error || {}
             state.error.productLists = null
          })
          .addCase(addProductListThunk.fulfilled, (state, action) => {
@@ -473,29 +506,34 @@ const adminSlice = createSlice({
          })
          .addCase(addProductListThunk.rejected, (state, action) => {
             state.loading.productLists = false
+            state.error = state.error || {}
             state.error.productLists = action.payload?.message || '상품 유형을 추가하지 못했습니다.'
          })
 
          // 상품 유형 수정
          .addCase(updateProductListThunk.pending, (state) => {
             state.loading.productLists = true
+            state.error = state.error || {}
             state.error.productLists = null
          })
          .addCase(updateProductListThunk.fulfilled, (state, action) => {
             state.loading.productLists = false
-            const index = state.productLists.findIndex((list) => list.id === action.payload.id)
+            const updatedItem = action.payload
+            const index = state.productLists.findIndex((list) => list.id === updatedItem.id)
             if (index !== -1) {
-               state.productLists[index] = action.payload
+               state.productLists[index] = updatedItem
             }
          })
          .addCase(updateProductListThunk.rejected, (state, action) => {
             state.loading.productLists = false
+            state.error = state.error || {}
             state.error.productLists = action.payload?.message || '상품 유형을 수정하지 못했습니다.'
          })
 
          // 상품 유형 삭제
          .addCase(deleteProductListThunk.pending, (state) => {
             state.loading.productLists = true
+            state.error = state.error || {}
             state.error.productLists = null
          })
          .addCase(deleteProductListThunk.fulfilled, (state, action) => {
@@ -504,8 +542,10 @@ const adminSlice = createSlice({
          })
          .addCase(deleteProductListThunk.rejected, (state, action) => {
             state.loading.productLists = false
+            state.error = state.error || {}
             state.error.productLists = action.payload?.message || '상품 유형을 삭제하지 못했습니다.'
          })
+
          // 통계
          .addCase(getStatisticsThunk.pending, (state) => {
             state.loading = true

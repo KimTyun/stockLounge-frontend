@@ -42,6 +42,17 @@ export const updateUserBanStatus = async (userId, isBanned) => {
       throw error
    }
 }
+// 사용자 보상 업데이트
+export const updateUserReward = async (userId, rewardAmount) => {
+   try {
+      // API 엔드포인트와 요청 바디를 프로젝트에 맞게 조정하세요.
+      const response = await axiosApi.put(`/admin/user/${userId}/reward`, { reward: rewardAmount })
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
 // 사용자 삭제
 export const deleteUser = async (userId) => {
    try {
@@ -168,6 +179,7 @@ export const updateProduct = async (ProductId, ProductData) => {
       throw error
    }
 }
+
 // 상품 삭제
 export const deleteProduct = async (ProductId) => {
    try {
@@ -179,7 +191,7 @@ export const deleteProduct = async (ProductId) => {
    }
 }
 
-//상품 유형 관리
+// 상품 유형 관리
 export const getProductLists = async () => {
    try {
       const response = await axiosApi.get('/admin/product-lists')

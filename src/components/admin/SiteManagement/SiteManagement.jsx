@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Row, Col, Card, Form, Button, Alert, Table, Spinner } from 'react-bootstrap'
+import { Row, Col, Card, Form, Button, Alert, Table, Spinner, Modal } from 'react-bootstrap'
 import { getSiteSettingsThunk, updateSiteSettingsThunk, getBanWordsThunk, addBanWordThunk, deleteBanWordThunk, getProductsThunk, addProductThunk, deleteProductThunk, getProductListsThunk, addProductListThunk, updateProductListThunk, deleteProductListThunk } from '../../../features/adminSlice'
 import styles from '../../../styles/components/admin/admin-common.module.css'
 
@@ -20,6 +20,12 @@ const SiteManagement = () => {
    const [alertMessage, setAlertMessage] = useState('')
    const [alertType, setAlertType] = useState('success')
 
+   // 모-달
+   const [showConfirmModal, setShowConfirmModal] = useState(false)
+   const [confirmModalMessage, setConfirmModalMessage] = useState('')
+   const [confirmAction, setConfirmAction] = useState(null)
+
+   // 데이터 로드
    useEffect(() => {
       dispatch(getSiteSettingsThunk())
       dispatch(getBanWordsThunk())
@@ -33,6 +39,22 @@ const SiteManagement = () => {
       }
    }, [settings])
 
+   useEffect(() => {
+      // productLists가 로딩되지 않았고, 비어있을 때만 실행
+      if (productLists.length === 0 && !loading.productLists) {
+         const defaultLists = [{ name: '상품권' }, { name: '기프티콘' }, { name: '기타' }]
+
+         defaultLists.forEach((list) => {
+            dispatch(addProductListThunk(list))
+               .unwrap()
+               .then(() => {})
+               .catch((error) => {
+                  console.error(`기본 상품 분류 '${list.name}' 추가 실패: ${error.message}`)
+               })
+         })
+      }
+   }, [dispatch, productLists, loading.productLists])
+
    const showTimedAlert = (message, type) => {
       setAlertMessage(message)
       setAlertType(type)
@@ -40,8 +62,16 @@ const SiteManagement = () => {
       setTimeout(() => setShowAlert(false), 3000)
    }
 
+   // 모달 출력
+   const handleShowConfirm = (message, action) => {
+      setConfirmModalMessage(message)
+      setConfirmAction(() => action)
+      setShowConfirmModal(true)
+   }
+
    // 사이트 설정 저장
-   const handleSaveSettings = () => {
+   const handleSaveSettings = (e) => {
+      e.preventDefault()
       dispatch(updateSiteSettingsThunk(siteSettings))
          .unwrap()
          .then(() => {
@@ -53,7 +83,8 @@ const SiteManagement = () => {
    }
    const handleSettingChange = (e) => {
       const { name, value, type, checked } = e.target
-      const finalValue = type === 'checkbox' ? checked : value
+      // 숫자 입력 필드의 경우 문자열을 숫자로 변환합니다.
+      const finalValue = type === 'number' ? parseInt(value, 10) || 0 : value
       setSiteSettings((prev) => ({
          ...prev,
          [name]: finalValue,
@@ -131,20 +162,20 @@ const SiteManagement = () => {
          })
    }
 
-   // 상품 유형 관리
+   // 상품 분류 관리
    const handleAddProductList = async (e) => {
       e.preventDefault()
       if (!newProductList.name) {
-         setAlertMessage('상품 유형 이름을 입력해야 합니다.')
+         setAlertMessage('상품 분류 이름을 입력해야 합니다.')
          setAlertType('danger')
          setShowAlert(true)
          return
       }
 
       try {
-         // Redux Thunk를 디스패치하여 상품 유형을 추가합니다.
+         // Redux Thunk를 디스패치하여 상품 분류을 추가합니다.
          await dispatch(addProductListThunk(newProductList)).unwrap()
-         setAlertMessage('상품 유형이 성공적으로 추가되었습니다!')
+         setAlertMessage('상품 분류이 성공적으로 추가되었습니다!')
          setAlertType('success')
          setShowAlert(true)
          // 폼 초기화
@@ -152,19 +183,19 @@ const SiteManagement = () => {
          // 최신 목록을 다시 불러옵니다.
          dispatch(getProductListsThunk())
       } catch (error) {
-         setAlertMessage(`상품 유형 추가 실패: ${error.message}`)
+         setAlertMessage(`상품 분류 추가 실패: ${error.message}`)
          setAlertType('danger')
          setShowAlert(true)
       }
    }
 
-   // 상품 유형 수정 시작
+   // 상품 분류 수정 시작
    const handleEditProductList = (item) => {
       setEditingProductListId(item.id)
       setEditedProductList({ name: item.name, description: item.description })
    }
 
-   // 상품 유형 수정 완료
+   // 상품 분류 수정 완료
    const handleUpdateProductList = async (e) => {
       e.preventDefault()
       try {
@@ -179,31 +210,31 @@ const SiteManagement = () => {
          setEditedProductList({ name: '', description: '' })
 
          // 성공 알림
-         setAlertMessage('상품 유형이 성공적으로 수정되었습니다.')
+         setAlertMessage('상품 분류이 성공적으로 수정되었습니다.')
          setAlertType('success')
          setShowAlert(true)
          setTimeout(() => setShowAlert(false), 3000)
       } catch (error) {
-         setAlertMessage(error.message || '상품 유형 수정에 실패했습니다.')
+         setAlertMessage(error.message || '상품 분류 수정에 실패했습니다.')
          setAlertType('danger')
          setShowAlert(true)
          setTimeout(() => setShowAlert(false), 3000)
       }
    }
 
-   // 상품 유형 삭제
+   // 상품 분류 삭제
    const handleDeleteProductList = async (listId) => {
-      if (!window.confirm('정말로 이 상품 유형을 삭제하시겠습니까?')) return
+      if (!window.confirm('정말로 이 상품 분류을 삭제하시겠습니까?')) return
 
       try {
          await dispatch(deleteProductListThunk(listId)).unwrap()
          // 성공 알림
-         setAlertMessage('상품 유형이 성공적으로 삭제되었습니다.')
+         setAlertMessage('상품 분류이 성공적으로 삭제되었습니다.')
          setAlertType('info')
          setShowAlert(true)
          setTimeout(() => setShowAlert(false), 3000)
       } catch (error) {
-         setAlertMessage(error.message || '상품 유형 삭제에 실패했습니다.')
+         setAlertMessage(error.message || '상품 분류 삭제에 실패했습니다.')
          setAlertType('danger')
          setShowAlert(true)
          setTimeout(() => setShowAlert(false), 3000)
@@ -232,7 +263,31 @@ const SiteManagement = () => {
             </Alert>
          )}
 
+         {/* 커스텀 확인 모달 */}
+
+         <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+            <Modal.Header closeButton>
+               <Modal.Title>확인</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>{confirmModalMessage}</Modal.Body>
+            <Modal.Footer>
+               <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+                  취소
+               </Button>
+               <Button
+                  variant="danger"
+                  onClick={() => {
+                     confirmAction && confirmAction()
+                     setShowConfirmModal(false)
+                  }}
+               >
+                  확인
+               </Button>
+            </Modal.Footer>
+         </Modal>
+
          {/* 기본 설정 */}
+
          <Card className={styles.contentCard}>
             <div className={styles.cardHeader}>
                <h4 className={styles.cardTitle}>
@@ -273,6 +328,7 @@ const SiteManagement = () => {
          </Card>
 
          {/* 포인트 시스템 설정 */}
+
          <Card className={styles.contentCard}>
             <div className={styles.cardHeader}>
                <h4 className={styles.cardTitle}>
@@ -302,16 +358,29 @@ const SiteManagement = () => {
                   </Col>
                   <Col md={3}>
                      <Form.Group className="mb-3">
+                        <Form.Label>일일 로그인 포인트</Form.Label>
+                        <Form.Control type="number" name="pointsPerLogin" value={siteSettings?.pointsPerLogin || 0} onChange={handleSettingChange} min="0" />
+                        <Form.Text className="text-muted">회원이 하루에 로그인할 때마다 받는 포인트</Form.Text>
+                     </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                     <Form.Group className="mb-3">
                         <Form.Label>코인 교환 비율</Form.Label>
                         <Form.Control type="number" name="coinExchangeRate" value={siteSettings?.coinExchangeRate || 1} onChange={handleSettingChange} min="1" />
                         <Form.Text className="text-muted">{siteSettings?.coinExchangeRate || 1}포인트 = 1코인</Form.Text>
                      </Form.Group>
                   </Col>
                </Row>
+               <div className="d-grid mt-3">
+                  <Button variant="success" type="submit" disabled={loading.settings}>
+                     {loading.settings ? <Spinner animation="border" size="sm" /> : '포인트 설정 저장'}
+                  </Button>
+               </div>
             </Card.Body>
          </Card>
 
          {/* 이용 제한 설정 */}
+
          <Card className={styles.contentCard}>
             <div className={styles.cardHeader}>
                <h4 className={styles.cardTitle}>
@@ -340,6 +409,7 @@ const SiteManagement = () => {
          </Card>
 
          {/* 금지어 관리 */}
+
          <Card className={styles.contentCard}>
             <div className={styles.cardHeader}>
                <h4 className={styles.cardTitle}>
@@ -440,7 +510,7 @@ const SiteManagement = () => {
                         <Form.Control type="file" onChange={(e) => setProductImage(e.target.files[0])} accept="image/*" />
                      </Col>
                      <Col md={6} className="mt-3">
-                        <Form.Label>상품 유형</Form.Label>
+                        <Form.Label>상품 분류</Form.Label>
                         <Form.Control as="select" onChange={(e) => setProductListId(e.target.value)} value={productListId || ''}>
                            <option value="">상품 목록을 선택하세요</option>
                            {productLists?.map((list) => (
@@ -508,22 +578,22 @@ const SiteManagement = () => {
          <br />
          <br />
 
-         {/* 상품 유형 관리 */}
+         {/* 상품 분류 관리 */}
 
          <Card className={styles.contentCard}>
             <div className={styles.cardHeader}>
                <h4 className={styles.cardTitle}>
                   <i className="fas fa-list me-2"></i>
-                  상품 유형 관리
+                  상품 분류 관리
                </h4>
             </div>
             <Card.Body>
-               {/* 상품 유형 추가 폼 */}
+               {/* 상품 분류 추가 폼 */}
                <Form className="mb-4" onSubmit={handleAddProductList}>
                   <Row className="align-items-end">
                      <Col md={6}>
-                        <Form.Label>유형명</Form.Label>
-                        <Form.Control type="text" placeholder="유형명 입력" value={newProductList.name} onChange={(e) => setNewProductList({ ...newProductList, name: e.target.value })} />
+                        <Form.Label>분류명</Form.Label>
+                        <Form.Control type="text" placeholder="분류명 입력" value={newProductList.name} onChange={(e) => setNewProductList({ ...newProductList, name: e.target.value })} />
                      </Col>
                      <Col md={6} className="mt-3">
                         <Button variant="success" type="submit" className="w-100">
@@ -533,10 +603,9 @@ const SiteManagement = () => {
                   </Row>
                </Form>
 
-               {/* 등록된 상품 유형 테이블 */}
-
+               {/* 상품 분류 테이블 */}
                <div className="mb-3">
-                  <strong>등록된 상품 유형({productLists?.length || 0}개)</strong>
+                  <strong>상품 분류({productLists?.length || 0}개)</strong>
                </div>
 
                {loading.productLists ? (
@@ -548,7 +617,7 @@ const SiteManagement = () => {
                      <thead>
                         <tr>
                            <th>ID</th>
-                           <th>유형명</th>
+                           <th>분류명</th>
                            <th>관리</th>
                         </tr>
                      </thead>
@@ -585,7 +654,7 @@ const SiteManagement = () => {
                            <tr>
                               <td colSpan="3" className="text-center">
                                  <i className="fas fa-list fa-3x text-muted mb-3"></i>
-                                 <p className="text-muted">등록된 상품 유형이 없습니다.</p>
+                                 <p className="text-muted">등록된 상품 분류이 없습니다.</p>
                               </td>
                            </tr>
                         )}
