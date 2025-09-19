@@ -6,7 +6,7 @@ import { getMe, getMyComments, getMyPosts, getMyReward, getUserById, getUsers, u
  * limit : 가져올 개수
  * page : 가져올 페이지
  */
-export const getUsersThunk = createAsyncThunk('user/getusers', async ({ limit, page }, { rejectWithValue }) => {
+export const getUsersThunk = createAsyncThunk('user/getusers', async ({ limit = 10, page = 1 } = {}, { rejectWithValue }) => {
    try {
       const response = await getUsers(limit, page)
       return response
@@ -72,7 +72,7 @@ export const updateMyProfileThunk = createAsyncThunk('user/updateMyProfile', asy
  * limit : 가져올 개수
  * page : 가져올 페이지
  */
-export const getMyPostsThunk = createAsyncThunk('user/getMyPosts', async ({ limit, page }, { rejectWithValue }) => {
+export const getMyPostsThunk = createAsyncThunk('user/getMyPosts', async ({ limit = 10, page = 1 } = {}, { rejectWithValue }) => {
    try {
       const response = await getMyPosts(limit, page)
       return response
@@ -86,7 +86,7 @@ export const getMyPostsThunk = createAsyncThunk('user/getMyPosts', async ({ limi
  * limit : 가져올 개수
  * page : 가져올 페이지
  */
-export const getMyCommentsThunk = createAsyncThunk('user/getMyComments', async ({ limit, page }, { rejectWithValue }) => {
+export const getMyCommentsThunk = createAsyncThunk('user/getMyComments', async ({ limit = 10, page = 1 } = {}, { rejectWithValue }) => {
    try {
       const response = await getMyComments(limit, page)
       return response
@@ -100,7 +100,7 @@ export const getMyCommentsThunk = createAsyncThunk('user/getMyComments', async (
  * limit : 가져올 개수
  * page : 가져올 페이지
  */
-export const getMyRewardThunk = createAsyncThunk('user/getMyReward', async ({ limit, page }, { rejectWithValue }) => {
+export const getMyRewardThunk = createAsyncThunk('user/getMyReward', async ({ limit = 10, page = 1 } = {}, { rejectWithValue }) => {
    try {
       const response = await getMyReward(limit, page)
       return response

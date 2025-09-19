@@ -2,28 +2,40 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Container, Row, Col, Card, Form, Button, Alert, Badge } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
+import '../../../styles/components/board/ReactQuill.css'
 import styles from '../../../styles/pages/Board_fixed.module.css'
-import { getBoardThunk, writeBoardThunk, updateBoardThunk, getBoardByIdThunk } from '../../../features/boardSlice'
+import { writeBoardThunk, updateBoardThunk, getBoardByIdThunk } from '../../../features/boardSlice'
+import { getMeThunk } from '../../../features/userSlice'
 
-const PostEditor = ({ onSuccess, editPostId }) => {
+const PostEditor = React.forwardRef(({ onSuccess, editPostId, defaultCategory = 'free' }, ref) => {
+   const localQuillRef = React.useRef(null)
+   const quillRef = ref || localQuillRef
    const dispatch = useDispatch()
    const navigate = useNavigate()
    const { loading, error, board } = useSelector((state) => state.board)
    const { id } = useParams()
+   const { user } = useSelector((state) => state.user)
 
    const postId = editPostId || id
    const isEditMode = Boolean(postId)
 
    const [formData, setFormData] = useState({
       title: '',
-      category: 'free',
+      category: defaultCategory,
       content: '',
    })
 
    const [imgUrl, setImgUrl] = useState(null) // 이미지 미리보기 URL
    const [imgFile, setImgFile] = useState(null) // 이미지 파일
-   const [success, setSuccess] = useState('')
-   const [wordCount, setWordCount] = useState(0)
+
+   // Quill 에디터 설정
+   const modules = {
+      toolbar: [[{ header: [1, 2, 3, 4, 5, 6, false] }], ['bold', 'italic', 'underline', 'strike'], [{ list: 'ordered' }, { list: 'bullet' }], [{ color: [] }, { background: [] }], [{ align: [] }], ['clean']],
+   }
+
+   const formats = ['header', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'color', 'background', 'align', 'link', 'image']
 
    // 카테고리 옵션
    const categories = [
@@ -43,7 +55,11 @@ const PostEditor = ({ onSuccess, editPostId }) => {
          // 게시글 데이터 가져오기
          dispatch(getBoardByIdThunk(postId))
       }
-   }, [isEditMode, postId, dispatch])
+      // 사용자 정보가 없을 때만 가져오기
+      if (!user) {
+         dispatch(getMeThunk())
+      }
+   }, [isEditMode, postId, dispatch, user])
 
    // 게시글 데이터가 로드되면 폼 데이터 설정
    useEffect(() => {
@@ -53,11 +69,10 @@ const PostEditor = ({ onSuccess, editPostId }) => {
             category: board.category || 'free',
             content: board.content || '',
          })
-         setWordCount((board.content || '').length)
 
          // 기존 이미지가 있다면 미리보기 설정
          if (board.board_img) {
-            setImgUrl(`${import.meta.env.VITE_API_URI}/uploads/${board.board_img}`)
+            setImgUrl(`${import.meta.env.VITE_API_URL}/uploads/${board.board_img}`)
          }
       }
    }, [isEditMode, board])
@@ -69,10 +84,6 @@ const PostEditor = ({ onSuccess, editPostId }) => {
          ...prev,
          [name]: type === 'checkbox' ? checked : value,
       }))
-
-      if (name === 'content') {
-         setWordCount(value.length)
-      }
    }
 
    // 이미지 파일 업로드 핸들러
@@ -111,24 +122,39 @@ const PostEditor = ({ onSuccess, editPostId }) => {
    const handleSubmit = async (e) => {
       e.preventDefault()
 
+      // 사용자 정보 확인
+      if (!user) {
+         alert('로그인이 필요합니다.')
+         return
+      }
+
       if (!formData.title.trim()) {
          alert('제목을 입력해주세요.')
          return
       }
 
-      if (!formData.content.trim()) {
+      // React-Quill의 빈 내용 체크
+      if (!formData.content || formData.content.trim() === '' || formData.content === '<p><br></p>') {
          alert('내용을 입력해주세요.')
          return
       }
 
       try {
          const data = new FormData()
-         data.append('title', formData.title)
+         data.append('title', formData.title.trim())
          data.append('category', formData.category)
          data.append('content', formData.content)
 
+         // 사용자 정보 추가
+         data.append('user_id', user.id)
+
          // 이미지 파일이 있을 경우 추가
          if (imgFile) {
+            // 이미지 파일 크기 체크 (5MB)
+            if (imgFile.size > 5 * 1024 * 1024) {
+               alert('이미지 파일 크기는 5MB를 초과할 수 없습니다.')
+               return
+            }
             data.append('file', imgFile)
          }
 
@@ -155,6 +181,18 @@ const PostEditor = ({ onSuccess, editPostId }) => {
       }
    }
 
+   // 사용자 정보가 없을 때 로딩 표시
+   if (!user) {
+      return (
+         <div className="text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+               <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3">사용자 정보를 불러오는 중...</p>
+         </div>
+      )
+   }
+
    if (loading) {
       return (
          <div className="text-center py-5">
@@ -177,15 +215,20 @@ const PostEditor = ({ onSuccess, editPostId }) => {
                <Col lg={10} xl={8} className="mx-auto">
                   <Card className={styles.editorCard}>
                      <Card.Header className={styles.editorHeader}>
-                        <h3>
-                           <i className={`fas fa-${isEditMode ? 'edit' : 'pen'} me-2`}></i>
-                           {isEditMode ? '게시글 수정' : '새 게시글 작성'}
-                        </h3>
+                        <div className="d-flex justify-content-between align-items-center">
+                           <h3>
+                              <i className={`fas fa-${isEditMode ? 'edit' : 'pen'} me-2`}></i>
+                              {isEditMode ? '게시글 수정' : '새 게시글 작성'}
+                           </h3>
+                           {/* 현재 사용자 정보 표시 */}
+                           <div className="d-flex align-items-center">
+                              <small className="text-muted me-2">작성자:</small>
+                              <Badge bg="primary">{user.name || user.username || `사용자${user.id}`}</Badge>
+                           </div>
+                        </div>
                      </Card.Header>
 
                      <Card.Body>
-                        {success && <Alert variant="success">{success}</Alert>}
-
                         <Form onSubmit={handleSubmit}>
                            {/* 제목 및 카테고리 */}
                            <Row className="mb-3">
@@ -219,42 +262,20 @@ const PostEditor = ({ onSuccess, editPostId }) => {
 
                            {/* 이미지 미리보기 */}
                            {imgUrl && (
-                              <div className="mb-3">
+                              <div className={styles.imagePreview}>
                                  <h5>미리보기:</h5>
-                                 <div
-                                    style={{
-                                       width: '200px',
-                                       height: '200px',
-                                       border: '1px solid #ccc',
-                                       borderRadius: '8px',
-                                       overflow: 'hidden',
-                                       display: 'flex',
-                                       justifyContent: 'center',
-                                       alignItems: 'center',
-                                    }}
-                                 >
-                                    <img
-                                       src={imgUrl}
-                                       alt="미리보기"
-                                       style={{
-                                          width: '100%',
-                                          height: '100%',
-                                          objectFit: 'cover',
-                                       }}
-                                    />
+                                 <div className={styles.previewContainer}>
+                                    <img src={imgUrl} alt="미리보기" className={styles.previewImage} />
                                  </div>
                               </div>
                            )}
 
                            {/* 내용 */}
                            <Form.Group className="mb-3">
-                              <Form.Label>
-                                 내용 *
-                                 <Badge bg="secondary" className="ms-2">
-                                    {wordCount.toLocaleString()}자
-                                 </Badge>
-                              </Form.Label>
-                              <Form.Control as="textarea" rows={20} name="content" value={formData.content} onChange={handleChange} placeholder="내용을 입력하세요. 마크다운 문법을 지원합니다. 예시: ## 제목 ### 소제목 **굵은글씨** *기울임* - 목록 아이템" className={styles.contentTextarea} />
+                              <Form.Label>내용 *</Form.Label>
+                              <div className={styles.editorContainer}>
+                                 <ReactQuill ref={quillRef} theme="snow" value={formData.content} onChange={(content) => setFormData((prev) => ({ ...prev, content }))} modules={modules} formats={formats} placeholder="내용을 입력하세요" />
+                              </div>
                               <Form.Text className="text-muted">마크다운 문법을 지원합니다. (## 제목, **굵은글씨**, *기울임*, - 목록)</Form.Text>
                            </Form.Group>
 
@@ -299,6 +320,6 @@ const PostEditor = ({ onSuccess, editPostId }) => {
          </Container>
       </div>
    )
-}
+})
 
 export default PostEditor
