@@ -20,11 +20,11 @@ const News = () => {
    )
 
    useEffect(() => {
-      dispatch(getNewsThunk({ length: 10, query: query[activeTab], start: 1 }))
+      dispatch(getNewsThunk({ length: 10, query: query[activeTab], start: 1, lastLink: news?.query?.[activeTab]?.lastLink }))
    }, [dispatch, activeTab, query])
 
    const handlePage = () => {
-      dispatch(getNewsThunk({ length: 10, query: query[activeTab], start: page[activeTab] }))
+      dispatch(getNewsThunk({ length: 10, query: query[activeTab], start: page[activeTab], lastLink: news?.query?.[activeTab]?.lastLink }))
       setPage((prev) => ({ ...prev, [activeTab]: prev[activeTab] + 10 }))
    }
 
