@@ -12,7 +12,7 @@ export const getDashboardData = async () => {
    }
 }
 
-// 사용자 조회
+// 사용자 조회(관리자용)
 export const getUsers = async () => {
    try {
       const response = await axiosApi.get(`/admin/users`)
@@ -225,66 +225,68 @@ export const deleteProductList = async (listId) => {
 
 // // 여기부터 통계
 
-// 전체 통계 데이터 가져오기 (period 매개변수 추가)
-export const getStatistics = async (period = 'week') => {
+// 통계
+export const getStatistics = async (period) => {
    try {
       const response = await axiosApi.get(`/admin/statistics?period=${period}`)
-
-      // 응답 데이터 구조 확인
-      console.log('API Response:', response.data)
-
-      // response.data가 있는지 확인하고 반환
-      if (!response.data) {
-         throw new Error('No data received from server')
-      }
-
       return response.data
    } catch (error) {
-      if (env === 'development') console.error('getStatistics API Error:', error)
+      if (env === 'development') console.error(error)
       throw error
    }
 }
 
-// 인기 게시글 가져오기 (별도 API가 필요한 경우)
-export const getPopularPosts = async (period = 'week') => {
+// 통계 데이터 가져오기 (메인 통계)
+export const getMainStats = async (period) => {
    try {
-      const response = await axiosApi.get(`/admin/popular-posts?period=${period}`)
+      const response = await axiosApi.get(`/admin/statistics?period=${period}`)
       return response.data
    } catch (error) {
-      if (env === 'development') console.error('getPopularPosts API Error:', error)
+      if (env === 'development') console.error(error)
       throw error
    }
 }
 
-// 활성 사용자 가져오기 (별도 API가 필요한 경우)
-export const getActiveUsers = async (period = 'week') => {
+// 인기 게시글 가져오기
+export const getPopularPosts = async (period) => {
    try {
-      const response = await axiosApi.get(`/admin/active-users?period=${period}`)
+      const response = await axiosApi.get(`/popular-posts?period=${period}`)
       return response.data
    } catch (error) {
-      if (env === 'development') console.error('getActiveUsers API Error:', error)
+      if (env === 'development') console.error(error)
       throw error
    }
 }
 
-// 카테고리별 통계 가져오기 (별도 API가 필요한 경우)
-export const getCategoryStats = async (period = 'week') => {
+// 활성 사용자 가져오기
+export const getActiveUsers = async (period) => {
    try {
-      const response = await axiosApi.get(`/admin/category-stats?period=${period}`)
+      const response = await axiosApi.get(`/active-users?period=${period}`)
       return response.data
    } catch (error) {
-      if (env === 'development') console.error('getCategoryStats API Error:', error)
+      if (env === 'development') console.error(error)
       throw error
    }
 }
 
-// 시간대별 통계 가져오기 (별도 API가 필요한 경우)
-export const getHourlyStats = async (period = 'week') => {
+// 카테고리별 통계 가져오기
+export const getCategoryStats = async (period) => {
    try {
-      const response = await axiosApi.get(`/admin/hourly-stats?period=${period}`)
+      const response = await axiosApi.get(`/category-stats?period=${period}`)
       return response.data
    } catch (error) {
-      if (env === 'development') console.error('getHourlyStats API Error:', error)
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+// 시간대별 통계 가져오기
+export const getHourlyStats = async (period) => {
+   try {
+      const response = await axiosApi.get(`/hourly-stats?period=${period}`)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
       throw error
    }
 }

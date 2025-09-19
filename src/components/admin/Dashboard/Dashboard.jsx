@@ -64,24 +64,23 @@ const Dashboard = () => {
       </Col>
    )
 
-   const getStatusBadge = (status) => {
-      const variants = {
-         active: 'success',
-         pending: 'warning',
-         inactive: 'secondary',
-         banned: 'danger',
+   const getStatusBadge = (user) => {
+      // 0 양호, 1 주의, 2 경고, 3 정지
+      const badgeInfo = {
+         0: { variant: 'success', label: '양호' },
+         1: { variant: 'warning', label: '주의' },
+         2: { variant: 'danger', label: '경고' },
+         3: { variant: 'dark', label: '정지' },
       }
 
-      const labels = {
-         active: '활성',
-         pending: '대기',
-         inactive: '비활성',
-         banned: '정지',
-      }
+      const statusValue = Number(user.is_ban)
+
+      // 유효한 숫자가 아닐 경우를 대비해 기본값 설정
+      const info = badgeInfo[statusValue] || { variant: 'secondary', label: '정보 없음' }
 
       return (
-         <Badge bg={variants[status]} className={styles.statusBadge}>
-            {labels[status]}
+         <Badge bg={info.variant} className={styles.statusBadge}>
+            {info.label}
          </Badge>
       )
    }
@@ -124,7 +123,7 @@ const Dashboard = () => {
                                     <tr key={user.id}>
                                        <td>{user.id}</td>
                                        <td>{user.name}</td>
-                                       <td>{getStatusBadge(user.status)}</td>
+                                       <td>{getStatusBadge(user)}</td>
                                     </tr>
                                  ))
                               ) : (

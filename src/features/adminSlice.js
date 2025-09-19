@@ -152,7 +152,7 @@ export const getProductListsThunk = createAsyncThunk('admin/getProductLists', as
    }
 })
 
-// 상품 유형 생성 Thunk
+// 상품 유형 생성
 export const addProductListThunk = createAsyncThunk('admin/addProductList', async (listData, { rejectWithValue }) => {
    try {
       const response = await adminApi.addProductList(listData)
@@ -162,7 +162,7 @@ export const addProductListThunk = createAsyncThunk('admin/addProductList', asyn
    }
 })
 
-// 상품 유형 수정 Thunk
+// 상품 유형 수정
 export const updateProductListThunk = createAsyncThunk('admin/updateProductList', async ({ listId, listData }, { rejectWithValue }) => {
    try {
       const response = await adminApi.updateProductList(listId, listData)
@@ -172,7 +172,7 @@ export const updateProductListThunk = createAsyncThunk('admin/updateProductList'
    }
 })
 
-// 상품 유형 삭제 Thunk
+// 상품 유형 삭제
 export const deleteProductListThunk = createAsyncThunk('admin/deleteProductList', async (listId, { rejectWithValue }) => {
    try {
       await adminApi.deleteProductList(listId)
@@ -184,61 +184,13 @@ export const deleteProductListThunk = createAsyncThunk('admin/deleteProductList'
 
 // // 여기부터 통계
 
-// 전체 통계 데이터 가져오기
-export const getStatisticsThunk = createAsyncThunk('admin/getStatistics', async (period = 'week', { rejectWithValue }) => {
+// 통계
+export const getStatisticsThunk = createAsyncThunk('admin/getStatistics', async (period, { rejectWithValue }) => {
    try {
-      const response = await adminApi.getStatistics(period)
-      console.log('Thunk received response:', response)
-
-      // response가 직접 데이터인지, 아니면 response.data 구조인지 확인
-      const data = response.data || response
-
-      return {
-         period,
-         data: data,
-      }
-   } catch (error) {
-      return rejectWithValue(error.response?.data)
-   }
-})
-
-// 인기 게시글 가져오기 (별도 API가 필요한 경우)
-export const getPopularPostsThunk = createAsyncThunk('admin/getPopularPosts', async (period = 'week', { rejectWithValue }) => {
-   try {
-      const response = await adminApi.getPopularPosts(period)
-      return response.data
-   } catch (error) {
-      return rejectWithValue(error.response?.data)
-   }
-})
-
-// 활성 사용자 가져오기 (별도 API가 필요한 경우)
-export const getActiveUsersThunk = createAsyncThunk('admin/getActiveUsers', async (period = 'week', { rejectWithValue }) => {
-   try {
-      const response = await adminApi.getActiveUsers(period)
-      return response.data
-   } catch (error) {
-      return rejectWithValue(error.response?.data)
-   }
-})
-
-// 카테고리별 통계 가져오기 (별도 API가 필요한 경우)
-export const getCategoryStatsThunk = createAsyncThunk('admin/getCategoryStats', async (period = 'week', { rejectWithValue }) => {
-   try {
-      const response = await adminApi.getCategoryStats(period)
-      return response.data
-   } catch (error) {
-      return rejectWithValue(error.response?.data)
-   }
-})
-
-// 시간대별 통계 가져오기 (별도 API가 필요한 경우)
-export const getHourlyStatsThunk = createAsyncThunk('admin/getHourlyStats', async (period = 'week', { rejectWithValue }) => {
-   try {
-      const response = await adminApi.getHourlyStats(period)
-      return response.data
-   } catch (error) {
-      return rejectWithValue(error.response?.data)
+      const data = await adminApi.getStatistics(period)
+      return data
+   } catch (err) {
+      return rejectWithValue(err.response?.data || err.message)
    }
 })
 
@@ -260,12 +212,14 @@ const adminSlice = createSlice({
          banWords: false,
          products: false,
          productLists: false,
+         allStats: false,
       },
       error: {
          settings: null,
          products: null,
          banWords: null,
          productLists: null,
+         allStats: null,
       },
       // 통계 관련 상태들
       statistics: null,
@@ -273,13 +227,6 @@ const adminSlice = createSlice({
       activeUsers: [],
       categoryStats: [],
       hourlyStats: [],
-
-      // 개별 로딩 상태들
-      statisticsLoading: false,
-      popularPostsLoading: false,
-      activeUsersLoading: false,
-      categoryStatsLoading: false,
-      hourlyStatsLoading: false,
    },
    reducers: {
       clearError: (state) => {
@@ -559,164 +506,17 @@ const adminSlice = createSlice({
             state.loading.productLists = false
             state.error.productLists = action.payload?.message || '상품 유형을 삭제하지 못했습니다.'
          })
-
-         // 전체 통계 데이터
+         // 통계
          .addCase(getStatisticsThunk.pending, (state) => {
-            state.loading.statistics = true
-            state.statisticsLoading = true
+            state.loading = true
             state.error = null
          })
          .addCase(getStatisticsThunk.fulfilled, (state, action) => {
-            console.log('Redux action.payload:', action.payload)
-
-            const payload = action.payload || {}
-            const { period, data } = payload
-
-            // data가 없다면 에러 처리
-            if (!data) {
-               console.error('No data in payload:', action.payload)
-               state.loading.statistics = false
-               state.statisticsLoading = false
-               state.error = 'No data received from server'
-               return
-            }
-
-            // 백엔드 응답 구조 확인 및 안전하게 처리
-            console.log('Processing data:', data)
-
-            // 백엔드 응답 구조에 맞게 데이터 변환
-            const { mainStats = {}, popularPosts = [], activeUsers = [], categoryStats = [], hourlyActivity = [] } = data
-
-            // 백엔드에서 계산된 변화율과 함께 통계 데이터 설정
-            state.statistics = {
-               visitors: mainStats.visitors || { current: 0, previous: 0, change: 0 },
-               pageViews: mainStats.pageViews || { current: 0, previous: 0, change: 0 },
-               newUsers: mainStats.newUsers || { current: 0, previous: 0, change: 0 },
-               posts: mainStats.posts || { current: 0, previous: 0, change: 0 },
-               comments: mainStats.comments || { current: 0, previous: 0, change: 0 },
-               reports: mainStats.reports || { current: 0, previous: 0, change: 0 },
-            }
-
-            // 인기 게시글 데이터 설정
-            state.popularPosts = Array.isArray(popularPosts)
-               ? popularPosts.map((post) => ({
-                    id: post.id,
-                    title: post.title || '',
-                    view_count: post.view_count || 0,
-                    like_count: post.like_count || 0,
-                    comment_count: post.comment_count || 0,
-                 }))
-               : []
-
-            // 활성 사용자 데이터 설정
-            state.activeUsers = Array.isArray(activeUsers)
-               ? activeUsers.map((user) => ({
-                    id: user.id,
-                    name: user.name || '익명',
-                    post_count: user.post_count || 0,
-                    comment_count: user.comment_count || 0,
-                    points: user.points || 0,
-                    accumulated_points: user.accumulated_points || 0,
-                 }))
-               : []
-
-            // 카테고리별 통계 변환
-            if (Array.isArray(categoryStats) && categoryStats.length > 0) {
-               const totalCategoryPosts = categoryStats.reduce((sum, cat) => sum + (cat.count || 0), 0)
-               const categoryColors = ['bg-warning', 'bg-info', 'bg-secondary', 'bg-primary', 'bg-success']
-
-               state.categoryStats = categoryStats.map((category, index) => ({
-                  id: index,
-                  name: category.name || '기타',
-                  count: category.count || 0,
-                  percentage: totalCategoryPosts > 0 ? Math.round((category.count / totalCategoryPosts) * 100) : 0,
-                  colorClass: categoryColors[index % categoryColors.length],
-               }))
-            } else {
-               state.categoryStats = []
-            }
-
-            // 시간대별 통계 변환
-            if (Array.isArray(hourlyActivity) && hourlyActivity.length > 0) {
-               const timeRanges = [
-                  { range: '00:00 - 06:00', hours: [0, 1, 2, 3, 4, 5] },
-                  { range: '06:00 - 12:00', hours: [6, 7, 8, 9, 10, 11] },
-                  { range: '12:00 - 18:00', hours: [12, 13, 14, 15, 16, 17] },
-                  { range: '18:00 - 24:00', hours: [18, 19, 20, 21, 22, 23] },
-               ]
-
-               const totalHourlyPosts = hourlyActivity.reduce((sum, hour) => sum + (hour.count || 0), 0)
-               const timeSlotColors = ['bg-secondary', 'bg-info', 'bg-success', 'bg-primary']
-
-               state.hourlyStats = timeRanges.map((timeSlot, index) => {
-                  const slotCount = hourlyActivity.filter((hour) => timeSlot.hours.includes(hour.hour)).reduce((sum, hour) => sum + (hour.count || 0), 0)
-
-                  return {
-                     timeRange: timeSlot.range,
-                     count: slotCount,
-                     percentage: totalHourlyPosts > 0 ? Math.round((slotCount / totalHourlyPosts) * 100) : 0,
-                     colorClass: timeSlotColors[index],
-                  }
-               })
-            } else {
-               state.hourlyStats = []
-            }
-
-            state.loading.statistics = false
-            state.statisticsLoading = false
+            state.loading = false
+            state.statistics = action.payload
          })
          .addCase(getStatisticsThunk.rejected, (state, action) => {
-            state.loading.statistics = false
-            state.statisticsLoading = false
-            state.error = action.payload
-         })
-
-         // 개별 API들 (필요한 경우)
-         .addCase(getPopularPostsThunk.pending, (state) => {
-            state.popularPostsLoading = true
-         })
-         .addCase(getPopularPostsThunk.fulfilled, (state, action) => {
-            state.popularPosts = action.payload
-            state.popularPostsLoading = false
-         })
-         .addCase(getPopularPostsThunk.rejected, (state, action) => {
-            state.popularPostsLoading = false
-            state.error = action.payload
-         })
-
-         .addCase(getActiveUsersThunk.pending, (state) => {
-            state.activeUsersLoading = true
-         })
-         .addCase(getActiveUsersThunk.fulfilled, (state, action) => {
-            state.activeUsers = action.payload
-            state.activeUsersLoading = false
-         })
-         .addCase(getActiveUsersThunk.rejected, (state, action) => {
-            state.activeUsersLoading = false
-            state.error = action.payload
-         })
-
-         .addCase(getCategoryStatsThunk.pending, (state) => {
-            state.categoryStatsLoading = true
-         })
-         .addCase(getCategoryStatsThunk.fulfilled, (state, action) => {
-            state.categoryStats = action.payload
-            state.categoryStatsLoading = false
-         })
-         .addCase(getCategoryStatsThunk.rejected, (state, action) => {
-            state.categoryStatsLoading = false
-            state.error = action.payload
-         })
-
-         .addCase(getHourlyStatsThunk.pending, (state) => {
-            state.hourlyStatsLoading = true
-         })
-         .addCase(getHourlyStatsThunk.fulfilled, (state, action) => {
-            state.hourlyStats = action.payload
-            state.hourlyStatsLoading = false
-         })
-         .addCase(getHourlyStatsThunk.rejected, (state, action) => {
-            state.hourlyStatsLoading = false
+            state.loading = false
             state.error = action.payload
          })
    },
