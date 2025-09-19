@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Card, Badge, Button, Pagination, Collapse } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import styles from '../../../styles/components/board/PostList.module.css'
@@ -6,30 +6,53 @@ import PostEditor from '../PostEditor/PostEditor'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { getBoardThunk } from '../../../features/boardSlice'
-import { getMeThunk } from '../../../features/userSlice'
 
 const PostList = ({ category = 'free' }) => {
    const [currentPage, setCurrentPage] = useState(1)
-   const [totalPages] = useState(1)
    const [write, setWrite] = useState(false)
-
    const [editPostId, setEditPostId] = useState(null)
+
+   const POSTS_PER_PAGE = 10 // 페이지당 게시글 수
+
    const navigate = useNavigate()
    const dispatch = useDispatch()
    const { boards, error, loading } = useSelector((state) => state.board)
-   const { user } = useSelector((state) => state.user)
 
+   // 전체 데이터 가져오기
    useEffect(() => {
       dispatch(getBoardThunk(category))
+      setCurrentPage(1) // 카테고리 변경 시 첫 페이지로
    }, [dispatch, category])
+
+   // 현재 페이지에 표시할 게시글들과 총 페이지 수 계산
+   const { currentBoards, totalPages } = useMemo(() => {
+      if (!boards || boards.length === 0) {
+         return { currentBoards: [], totalPages: 1 }
+      }
+
+      const startIndex = (currentPage - 1) * POSTS_PER_PAGE
+      const endIndex = startIndex + POSTS_PER_PAGE
+      const currentBoards = boards.slice(startIndex, endIndex)
+      const totalPages = Math.ceil(boards.length / POSTS_PER_PAGE)
+
+      return { currentBoards, totalPages }
+   }, [boards, currentPage, POSTS_PER_PAGE])
 
    const handlePostClick = (id) => {
       navigate(`/board/${id}`)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
    }
 
    const handleWritePost = () => {
       setWrite(!write)
       setEditPostId(null)
+   }
+
+   // 페이지 변경 핸들러
+   const handlePageChange = (page) => {
+      setCurrentPage(page)
+      // 페이지 변경 시 맨 위로 스크롤
+      window.scrollTo({ top: 0, behavior: 'smooth' })
    }
 
    const formatTimeAgo = (dateString) => {
@@ -125,12 +148,20 @@ const PostList = ({ category = 'free' }) => {
                               onSuccess={() => {
                                  setWrite(false)
                                  dispatch(getBoardThunk(category))
+                                 setCurrentPage(1) // 새 글 작성 후 첫 페이지로
                               }}
                            />
                         </Card.Body>
                      </Card>
                   </div>
                </Collapse>
+
+               {/* 게시글 개수 정보 표시 */}
+               {boards && boards.length > 0 && (
+                  <div className="mb-3 text-muted small">
+                     전체 {boards.length}개 게시글 중 {(currentPage - 1) * POSTS_PER_PAGE + 1}~{Math.min(currentPage * POSTS_PER_PAGE, boards.length)}개 표시
+                  </div>
+               )}
 
                {/* 1000px 이상일때 */}
                <div className={`${styles.posts} ${styles.tableView}`}>
@@ -142,8 +173,8 @@ const PostList = ({ category = 'free' }) => {
                         <div className={styles.likesColumn}>추천수</div>
                         <div className={styles.dateColumn}>등록일</div>
                      </li>
-                     {boards && boards.length > 0 ? (
-                        boards.map((board) => (
+                     {currentBoards && currentBoards.length > 0 ? (
+                        currentBoards.map((board) => (
                            <li key={board.id} className={`${styles.postRow} ${board.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(board.id)}>
                               <div className={styles.titleColumn}>
                                  {board.isPinned && (
@@ -180,8 +211,8 @@ const PostList = ({ category = 'free' }) => {
 
                {/* 1000px 이하일때 */}
                <div className={`${styles.posts} ${styles.cardView}`}>
-                  {boards && boards.length > 0 ? (
-                     boards.map((board) => (
+                  {currentBoards && currentBoards.length > 0 ? (
+                     currentBoards.map((board) => (
                         <Card key={board.id} className={`${styles.postCard} ${board.isPinned ? styles.pinned : ''}`} onClick={() => handlePostClick(board.id)}>
                            <Card.Body>
                               <div className={styles.postHeader}>
@@ -201,8 +232,6 @@ const PostList = ({ category = 'free' }) => {
                               {board.content && (
                                  <div
                                     className={styles.postContent}
-                                    // React에서 HTML 문자열을 직접 DOM에 삽입할 때 사용하는 속성
-                                    // 보안상 위험할 수 있어 이름 앞에 dangerously가 붙음.
                                     dangerouslySetInnerHTML={{
                                        __html: board.content.length > 100 ? board.content.substring(0, 200) + '...' : board.content,
                                     }}
@@ -251,18 +280,39 @@ const PostList = ({ category = 'free' }) => {
                   )}
                </div>
 
+               {/* 페이지네이션 - 총 페이지가 1보다 클 때만 표시 */}
                {totalPages > 1 && (
                   <div className={styles.pagination}>
                      <Pagination>
-                        <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
-                        <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
-                        {[...Array(totalPages)].map((_, index) => (
-                           <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => setCurrentPage(index + 1)}>
-                              {index + 1}
+                        <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
+                        <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+
+                        {/* --- 페이지 버튼 동적 생성 --- */}
+                        <Pagination.Item key={1} active={1 === currentPage} onClick={() => handlePageChange(1)}>
+                           1
+                        </Pagination.Item>
+
+                        {currentPage > 4 && <Pagination.Ellipsis disabled />}
+
+                        {Array.from({ length: Math.max(0, Math.min(totalPages - 1, currentPage + 2) - Math.max(2, currentPage - 2) + 1) }, (_, i) => {
+                           const page = Math.max(2, currentPage - 2) + i
+                           return (
+                              <Pagination.Item key={page} active={page === currentPage} onClick={() => handlePageChange(page)}>
+                                 {page}
+                              </Pagination.Item>
+                           )
+                        })}
+
+                        {currentPage < totalPages - 3 && <Pagination.Ellipsis disabled />}
+
+                        {totalPages !== 1 && (
+                           <Pagination.Item key={totalPages} active={totalPages === currentPage} onClick={() => handlePageChange(totalPages)}>
+                              {totalPages}
                            </Pagination.Item>
-                        ))}
-                        <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
-                        <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
+                        )}
+
+                        <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+                        <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
                      </Pagination>
                   </div>
                )}
