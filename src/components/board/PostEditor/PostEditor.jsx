@@ -55,6 +55,8 @@ const PostEditor = React.forwardRef(({ onSuccess, editPostId, defaultCategory = 
       }
    }, [ban])
 
+
+
    // 수정 모드일 때 기존 데이터 로드
    useEffect(() => {
       if (isEditMode && postId) {
@@ -169,8 +171,13 @@ const PostEditor = React.forwardRef(({ onSuccess, editPostId, defaultCategory = 
             alert('게시글 수정 완료!')
          } else {
             // 새 글 작성 모드
-            await dispatch(writeBoardThunk(data)).unwrap()
-            alert('게시글 등록 완료!')
+            const result = await dispatch(writeBoardThunk(data)).unwrap()
+            if (result.success) {
+               alert('게시글 등록 완료!')
+            } else {
+               alert(result.message || '게시글 등록에 실패했습니다.')
+               return // 실패시 여기서 종료
+            }
          }
 
          if (onSuccess) {
