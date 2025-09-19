@@ -85,10 +85,12 @@ const boardSlice = createSlice({
       // 상세 페이지의 로딩을 따로 두어 관리
       loadingDetail: false,
       error: null,
+      ban: null,
    },
    reducers: {},
    extraReducers: (builder) => {
       builder
+      // 게시글 리스트
          .addCase(getBoardThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -101,18 +103,28 @@ const boardSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
          })
+         // 게시글 등록
          .addCase(writeBoardThunk.pending, (state) => {
             state.loading = true
             state.error = null
          })
          .addCase(writeBoardThunk.fulfilled, (state, action) => {
             state.loading = false
-            state.board = action.payload.data
+            if (action.payload.success) {
+               state.comment = action.payload.data
+               // ban이 있다면
+            } else {
+               state.ban = {
+                  type: action.payload.modalType,
+                  message: action.payload.message,
+               }
+            }
          })
          .addCase(writeBoardThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 게시글을 등록하지 못했습니다.'
          })
+         // 특정 게시글
          .addCase(getBoardByIdThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null
@@ -125,6 +137,7 @@ const boardSlice = createSlice({
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
          })
+         // 게시글 삭제
          .addCase(deleteBoardThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null
@@ -136,6 +149,7 @@ const boardSlice = createSlice({
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 삭제하지 못했습니다.'
          })
+         // 게시글 수정
          .addCase(updateBoardThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null
@@ -147,6 +161,7 @@ const boardSlice = createSlice({
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 수정하지 못했습니다.'
          })
+         // 게시글 좋아요
          .addCase(likeBoardThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null

@@ -32,55 +32,55 @@
 /* 게시글상세 */
 
 .authorInfo .authorProfile {
-  display: flex;
-  line-height: auto;
+   display: flex;
+   line-height: auto;
 }
 
 .authorInfo .authorProfile>.authorImage {
-  border-radius: 50px;
-  width: 3rem;
-  height: 3rem;
+   border-radius: 50px;
+   width: 3rem;
+   height: 3rem;
 }
 
 .authorInfo .authorName {
-  font-weight: bold;
-  font-size: 1rem;
+   font-weight: bold;
+   font-size: 1rem;
 }
 
 .authorInfo .authorDetails {
-  font-size: 0.8rem;
-  text-align: left;
-  margin-left: 20px;
+   font-size: 0.8rem;
+   text-align: left;
+   margin-left: 20px;
 }
 
 .authorInfo .postActions {
-  margin-left: auto;
+   margin-left: auto;
 }
 
 .postStats>span:nth-child(2)>i {
-  color: red;
+   color: red;
 }
 
 .likes {
-  color: red;
+   color: red;
 }
 
 .postStats {
-  display: flex;
-  justify-content: end;
+   display: flex;
+   justify-content: end;
 }
 
 .postStats>span {
-  margin: 1rem;
+   margin: 1rem;
 }
 
 .postContent {
-  text-align: left;
+   text-align: left;
 }
 
 /* 게시글 이미지 */
 .postImage {
-   width: 16rem;
+   width: 30rem;
    margin: 0 auto;
 }
 
@@ -90,7 +90,7 @@
    height: 300px;
 }
 
-.postStats > span:nth-child(2) > i {
+.postStats>span:nth-child(2)>i {
    color: red;
 }
 
@@ -102,6 +102,7 @@
 
 
 @media (min-width: 1400px) {
+
    .container,
    .container-lg,
    .container-md,
@@ -135,6 +136,7 @@
 }
 
 @media (max-width: 480px) {
+
    .chartSection,
    .boardSection {
       padding: 0.75rem 0.25rem;
