@@ -17,7 +17,7 @@ const UserManagement = () => {
    const [showModal, setShowModal] = useState(false)
    const [filterStatus, setFilterStatus] = useState('all')
    const [sortBy, setSortBy] = useState('joinDate')
-   const [currentPage, setCurrentPage] = useState(1)
+   const [currentPage, _setCurrentPage] = useState(1)
    const itemsPerPage = 10
 
    // 알림 상태
@@ -218,7 +218,6 @@ const UserManagement = () => {
       </Modal>
    )
 
-   const totalPages = Math.ceil((users || []).length / itemsPerPage)
    return (
       <div>
          <Card className={styles.contentCard}>

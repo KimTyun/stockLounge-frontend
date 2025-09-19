@@ -1,6 +1,17 @@
 import axiosApi from './index'
 const env = import.meta.env.VITE_ENV
 
+// 사용자 상태 및 권한 확인
+export const getUserStatus = async () => {
+   try {
+      const response = await axiosApi.get('/admin/user-status')
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error('API Error:', error)
+      throw error
+   }
+}
+
 // 대시보드
 export const getDashboardData = async () => {
    try {
@@ -200,7 +211,7 @@ export const deleteProduct = async (ProductId) => {
 export const getProductLists = async () => {
    try {
       const response = await axiosApi.get('/admin/product-lists')
-      return response.data
+      return response.data.data
    } catch (error) {
       if (env === 'development') console.error(error)
       throw error

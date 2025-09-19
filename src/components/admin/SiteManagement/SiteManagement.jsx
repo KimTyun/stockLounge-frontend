@@ -6,7 +6,7 @@ import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const SiteManagement = () => {
    const dispatch = useDispatch()
-   const { settings, banWords, products, productLists = [], loading = {}, error = {} } = useSelector((state) => state.admin)
+   const { settings, banWords, products, productLists = [], loading = {} } = useSelector((state) => state.admin)
 
    const [newBanWord, setNewBanWord] = useState('')
    const [siteSettings, setSiteSettings] = useState(settings || {})
@@ -31,29 +31,13 @@ const SiteManagement = () => {
       dispatch(getBanWordsThunk())
       dispatch(getProductsThunk())
       dispatch(getProductListsThunk())
-   }, [])
+   }, [dispatch])
 
    useEffect(() => {
       if (settings) {
          setSiteSettings(settings)
       }
    }, [settings])
-
-   useEffect(() => {
-      // productLists가 로딩되지 않았고, 비어있을 때만 실행
-      if (productLists.length === 0 && !loading.productLists) {
-         const defaultLists = [{ name: '상품권' }, { name: '기프티콘' }, { name: '기타' }]
-
-         defaultLists.forEach((list) => {
-            dispatch(addProductListThunk(list))
-               .unwrap()
-               .then(() => {})
-               .catch((error) => {
-                  console.error(`기본 상품 분류 '${list.name}' 추가 실패: ${error.message}`)
-               })
-         })
-      }
-   }, [dispatch, productLists, loading.productLists])
 
    const showTimedAlert = (message, type) => {
       setAlertMessage(message)
@@ -83,8 +67,15 @@ const SiteManagement = () => {
    }
    const handleSettingChange = (e) => {
       const { name, value, type, checked } = e.target
+      let finalValue = value
       // 숫자 입력 필드의 경우 문자열을 숫자로 변환합니다.
-      const finalValue = type === 'number' ? parseInt(value, 10) || 0 : value
+      if (type === 'number') {
+         finalValue = parseInt(value, 10) || 0
+      } else if (type === 'checkbox' || type === 'switch') {
+         // 체크박스/스위치일 경우 checked 값을 사용합니다.
+         finalValue = checked
+      }
+
       setSiteSettings((prev) => ({
          ...prev,
          [name]: finalValue,
@@ -113,16 +104,15 @@ const SiteManagement = () => {
    }
 
    // 금지어 삭제
-   const handleRemoveBanWord = async (banWordId) => {
-      if (!window.confirm('정말로 이 금지어를 삭제하시겠습니까?')) {
-         return
-      }
-      try {
-         await dispatch(deleteBanWordThunk(banWordId)).unwrap()
-         showTimedAlert('금지어가 삭제되었습니다.', 'info')
-      } catch (error) {
-         showTimedAlert(error.message || '금지어 삭제에 실패했습니다.', 'danger')
-      }
+   const handleRemoveBanWord = (banWordId) => {
+      handleShowConfirm('정말로 이 금지어를 삭제하시겠습니까?', async () => {
+         try {
+            await dispatch(deleteBanWordThunk(banWordId)).unwrap()
+            showTimedAlert('금지어가 삭제되었습니다.', 'info')
+         } catch (error) {
+            showTimedAlert(error.message || '금지어 삭제에 실패했습니다.', 'danger')
+         }
+      })
    }
 
    // 상품 추가
@@ -514,7 +504,7 @@ const SiteManagement = () => {
                         </tr>
                      </thead>
                      <tbody>
-                        {productLists?.length > 0 ? (
+                        {Array.isArray(productLists) && productLists.length > 0 ? (
                            productLists.map((item) => (
                               <tr key={item.id}>
                                  <td>{item.id}</td>
@@ -546,7 +536,7 @@ const SiteManagement = () => {
                            <tr>
                               <td colSpan="3" className="text-center">
                                  <i className="fas fa-list fa-3x text-muted mb-3"></i>
-                                 <p className="text-muted">등록된 상품 분류이 없습니다.</p>
+                                 <p className="text-muted">등록된 상품 분류가 없습니다.</p>
                               </td>
                            </tr>
                         )}
