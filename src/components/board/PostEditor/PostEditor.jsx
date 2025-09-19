@@ -14,7 +14,7 @@ const PostEditor = React.forwardRef(({ onSuccess, editPostId, defaultCategory = 
    const quillRef = ref || localQuillRef
    const dispatch = useDispatch()
    const navigate = useNavigate()
-   const { loading, error, board } = useSelector((state) => state.board)
+   const { loading, error, board, ban } = useSelector((state) => state.board)
    const { id } = useParams()
    const { user } = useSelector((state) => state.user)
 
@@ -48,6 +48,12 @@ const PostEditor = React.forwardRef(({ onSuccess, editPostId, defaultCategory = 
       { value: 'news', label: '뉴스' },
       { value: 'analysis', label: '분석' },
    ]
+
+   useEffect(() => {
+      if (ban) {
+         alert(ban.message)
+      }
+   }, [ban])
 
    // 수정 모드일 때 기존 데이터 로드
    useEffect(() => {
@@ -132,9 +138,8 @@ const PostEditor = React.forwardRef(({ onSuccess, editPostId, defaultCategory = 
          alert('제목을 입력해주세요.')
          return
       }
-
-      // React-Quill의 빈 내용 체크
       if (!formData.content || formData.content.trim() === '' || formData.content === '<p><br></p>') {
+         // React-Quill의 빈 내용 체크
          alert('내용을 입력해주세요.')
          return
       }
@@ -212,20 +217,6 @@ const PostEditor = React.forwardRef(({ onSuccess, editPostId, defaultCategory = 
             <Row>
                <Col lg={10} xl={8} className="mx-auto">
                   <Card className={styles.editorCard}>
-                     <Card.Header className={styles.editorHeader}>
-                        <div className="d-flex justify-content-between align-items-center">
-                           <h3>
-                              <i className={`fas fa-${isEditMode ? 'edit' : 'pen'} me-2`}></i>
-                              {isEditMode ? '게시글 수정' : '새 게시글 작성'}
-                           </h3>
-                           {/* 현재 사용자 정보 표시 */}
-                           <div className="d-flex align-items-center">
-                              <small className="text-muted me-2">작성자:</small>
-                              <Badge bg="primary">{user.name || user.username || `사용자${user.id}`}</Badge>
-                           </div>
-                        </div>
-                     </Card.Header>
-
                      <Card.Body>
                         <Form onSubmit={handleSubmit}>
                            {/* 제목 및 카테고리 */}

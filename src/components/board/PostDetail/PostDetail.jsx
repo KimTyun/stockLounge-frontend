@@ -226,7 +226,7 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                         {board.board_img && (
                            <div className={styles.postImage}>
                               <img
-                                 src={`${import.meta.env.VITE_API_URI}/uploads/${board.board_img}`}
+                                 src={`${import.meta.env.VITE_API_URL}/uploads/board/${board.board_img}`}
                                  alt="게시글 이미지"
                                  className="img-fluid mb-3"
                                  onError={(e) => {

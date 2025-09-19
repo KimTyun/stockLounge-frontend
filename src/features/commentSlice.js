@@ -58,6 +58,7 @@ const commentSlice = createSlice({
       comment: null,
       loading: false,
       error: null,
+      ban: null,
    },
    reducers: {
       clearComments: (state) => {
@@ -78,7 +79,15 @@ const commentSlice = createSlice({
          })
          .addCase(createCommentThunk.fulfilled, (state, action) => {
             state.loading = false
-            state.comment = action.payload.data
+            if (action.payload.success) {
+               state.comment = action.payload.data
+               state.ban = null
+            } else {
+               state.ban = {
+                  type: action.payload.modalType,
+                  message: action.payload.message,
+               }
+            }
          })
          .addCase(createCommentThunk.rejected, (state, action) => {
             state.loading = false
