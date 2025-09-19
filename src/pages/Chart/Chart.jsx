@@ -55,6 +55,19 @@ const Chart = () => {
       fetchData()
    }, [coins, coinList, dispatch])
 
+   useEffect(() => {
+      if (!selectedCoin && coinData?.length > 0) {
+         setSelectedCoin({
+            id: coinData[0].market,
+            symbol: coinData[0].market.split('-')[1],
+            name: coinData[0].find((e) => e.market === coinData[0].market)?.korean_name ?? '',
+            price: coinData[0].trade_price,
+            change24h: coinData[0].signed_change_rate,
+            volume24h: coinData[0].acc_trade_volume_24h,
+         })
+      }
+   }, [coinData, selectedCoin])
+
    if (!selectedCoin) return <div>Loading...</div>
 
    return (
