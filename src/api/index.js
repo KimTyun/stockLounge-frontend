@@ -1,13 +1,14 @@
-import axios from "axios"
+import axios from 'axios'
 
-const baseURL = import.meta.env.VITE_API_URL
+const apiUrI = import.meta.env.VITE_API_URI
+const baseURL = `${apiUrI}/api`
 
 const axiosApi = axios.create({
-  baseURL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  withCredentials: true,
+   baseURL,
+   headers: {
+      'Content-Type': 'application/json',
+   },
+   withCredentials: true,
 })
 
 export default axiosApi

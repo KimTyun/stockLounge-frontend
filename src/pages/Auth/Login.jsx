@@ -1,35 +1,30 @@
-import { Container, Card, Button } from 'react-bootstrap'
+import { Container, Card } from 'react-bootstrap'
 import SocialLogin from '../../components/auth/SocialLogin/SocialLogin'
 import styles from '../../styles/components/auth/LoginPage.module.css'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkAuthStatusThunk } from '../../features/authSlice'
 import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '../../config/routes'
 
 const LoginPage = () => {
    const dispatch = useDispatch()
-   const auth = useSelector((s) => s.auth)
+   const { isLoggedIn } = useSelector((state) => state.auth)
    const navigate = useNavigate()
 
-   useEffect(() => {
-      // Re-check auth status (useful after OAuth redirect back to frontend)
+   // 소셜 로그인 성공 후 콜백 함수
+   const handleLoginSuccess = () => {
+      // 로그인 성공 후, 최신 인증 상태를 다시 확인하여 유저 정보를 가져옴
       dispatch(checkAuthStatusThunk())
+   }
 
-      // Poll a few times to pick up auth status quickly after OAuth redirect
-      let attempts = 0
-      const timer = setInterval(() => {
-         attempts += 1
-         dispatch(checkAuthStatusThunk())
-         if (attempts >= 10) clearInterval(timer)
-      }, 1000)
-      return () => clearInterval(timer)
-   }, [dispatch])
-
+   // 로그인 상태가 변경되면 메인 페이지로 이동
    useEffect(() => {
-      if (auth?.isLoggedIn) {
-         navigate('/')
+      if (isLoggedIn) {
+         navigate(ROUTES.MAIN)
       }
-   }, [auth?.isLoggedIn, navigate])
+   }, [isLoggedIn, navigate])
+
    return (
       <Container className={styles.page} style={{ paddingTop: '6rem', paddingBottom: '4rem' }}>
          <Card className={styles.card}>
@@ -37,9 +32,9 @@ const LoginPage = () => {
                <h2 className="mb-3 text-center">STOCKLOUNGE에 로그인</h2>
                <p className="text-center text-muted">소셜 계정으로 간편하게 로그인하세요.</p>
 
-               <div className="d-grid gap-2 mt-4">
-                  <SocialLogin provider="google" onSuccess={() => dispatch(checkAuthStatusThunk())} />
-                  <SocialLogin provider="kakao" onSuccess={() => dispatch(checkAuthStatusThunk())} />
+               <div className="d-grid gap-3 mt-4">
+                  <SocialLogin provider="google" onSuccess={handleLoginSuccess} />
+                  <SocialLogin provider="kakao" onSuccess={handleLoginSuccess} />
                </div>
 
                <hr className="my-4" />

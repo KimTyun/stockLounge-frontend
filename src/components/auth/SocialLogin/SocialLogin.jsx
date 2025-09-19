@@ -2,17 +2,23 @@ import { Button } from 'react-bootstrap'
 
 const SocialLogin = ({ provider, onSuccess, className }) => {
    const handleLogin = () => {
-      const apiBase = import.meta.env.VITE_API_URL || ''
+      const apiBase = import.meta.env.VITE_API_URI
+      // VITE_API_URL || ''
       let authUrl = ''
 
       if (provider === 'google') {
-         authUrl = `${apiBase}/auth/google`
+         authUrl = `${apiBase}/api/auth/google`
       } else if (provider === 'kakao') {
-         authUrl = `${apiBase}/auth/kakao`
+         authUrl = `${apiBase}/api/auth/kakao`
       }
 
-      if (authUrl && apiBase) {
-         // Open OAuth in a popup and notify parent when done
+      if (!apiBase) {
+         console.error('VITE_API_BASE_URL 환경 변수가 설정되지 않았습니다.')
+         alert('로그인 설정에 오류가 발생했습니다. 관리자에게 문의하세요.')
+         return
+      }
+
+      if (authUrl) {
          const w = 600
          const h = 700
          const left = window.screenX + (window.outerWidth - w) / 2
@@ -20,7 +26,6 @@ const SocialLogin = ({ provider, onSuccess, className }) => {
          const popup = window.open(authUrl, 'oauth_popup', `width=${w},height=${h},left=${left},top=${top}`)
 
          if (!popup) {
-            // fallback to full redirect
             window.location.href = authUrl
             return
          }
@@ -28,17 +33,10 @@ const SocialLogin = ({ provider, onSuccess, className }) => {
          const timer = setInterval(() => {
             if (popup.closed) {
                clearInterval(timer)
-               // notify caller to re-check auth status
                if (onSuccess) onSuccess()
             }
          }, 500)
-
-         return
       }
-
-      // Fallback: simulate success
-      console.log(`${provider} 로그인 시도 (로컬 시뮬레이트)`)
-      if (onSuccess) onSuccess()
    }
 
    const getButtonText = () => {
