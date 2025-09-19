@@ -22,6 +22,7 @@ export const getUsers = async () => {
       throw error
    }
 }
+
 // 특정 사용자 관리
 export const getUserById = async (userId) => {
    try {
@@ -32,6 +33,7 @@ export const getUserById = async (userId) => {
       throw error
    }
 }
+
 // 사용자 제재 처리 관리
 export const updateUserBanStatus = async (userId, isBanned) => {
    try {
@@ -42,6 +44,7 @@ export const updateUserBanStatus = async (userId, isBanned) => {
       throw error
    }
 }
+
 // 사용자 보상 업데이트
 export const updateUserReward = async (userId, rewardAmount) => {
    try {
@@ -53,6 +56,7 @@ export const updateUserReward = async (userId, rewardAmount) => {
       throw error
    }
 }
+
 // 사용자 삭제
 export const deleteUser = async (userId) => {
    try {
@@ -74,6 +78,7 @@ export const getBoards = async () => {
       throw error
    }
 }
+
 // 게시판 삭제
 export const deleteBoard = async (boardId) => {
    try {

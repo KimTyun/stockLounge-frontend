@@ -71,16 +71,6 @@ export const updateSiteSettingsThunk = createAsyncThunk('admin/updateSiteSetting
    }
 })
 
-// 포인트 시스템
-export const updateUserRewardThunk = createAsyncThunk('admin/updateUserReward', async ({ userId, points, type }, { rejectWithValue }) => {
-   try {
-      const response = await adminApi.updateReward(userId, points, type)
-      return response.data
-   } catch (error) {
-      return rejectWithValue(error.response?.data)
-   }
-})
-
 // 금지어 관리
 export const getBanWordsThunk = createAsyncThunk('admin/getBanWords', async (_, { rejectWithValue }) => {
    try {
