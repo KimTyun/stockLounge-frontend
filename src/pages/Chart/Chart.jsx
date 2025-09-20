@@ -79,6 +79,18 @@ const Chart = () => {
          title: '신규 상장 코인, 들어가도 괜찮을까 고민됨',
       },
    ]
+   useEffect(() => {
+      if (!selectedCoin && coinData?.length > 0) {
+         setSelectedCoin({
+            id: coinData[0].market,
+            symbol: coinData[0].market.split('-')[1],
+            name: coinData[0].name,
+            price: coinData[0].trade_price,
+            change24h: coinData[0].signed_change_rate,
+            volume24h: coinData[0].acc_trade_volume_24h,
+         })
+      }
+   }, [coinData, selectedCoin])
 
    if (!selectedCoin) return <div>Loading...</div>
 
