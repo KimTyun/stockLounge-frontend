@@ -58,7 +58,7 @@ const Chart = () => {
       }
 
       fetchData()
-   }, [dispatch, coins.length, coinList.length])
+   }, [dispatch, coins.length, coinList.length, selectedCoin])
 
    useEffect(() => {
       if (!selectedCoin) return
