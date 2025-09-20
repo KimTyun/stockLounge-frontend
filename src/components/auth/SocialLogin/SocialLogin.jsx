@@ -1,7 +1,23 @@
+import { useEffect } from 'react'
 import { Button } from 'react-bootstrap'
 import { FaGoogle, FaComment } from 'react-icons/fa'
 
 const SocialLogin = ({ provider }) => {
+   useEffect(() => {
+      const handleMessage = (event) => {
+         if (event.origin !== 'http://localhost:8000' && event.origin !== 'http://localhost:5173') return
+         if (event.data?.success) {
+            if (event.data.redirectUrl) {
+               window.location.href = event.data.redirectUrl
+            } else {
+               window.location.reload()
+            }
+         }
+      }
+      window.addEventListener('message', handleMessage)
+      return () => window.removeEventListener('message', handleMessage)
+   }, [])
+
    const handleLogin = () => {
       const apiBase = import.meta.env.VITE_API_URL
       let authUrl = ''
@@ -19,13 +35,7 @@ const SocialLogin = ({ provider }) => {
       }
 
       if (authUrl) {
-         const popup = window.open(authUrl, 'oauth_popup', 'width=600,height=700')
-         const timer = setInterval(() => {
-            if (popup.closed) {
-               clearInterval(timer)
-               window.location.reload()
-            }
-         }, 500)
+         window.open(authUrl, 'oauth_popup', 'width=600,height=700')
       }
    }
 
