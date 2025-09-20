@@ -15,8 +15,10 @@ const SocialLogin = ({ provider, onSuccess, className }) => {
       }
 
       if (provider === 'google') {
+
          // 2. '/api' 없이 '/auth/google' 경로를 바로 붙입니다.
          authUrl = `${apiBase}/auth/google`
+
       } else if (provider === 'kakao') {
          authUrl = `${apiBase}/auth/kakao`
       }

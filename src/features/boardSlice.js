@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { getBoard, writeBoard, getBoardById, deleteBoard, updateBoard, likeBoard } from '../api/boardApi'
+import { recommendBoards } from '../api/pythonApi'
 
 /**
  * 게시글 리스트 가져오기
@@ -75,20 +76,35 @@ export const likeBoardThunk = createAsyncThunk('board/likeBoard', async (id, { r
    }
 })
 
+/**
+ * 추천 게시글 목록 가져오기(implicit)
+ */
+export const recommendBoardsThunk = createAsyncThunk('board/recommendBoards', async (id, { rejectWithValue }) => {
+   try {
+      const response = await recommendBoards(id)
+      return response
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
 const boardSlice = createSlice({
    name: 'boards',
    initialState: {
       board: null,
       boards: [],
+      recommend: null,
       loading: false,
       // 한 페이지에서 가져오다보니 로딩이 중첩되서 무한 로딩 발생
       // 상세 페이지의 로딩을 따로 두어 관리
       loadingDetail: false,
       error: null,
+      ban: null,
    },
    reducers: {},
    extraReducers: (builder) => {
       builder
+         // 게시글 리스트
          .addCase(getBoardThunk.pending, (state) => {
             state.loading = true
             state.error = null
@@ -101,18 +117,28 @@ const boardSlice = createSlice({
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
          })
+         // 게시글 등록
          .addCase(writeBoardThunk.pending, (state) => {
             state.loading = true
             state.error = null
          })
          .addCase(writeBoardThunk.fulfilled, (state, action) => {
             state.loading = false
-            state.board = action.payload.data
+            if (action.payload.success) {
+               state.board = action.payload.data
+               state.ban = null // 성공 시 ban 상태 초기화
+            } else {
+               state.ban = {
+                  type: action.payload.modalType,
+                  message: action.payload.message,
+               }
+            }
          })
          .addCase(writeBoardThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload?.message || '서버 문제로 게시글을 등록하지 못했습니다.'
          })
+         // 특정 게시글
          .addCase(getBoardByIdThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null
@@ -125,6 +151,7 @@ const boardSlice = createSlice({
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
          })
+         // 게시글 삭제
          .addCase(deleteBoardThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null
@@ -136,6 +163,7 @@ const boardSlice = createSlice({
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 삭제하지 못했습니다.'
          })
+         // 게시글 수정
          .addCase(updateBoardThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null
@@ -147,6 +175,7 @@ const boardSlice = createSlice({
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 수정하지 못했습니다.'
          })
+         // 게시글 좋아요
          .addCase(likeBoardThunk.pending, (state) => {
             state.loadingDetail = true
             state.error = null
@@ -161,11 +190,32 @@ const boardSlice = createSlice({
                state.board.like_count = updated.like_count
                state.board.isLiked = updated.isLiked
             }
-            state.boards = state.boards.map((board) => (board.id === updated.boardId ? { ...board, like_count: updated.like_count, isLiked: updated.isLiked } : board))
+            state.boards = state.boards.map((board) =>
+               board.id === updated.boardId
+                  ? {
+                       ...board,
+                       like_count: updated.like_count,
+                       isLiked: updated.isLiked,
+                    }
+                  : board
+            )
          })
          .addCase(likeBoardThunk.rejected, (state, action) => {
             state.loadingDetail = false
             state.error = action.payload?.message || '서버 문제로 게시글을 수정하지 못했습니다.'
+         })
+
+         .addCase(recommendBoardsThunk.pending, (state) => {
+            state.loadingDetail = true
+            state.error = null
+         })
+         .addCase(recommendBoardsThunk.fulfilled, (state, action) => {
+            state.loadingDetail = false
+            state.recommend = action.payload
+         })
+         .addCase(recommendBoardsThunk.rejected, (state, action) => {
+            state.loadingDetail = false
+            state.error = action.payload?.message || '서버 문제로 게시글을 가져오지 못했습니다.'
          })
    },
 })

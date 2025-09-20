@@ -1,28 +1,53 @@
 import React, { useEffect, useState } from 'react'
 import { Container, Row, Col, Card, Button, Badge, Dropdown } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import CommentList from '../CommentList'
 import styles from '../../../styles/pages/Board_fixed.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteBoardThunk, getBoardByIdThunk, likeBoardThunk } from '../../../features/boardSlice'
 import { reportBoardThunk } from '../../../features/reportSlice'
+import { getMeThunk } from '../../../features/userSlice'
 
 const PostDetail = ({ boardId, onBackToList, onEdit }) => {
    const navigate = useNavigate()
+   const params = useParams()
+
+   // URL에서 ID를 가져오거나 props에서 가져옴
+   const postId = boardId || parseInt(params.id)
+
+   const getCategoryLabel = (category) => {
+      const categoryMap = {
+         free: '자유토론',
+         bitcoin: '비트코인',
+         ethereum: '이더리움',
+         ripple: '리플',
+         nft: 'NFT',
+         defi: 'DeFi',
+         news: '뉴스',
+         analysis: '분석',
+      }
+      return categoryMap[category] || category
+   }
 
    const dispatch = useDispatch()
    const { board, loadingDetail, error } = useSelector((state) => state.board)
+   const { user } = useSelector((state) => state.user)
 
    const handleEdit = () => {
-      onEdit(boardId)
+      onEdit(postId)
    }
 
+   useEffect(() => {
+      if (!user) {
+         dispatch(getMeThunk())
+      }
+   }, [dispatch])
    const handleDelete = () => {
       if (window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-         dispatch(deleteBoardThunk(boardId))
+         dispatch(deleteBoardThunk(postId))
          alert('삭제되었습니다.')
          navigate('/board')
-         onBackToList()
+         if (onBackToList) onBackToList()
       }
    }
 
@@ -32,13 +57,13 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
          try {
             await dispatch(
                reportBoardThunk({
-                  boardId: boardId,
+                  boardId: postId,
                   userId: 1, // 실제로는 로그인한 사용자 ID
                   reason: reason.trim(),
                })
             )
             // 신고 후 게시글 정보 다시 가져오기
-            dispatch(getBoardByIdThunk(boardId))
+            dispatch(getBoardByIdThunk(postId))
             alert('신고가 접수되었습니다. 검토 후 처리하겠습니다.')
          } catch (error) {
             alert('신고 접수에 실패했습니다.')
@@ -59,17 +84,17 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
    }
 
    const onClickBoardHeart = () => {
-      if (boardId) {
-         dispatch(likeBoardThunk(boardId))
+      if (postId) {
+         dispatch(likeBoardThunk(postId))
       }
    }
 
    useEffect(() => {
       // 게시글 상세 정보를 가져오는 로직
-      if (boardId) {
-         dispatch(getBoardByIdThunk(boardId))
+      if (postId) {
+         dispatch(getBoardByIdThunk(postId))
       }
-   }, [dispatch, boardId])
+   }, [dispatch, postId])
 
    if (loadingDetail) {
       return (
@@ -128,7 +153,7 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                      <Card.Body>
                         <div className={styles.postHeader}>
                            <div className={styles.postMeta}>
-                              {board.category}
+                              {getCategoryLabel(board.Category?.category) || '일반'}
                               {board.report_count > 10 && (
                                  <Badge bg="danger" className="ms-2">
                                     신고됨
@@ -139,47 +164,43 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                            <h1 className={styles.postTitle}>{board.title}</h1>
 
                            <div className={styles.authorInfo}>
-                              <div className={styles.authorProfile}>
-                                 <img
-                                    src="./vite.svg"
-                                    alt={board.user_id ? `사용자${board.user_id}` : '익명'}
-                                    className={styles.authorImage}
-                                    onError={(e) => {
-                                       e.target.src = './vite.svg'
-                                    }}
-                                 />
-                                 <div className={styles.authorDetails}>
-                                    <div className={styles.authorName}>
-                                       {board.user_id ? `사용자${board.user_id}` : '익명'}
-                                       <Badge bg="secondary" className="ms-2">
-                                          Bronze
-                                       </Badge>
+                              <div>
+                                 <div className={styles.authorProfile}>
+                                    <img
+                                       src={board.User?.profile_img ? (board.User.profile_img.startsWith('http') ? board.User.profile_img : `${import.meta.env.VITE_API_URL}${board.User.profile_img}`) : './vite.svg'}
+                                       alt={board.user_id ? `사용자${board.user_id}` : '익명'}
+                                       className={styles.authorImage}
+                                       onError={(e) => {
+                                          e.target.src = './vite.svg'
+                                       }}
+                                    />
+                                    <div className={styles.authorDetails}>
+                                       <div className={styles.authorName}>{board.User?.name || '익명'}</div>
+                                       <div className={styles.postDate}>
+                                          작성일: {formatDate(board.createdAt)}
+                                          {board.updatedAt !== board.createdAt && <span className="text-muted ms-2">(수정됨: {formatDate(board.updatedAt)})</span>}
+                                       </div>
                                     </div>
-                                    <div className={styles.postDate}>
-                                       작성일: {formatDate(board.createdAt)}
-                                       {board.updatedAt !== board.createdAt && <span className="text-muted ms-2">(수정됨: {formatDate(board.updatedAt)})</span>}
+                                    <div className={styles.postActions}>
+                                       <Dropdown>
+                                          <Dropdown.Toggle variant="outline-secondary" size="sm">
+                                             <i className="fas fa-ellipsis-v"></i>
+                                          </Dropdown.Toggle>
+                                          <Dropdown.Menu>
+                                             <Dropdown.Item onClick={handleEdit}>
+                                                <i className="fas fa-edit me-2"></i>수정
+                                             </Dropdown.Item>
+                                             <Dropdown.Item onClick={handleDelete} className="text-danger">
+                                                <i className="fas fa-trash me-2"></i>삭제
+                                             </Dropdown.Item>
+                                             <Dropdown.Divider />
+                                             <Dropdown.Item onClick={handleReport}>
+                                                <i className="fas fa-flag me-2"></i>신고
+                                             </Dropdown.Item>
+                                          </Dropdown.Menu>
+                                       </Dropdown>
                                     </div>
                                  </div>
-                              </div>
-
-                              <div className={styles.postActions}>
-                                 <Dropdown>
-                                    <Dropdown.Toggle variant="outline-secondary" size="sm">
-                                       <i className="fas fa-ellipsis-v"></i>
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                       <Dropdown.Item onClick={handleEdit}>
-                                          <i className="fas fa-edit me-2"></i>수정
-                                       </Dropdown.Item>
-                                       <Dropdown.Item onClick={handleDelete} className="text-danger">
-                                          <i className="fas fa-trash me-2"></i>삭제
-                                       </Dropdown.Item>
-                                       <Dropdown.Divider />
-                                       <Dropdown.Item onClick={handleReport}>
-                                          <i className="fas fa-flag me-2"></i>신고
-                                       </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                 </Dropdown>
                               </div>
                            </div>
 
@@ -205,7 +226,7 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                         {board.board_img && (
                            <div className={styles.postImage}>
                               <img
-                                 src={`${import.meta.env.VITE_API_URI}/uploads/${board.board_img}`}
+                                 src={`${import.meta.env.VITE_API_URL}/uploads/board/${board.board_img}`}
                                  alt="게시글 이미지"
                                  className="img-fluid mb-3"
                                  onError={(e) => {
@@ -220,16 +241,19 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                   </Card>
 
                   {/* 좋아요 버튼 */}
-                  <Card className={styles.actionCard}>
-                     <Card.Body>
-                        <div className={styles.actionButtons}>
-                           <span className={styles.likes}>
-                              <i className="fas fa-heart me-1 my-red-icon"></i>
-                           </span>
-                           <Button onClick={onClickBoardHeart}>{board.like_count || 0}</Button>
-                        </div>
-                     </Card.Body>
-                  </Card>
+                  {/* 로그인 했을때만 보여짐 */}
+                  {user && (
+                     <Card className={styles.actionCard}>
+                        <Card.Body>
+                           <div className={styles.actionButtons}>
+                              <span className={styles.likes}>
+                                 <i className="fas fa-heart me-1 my-red-icon"></i>
+                              </span>
+                              <Button onClick={onClickBoardHeart}>{board.like_count || 0}</Button>
+                           </div>
+                        </Card.Body>
+                     </Card>
+                  )}
 
                   {/* 댓글 섹션 */}
                   <Card className={styles.commentSection}>
@@ -238,11 +262,19 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                            <i className="fas fa-comments me-2"></i>댓글
                         </h5>
                      </Card.Header>
-                     <Card.Body>{boardId && <CommentList postId={boardId} />}</Card.Body>
+                     <Card.Body>{postId && <CommentList postId={postId} />}</Card.Body>
                   </Card>
 
                   <div className={styles.postNavigation}>
-                     <Button variant="secondary" onClick={onBackToList}>
+                     <Button
+                        variant="secondary"
+                        onClick={
+                           onBackToList ||
+                           (() => {
+                              navigate('/board')
+                           })
+                        }
+                     >
                         <i className="fas fa-list me-2"></i>목록으로
                      </Button>
                   </div>

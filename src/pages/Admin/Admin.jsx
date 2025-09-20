@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Container, Row, Col, Nav, Tab, Card } from 'react-bootstrap'
 import Dashboard from '../../components/admin/Dashboard'
 import UserManagement from '../../components/admin/UserManagement'
@@ -6,13 +7,30 @@ import BoardManagement from '../../components/admin/BoardManagement'
 import SiteManagement from '../../components/admin/SiteManagement'
 import Statistics from '../../components/admin/Statistics'
 import styles from '../../styles/pages/Admin.module.css'
+import { fetchUserStatus } from '../../features/adminSlice.js'
 
 const Admin = () => {
+   const dispatch = useDispatch()
    const [activeTab, setActiveTab] = useState('dashboard')
 
-   // 관리자 권한 체크 (실제로는 Redux나 Context에서 가져올 예정)
-   const isAdmin = true // 임시로 true 설정
+   const user = useSelector((state) => state.admin.user)
+   const userStatusLoading = useSelector((state) => state.admin.userStatusLoading)
 
+   const isAdmin = user && user.roles === 'ADMIN'
+
+   useEffect(() => {
+      dispatch(fetchUserStatus())
+   }, [dispatch])
+
+   if (userStatusLoading) {
+      return (
+         <div className={styles.loadingScreen}>
+            <p>사용자 권한을 확인 중입니다...</p>
+         </div>
+      )
+   }
+
+   // 관리자 아니면 접근 금지
    if (!isAdmin) {
       return (
          <div className={styles.accessDenied}>
@@ -49,8 +67,8 @@ const Admin = () => {
       <div className={styles.admin}>
          <Container fluid>
             <div className={styles.adminHeader}>
-               <h1>관리자 대시보드</h1>
-               <p>StockRounge 관리 시스템</p>
+               <h1>StockRounge</h1>
+               <p>StockRounge 관리 시스템 페이지</p>
             </div>
 
             <Row>

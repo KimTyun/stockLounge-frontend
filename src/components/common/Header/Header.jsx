@@ -5,13 +5,15 @@ import { ROUTES } from '../../../config/routes'
 import styles from '../../../styles/components/common/Header.module.css'
 import { useSelector, useDispatch } from 'react-redux'
 import { logoutThunk } from '../../../features/authSlice'
+import { getMeThunk } from '../../../features/userSlice'
 
 const Header = () => {
    const navigate = useNavigate()
    const dispatch = useDispatch()
    const auth = useSelector((state) => state.auth)
+   const { user: userFromUserSlice } = useSelector((state) => state.user)
    const isLoggedIn = Boolean(auth?.isLoggedIn)
-   const user = auth?.user
+   const user = userFromUserSlice || auth?.user
    const [mobileOpen, setMobileOpen] = useState(false)
    const [showProfileMenu, setShowProfileMenu] = useState(false)
    const [showLoginToast, setShowLoginToast] = useState(false)
@@ -39,6 +41,13 @@ const Header = () => {
       }
       prevIsLoggedIn.current = isLoggedIn
    }, [isLoggedIn])
+
+   // 로그인 상태일 때 사용자 정보 가져오기
+   useEffect(() => {
+      if (isLoggedIn && !userFromUserSlice) {
+         dispatch(getMeThunk()).catch(() => {})
+      }
+   }, [isLoggedIn, userFromUserSlice, dispatch])
 
    return (
       <>
@@ -87,7 +96,21 @@ const Header = () => {
                      ) : (
                         <div className={styles.userInfo}>
                            <div className={styles.profileWrap}>
-                              <img src={user?.profile_img || '/default-profile.png'} alt="프로필" className={styles.profileImage} onClick={() => setShowProfileMenu((s) => !s)} />
+                              <img 
+                                 src={
+                                    user?.profile_img
+                                       ? user.profile_img.startsWith('http')
+                                          ? user.profile_img
+                                          : `${import.meta.env.VITE_API_URL}${user.profile_img}`
+                                       : '/default-profile.png'
+                                 } 
+                                 alt="프로필" 
+                                 className={styles.profileImage} 
+                                 onClick={() => setShowProfileMenu((s) => !s)}
+                                 onError={(e) => {
+                                    e.target.src = '/default-profile.png'
+                                 }}
+                              />
                               <span className={styles.nickname}>{user?.nickname || '사용자'}</span>
                               {showProfileMenu && (
                                  <div className={styles.profileDropdown}>
@@ -174,7 +197,20 @@ const Header = () => {
                      ) : (
                         <>
                            <div className={styles.userInfoMobile}>
-                              <img src={user?.profile_img || '/default-profile.png'} alt="프로필" className={styles.profileImage} />
+                              <img 
+                                 src={
+                                    user?.profile_img
+                                       ? user.profile_img.startsWith('http')
+                                          ? user.profile_img
+                                          : `${import.meta.env.VITE_API_URL}${user.profile_img}`
+                                       : '/default-profile.png'
+                                 } 
+                                 alt="프로필" 
+                                 className={styles.profileImage}
+                                 onError={(e) => {
+                                    e.target.src = '/default-profile.png'
+                                 }}
+                              />
                               <div>
                                  <div className={styles.nickname}>{user?.nickname || '사용자'}</div>
                                  <Button variant="link" className={styles.logoutBtn} onClick={handleLogout}>
