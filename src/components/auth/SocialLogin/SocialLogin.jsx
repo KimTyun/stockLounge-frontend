@@ -6,7 +6,7 @@ const SocialLogin = ({ provider, onSuccess, className }) => {
       let authUrl = ''
 
       if (provider === 'google') {
-         authUrl = `${apiBase}/auth/google`
+         authUrl = `${apiBase}/auth/google/login`
       } else if (provider === 'kakao') {
          authUrl = `${apiBase}/auth/kakao`
       }
