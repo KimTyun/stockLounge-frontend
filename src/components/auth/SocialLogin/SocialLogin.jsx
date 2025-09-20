@@ -1,21 +1,24 @@
 import { Button } from 'react-bootstrap'
+// 아이콘 라이브러리는 Font Awesome을 사용하도록 수정합니다. (lucide-react 대체)
+import { FaGoogle, FaComment } from 'react-icons/fa'
 
 const SocialLogin = ({ provider, onSuccess, className }) => {
    const handleLogin = () => {
-      const apiBase = import.meta.env.VITE_API_URI
-      // VITE_API_URL || ''
+      // 1. .env 파일에 정의한 VITE_API_URL을 가져옵니다. (http://localhost:8000)
+      const apiBase = import.meta.env.VITE_API_URL
       let authUrl = ''
 
-      if (provider === 'google') {
-         authUrl = `${apiBase}/api/auth/google`
-      } else if (provider === 'kakao') {
-         authUrl = `${apiBase}/api/auth/kakao`
-      }
-
       if (!apiBase) {
-         console.error('VITE_API_BASE_URI 환경 변수가 설정되지 않았습니다.')
+         console.error('VITE_API_URL 환경 변수가 설정되지 않았습니다.')
          alert('로그인 설정에 오류가 발생했습니다. 관리자에게 문의하세요.')
          return
+      }
+
+      if (provider === 'google') {
+         // 2. '/api' 없이 '/auth/google' 경로를 바로 붙입니다.
+         authUrl = `${apiBase}/auth/google`
+      } else if (provider === 'kakao') {
+         authUrl = `${apiBase}/auth/kakao`
       }
 
       if (authUrl) {
@@ -29,39 +32,25 @@ const SocialLogin = ({ provider, onSuccess, className }) => {
       }
    }
 
-   const getButtonText = () => {
-      switch (provider) {
-         case 'google':
-            return '구글로 로그인'
-         case 'kakao':
-            return '카카오로 로그인'
-         default:
-            return '로그인'
-      }
+   // 버튼 텍스트, 스타일, 아이콘을 provider에 따라 동적으로 설정합니다.
+   const config = {
+      google: {
+         text: '구글로 로그인',
+         style: { backgroundColor: '#4285F4', color: 'white', border: 'none' },
+         icon: <FaGoogle />,
+      },
+      kakao: {
+         text: '카카오로 로그인',
+         style: { backgroundColor: '#FEE500', color: '#191919', border: 'none' },
+         icon: <FaComment />,
+      },
    }
 
-   const getButtonStyle = () => {
-      switch (provider) {
-         case 'google':
-            return {
-               backgroundColor: '#4285F4',
-               borderColor: '#4285F4',
-               color: 'white',
-            }
-         case 'kakao':
-            return {
-               backgroundColor: '#FAD900',
-               borderColor: '#FAD900',
-               color: '#333',
-            }
-         default:
-            return {}
-      }
-   }
+   const { text, style, icon } = config[provider] || {}
 
    return (
-      <Button className={className} style={getButtonStyle()} onClick={handleLogin} size="lg">
-         {getButtonText()}
+      <Button style={style} onClick={handleLogin} size="lg" className="w-100 d-flex align-items-center justify-content-center">
+         <span className="me-2">{icon}</span> {text}
       </Button>
    )
 }
