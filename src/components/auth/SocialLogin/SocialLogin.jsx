@@ -13,22 +13,7 @@ const SocialLogin = ({ provider }) => {
       }
 
       if (provider === 'google') {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
-         // 2. '/api' 없이 '/auth/google' 경로를 바로 붙입니다.
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
          authUrl = `${apiBase}/auth/google`
-
       } else if (provider === 'kakao') {
          authUrl = `${apiBase}/auth/kakao`
       }
@@ -60,7 +45,6 @@ const SocialLogin = ({ provider }) => {
    const { text, style, icon } = config[provider] || {}
 
    return (
-      // [수정] 사용하지 않는 className prop을 제거합니다.
       <Button style={style} onClick={handleLogin} size="lg" className="w-100 d-flex align-items-center justify-content-center">
          <span className="me-2">{icon}</span> {text}
       </Button>
