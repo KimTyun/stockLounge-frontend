@@ -6,27 +6,27 @@ import styles from '../../styles/pages/Chart.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { getNewsThunk } from '../../features/newsSlice'
 import he from 'he'
-import { getMarketAllThunk, getTickerAllThunk } from '../../features/coinSlice'
+import { getcandlesThunk, getMarketAllThunk, getTickerAllThunk } from '../../features/coinSlice'
 import DOMPurify from 'dompurify'
 import { Link } from 'react-router-dom'
 import { recommendBoardsThunk } from '../../features/boardSlice'
+import { setSelectedCoin, setCoinData } from '../../features/coinSlice'
 
 const Chart = () => {
    const dispatch = useDispatch()
    const { news } = useSelector((s) => s.news)
-   const { coins, coinList } = useSelector((s) => s.coin)
+   const { coins, coinList, selectedCoin, coinData } = useSelector((s) => s.coin)
    const { user } = useSelector((s) => s.user)
    const { recommend } = useSelector((s) => s.board)
-   const [coinData, setCoinData] = useState(null)
 
    // 첫 번째 세션: 선택된 코인 상태
-   const [selectedCoin, setSelectedCoin] = useState(null)
+
    // 차트 기간(일간/주간/월간/년간)
    const [period, setPeriod] = useState('days')
 
    // 코인 리스트에서 코인 클릭 시
    const handleCoinSelect = (coin) => {
-      setSelectedCoin(coin)
+      dispatch(setSelectedCoin(coin))
    }
 
    useEffect(() => {
@@ -36,11 +36,11 @@ const Chart = () => {
 
    useEffect(() => {
       const fetchData = async () => {
-         if (coins.length === 0 || coinList.length === 0) {
+         if (!selectedCoin && !coins.length && !coinList.length) {
             const conlist = await dispatch(getMarketAllThunk()).unwrap()
             const result = await dispatch(getTickerAllThunk(30)).unwrap()
 
-            const mapped = result.map((coin, index) => ({
+            const mapped = result.data.map((coin, index) => ({
                id: coin.market,
                symbol: coin.market.split('-')[1],
                name: conlist.find((e) => e.market === coin.market)?.korean_name ?? '',
@@ -50,32 +50,21 @@ const Chart = () => {
                rank: index + 1,
             }))
 
-            setCoinData(mapped)
-
-            setSelectedCoin(mapped[0])
+            dispatch(setCoinData(mapped))
+            if (!selectedCoin) {
+               dispatch(setSelectedCoin(mapped[0]))
+            }
          }
       }
 
       fetchData()
-   }, [coins, coinList, dispatch])
+   }, [dispatch, coins.length, coinList.length, selectedCoin])
 
    useEffect(() => {
-      if (coins && coinList) {
-         const mapped = coins.map((coin, index) => ({
-            id: coin.market,
-            symbol: coin.market.split('-')[1],
-            name: coinList.find((e) => e.market === coin.market)?.korean_name ?? '',
-            price: coin.trade_price,
-            change24h: coin.signed_change_rate,
-            volume24h: coin.acc_trade_volume_24h,
-            rank: index + 1,
-         }))
-         setCoinData(mapped)
-         setSelectedCoin(mapped[0])
-      }
-   }, [])
+      if (!selectedCoin) return
 
-   // 임시 데이터: implicit로 맞춤 게시글 연동 예정
+      dispatch(getcandlesThunk({ time: period, params: { market: selectedCoin.id, count: 60 } }))
+   }, [dispatch, selectedCoin, period])
 
    if (!selectedCoin)
       return (
