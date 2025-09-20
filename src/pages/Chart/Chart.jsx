@@ -9,14 +9,16 @@ import he from 'he'
 import { getMarketAllThunk, getTickerAllThunk } from '../../features/coinSlice'
 import DOMPurify from 'dompurify'
 import { Link } from 'react-router-dom'
+import { recommendBoardsThunk } from '../../features/boardSlice'
 
 const Chart = () => {
    const dispatch = useDispatch()
    const { news } = useSelector((s) => s.news)
    const { coins, coinList } = useSelector((s) => s.coin)
+   const { user } = useSelector((s) => s.user)
+   const { recommend } = useSelector((s) => s.board)
    const [coinData, setCoinData] = useState(null)
-   // implicit로 가져온 데이터를 담을 변수
-   const [board, setBoard] = useState(null)
+
    // 첫 번째 세션: 선택된 코인 상태
    const [selectedCoin, setSelectedCoin] = useState(null)
    // 차트 기간(일간/주간/월간/년간)
@@ -29,7 +31,8 @@ const Chart = () => {
 
    useEffect(() => {
       dispatch(getNewsThunk({ length: 5, start: 1, query: '암호화폐' }))
-   }, [dispatch])
+      dispatch(recommendBoardsThunk(user ? user.id : 1))
+   }, [dispatch, user])
 
    useEffect(() => {
       const fetchData = async () => {
@@ -56,43 +59,33 @@ const Chart = () => {
       fetchData()
    }, [coins, coinList, dispatch])
 
-   // 임시 데이터: implicit로 맞춤 게시글 연동 예정
-   const mockBoardData = [
-      {
-         id: 1,
-         title: '이더리움 ETF 승인 임박? 분위기 심상치 않다',
-      },
-      {
-         id: 2,
-         title: '도지코인 아직도 투자 가치 있다고 보시나요?',
-      },
-      {
-         id: 3,
-         title: '도지 어디까지 갈거라고 생각함?',
-      },
-      {
-         id: 4,
-         title: '[분석] 최근 온체인 데이터로 보는 고래들의 움직임',
-      },
-      {
-         id: 5,
-         title: '신규 상장 코인, 들어가도 괜찮을까 고민됨',
-      },
-   ]
    useEffect(() => {
-      if (!selectedCoin && coinData?.length > 0) {
-         setSelectedCoin({
-            id: coinData[0].market,
-            symbol: coinData[0].market.split('-')[1],
-            name: coinData[0].name,
-            price: coinData[0].trade_price,
-            change24h: coinData[0].signed_change_rate,
-            volume24h: coinData[0].acc_trade_volume_24h,
-         })
+      if (coins && coinList) {
+         const mapped = coins.map((coin, index) => ({
+            id: coin.market,
+            symbol: coin.market.split('-')[1],
+            name: coinList.find((e) => e.market === coin.market)?.korean_name ?? '',
+            price: coin.trade_price,
+            change24h: coin.signed_change_rate,
+            volume24h: coin.acc_trade_volume_24h,
+            rank: index + 1,
+         }))
+         setCoinData(mapped)
+         setSelectedCoin(mapped[0])
       }
-   }, [coinData, selectedCoin])
+   }, [])
 
-   if (!selectedCoin) return <div>Loading...</div>
+   // 임시 데이터: implicit로 맞춤 게시글 연동 예정
+
+   if (!selectedCoin)
+      return (
+         <>
+            <div className="spinner-border text-primary" role="status">
+               <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-2">로딩중...</p>
+         </>
+      )
 
    return (
       <Container fluid className={styles.chartContainer}>
@@ -151,7 +144,7 @@ const Chart = () => {
                         <Card.Header>최신 뉴스</Card.Header>
                         <Card.Body>
                            <ul>
-                              {news &&
+                              {news ? (
                                  news['암호화폐']?.items.map((e) => (
                                     <li key={e.link} className={styles.sidebarList}>
                                        <a
@@ -166,28 +159,38 @@ const Chart = () => {
                                           }}
                                        />
                                     </li>
-                                 ))}
+                                 ))
+                              ) : (
+                                 <>
+                                    <div className="spinner-border text-primary" role="status">
+                                       <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p className="mt-2">뉴스 데이터를 불러오는 중...</p>
+                                 </>
+                              )}
                            </ul>
                         </Card.Body>
                      </Card>
                   </Col>
                   <Col md={12}>
                      <Card>
-                        <Card.Header>인기 게시글</Card.Header>
+                        <Card.Header>{user ? '맞춤 게시글' : '인기 게시글'}</Card.Header>
                         <Card.Body>
-                           {/* TODO: 인기 게시글 연동 */}
                            <ul>
-                              {board
-                                 ? board.map((e) => (
-                                      <li className={styles.sidebarList} key={e.id}>
-                                         <Link to={`/board?id=${e.id}`}>{e.title}</Link>
-                                      </li>
-                                   ))
-                                 : mockBoardData.map((e) => (
-                                      <li className={styles.sidebarList} key={e.id}>
-                                         <Link to={`/board?id=${e.id}`}>{e.title}</Link>
-                                      </li>
-                                   ))}
+                              {recommend ? (
+                                 recommend.map((e) => (
+                                    <li className={styles.sidebarList} key={e.board_id}>
+                                       <Link to={`/board?id=${e.board_id}`}>{e.title}</Link>
+                                    </li>
+                                 ))
+                              ) : (
+                                 <>
+                                    <div className="spinner-border text-primary" role="status">
+                                       <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p className="mt-2">게시판을 불러오는 중...</p>
+                                 </>
+                              )}
                            </ul>
                         </Card.Body>
                      </Card>
