@@ -7,7 +7,7 @@ export const fetchUserStatus = createAsyncThunk('admin/fetchUserStatus', async (
       const response = await adminApi.getUserStatus()
       return response.data
    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
