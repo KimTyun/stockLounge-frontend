@@ -1,6 +1,16 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import * as adminApi from '../api/adminApi'
 
+// 사용자 상태 및 권한 확인
+export const fetchUserStatus = createAsyncThunk('admin/fetchUserStatus', async (_, { rejectWithValue }) => {
+   try {
+      const response = await adminApi.getUserStatus()
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data || error.message)
+   }
+})
+
 // 사용자 목록
 export const getUsersThunk = createAsyncThunk('admin/getUsers', async (_, { rejectWithValue }) => {
    try {
@@ -66,16 +76,6 @@ export const updateSiteSettingsThunk = createAsyncThunk('admin/updateSiteSetting
    try {
       const response = await adminApi.updateSiteSettings(settings)
       return response
-   } catch (error) {
-      return rejectWithValue(error.response?.data)
-   }
-})
-
-// 포인트 시스템
-export const updateUserRewardThunk = createAsyncThunk('admin/updateUserReward', async ({ userId, points, type }, { rejectWithValue }) => {
-   try {
-      const response = await adminApi.updateReward(userId, points, type)
-      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
@@ -215,6 +215,9 @@ const adminSlice = createSlice({
       banWordsError: null,
       products: [],
       productLists: [],
+      user: null,
+      userStatusLoading: false,
+      userStatusError: null,
       loading: {
          users: false,
          boards: false,
@@ -225,6 +228,7 @@ const adminSlice = createSlice({
          allStats: false,
       },
       error: {
+         users: null,
          settings: null,
          products: null,
          banWords: null,
@@ -245,10 +249,25 @@ const adminSlice = createSlice({
    },
    extraReducers: (builder) => {
       builder
+         // 사용자 상태 및 권한 확인
+         .addCase(fetchUserStatus.pending, (state) => {
+            state.userStatusLoading = true
+            state.userStatusError = null
+         })
+         .addCase(fetchUserStatus.fulfilled, (state, action) => {
+            state.userStatusLoading = false
+            state.user = action.payload
+         })
+         .addCase(fetchUserStatus.rejected, (state, action) => {
+            state.userStatusLoading = false
+            state.user = null
+            state.userStatusError = action.payload
+         })
+
          // 사용자 목록
          .addCase(getUsersThunk.pending, (state) => {
             state.loading.users = true
-            state.error = null
+            state.error.users = null
          })
          .addCase(getUsersThunk.fulfilled, (state, action) => {
             state.loading.users = false
@@ -258,6 +277,7 @@ const adminSlice = createSlice({
             state.loading.users = false
             state.error = action.payload?.message || '사용자 목록을 불러오지 못했습니다.'
          })
+
          // 사용자 제재
          .addCase(updateUserStatusThunk.pending, (state) => {
             state.loading.users = true
@@ -322,6 +342,7 @@ const adminSlice = createSlice({
          // 사이트 설정
          .addCase(getSiteSettingsThunk.pending, (state) => {
             state.loading.settings = true
+            state.error.settings = null
          })
          .addCase(getSiteSettingsThunk.fulfilled, (state, action) => {
             state.loading.settings = false
@@ -344,23 +365,6 @@ const adminSlice = createSlice({
          .addCase(updateSiteSettingsThunk.rejected, (state, action) => {
             state.loading.settings = false
             state.error = action.payload?.message || '사이트 설정을 수정하지 못했습니다.'
-         })
-
-         // 포인트 시스템
-         .addCase(updateUserRewardThunk.pending, (state) => {
-            state.loading.rewards = true
-            state.error.rewards = null
-         })
-         .addCase(updateUserRewardThunk.fulfilled, (state, action) => {
-            state.loading.rewards = false
-            const userIndex = state.users.findIndex((user) => user.id === action.payload.userId)
-            if (userIndex !== -1) {
-               state.users[userIndex].Reward = { point: action.payload.newPoints }
-            }
-         })
-         .addCase(updateUserRewardThunk.rejected, (state, action) => {
-            state.loading.rewards = false
-            state.error.rewards = action.payload?.message || '포인트 업데이트에 실패했습니다.'
          })
 
          // 금지어 조회
@@ -407,7 +411,7 @@ const adminSlice = createSlice({
          // 상품 목록
          .addCase(getProductsThunk.pending, (state) => {
             state.loading.products = true
-            state.error = null
+            state.error.products = null
          })
          .addCase(getProductsThunk.fulfilled, (state, action) => {
             state.loading.products = false
@@ -548,16 +552,32 @@ const adminSlice = createSlice({
 
          // 통계
          .addCase(getStatisticsThunk.pending, (state) => {
-            state.loading = true
-            state.error = null
+            state.loading.allStats = true
+            state.error.allStats = null
          })
          .addCase(getStatisticsThunk.fulfilled, (state, action) => {
-            state.loading = false
-            state.statistics = action.payload
+            state.loading.allStats = false
+            const data = action.payload
+
+            // 메인 통계
+            state.statistics = {
+               visitors: data.visitors,
+               pageViews: data.pageViews,
+               newUsers: data.newUsers,
+               posts: data.posts,
+               comments: data.comments,
+               reports: data.reports,
+            }
+
+            // 개별 상세 통계
+            state.popularPosts = data.popularPosts || []
+            state.activeUsers = data.activeUsers || []
+            state.categoryStats = data.categoryStats || []
+            state.hourlyStats = data.hourlyStats || []
          })
          .addCase(getStatisticsThunk.rejected, (state, action) => {
-            state.loading = false
-            state.error = action.payload
+            state.loading.allStats = false
+            state.error.allStats = action.payload
          })
    },
 })
