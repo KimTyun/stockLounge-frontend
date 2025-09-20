@@ -15,8 +15,11 @@ const SocialLogin = ({ provider }) => {
       if (provider === 'google') {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
          // 2. '/api' 없이 '/auth/google' 경로를 바로 붙입니다.
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
