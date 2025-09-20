@@ -143,7 +143,7 @@ const PostTab = () => {
                               <tr key={history.id}>
                                  <td>{history.Category.category}</td>
                                  <td className={styles.tdwrap}>
-                                    <Link to={`/board/view/${history.id}`}>{history.title}</Link>
+                                    <Link to={`/board?id=${history.id}`}>{history.title}</Link>
                                  </td>
                                  <td className={`${styles.historyDate} d-none d-md-table-cell`}>{dayjs(history.createdAt).format('YY-MM-DD H:mm:ss')}</td>
                               </tr>

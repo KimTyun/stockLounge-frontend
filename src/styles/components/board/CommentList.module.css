@@ -2,6 +2,11 @@
    margin-top: 2rem;
 }
 
+.commentText {
+  text-align: left;
+  margin: 20px;
+}
+
 .loading {
    text-align: center;
    padding: 2rem 0;
@@ -127,6 +132,23 @@
 
 .actionButton.liked {
    color: #dc3545;
+}
+
+.commentActions {
+  display: flex;
+  align-items: center;
+}
+
+.stats {
+  margin-left: auto;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.likes>.likeButton>i {
+  color: red;
+  margin-left: auto;
 }
 
 .actionButton.liked:hover {

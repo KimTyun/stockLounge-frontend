@@ -11,7 +11,7 @@ const CommentForm = ({ postId, parentId = null, onCommentAdded, onCancel }) => {
    const [submitError, setSubmitError] = useState('')
 
    const dispatch = useDispatch()
-   const { loading, error, comment } = useSelector((state) => state.comment)
+   const { loading, error, comment, ban } = useSelector((state) => state.comment)
    const { user } = useSelector((state) => state.user)
    const { id } = useParams()
 
@@ -32,6 +32,12 @@ const CommentForm = ({ postId, parentId = null, onCommentAdded, onCancel }) => {
       }
    }, [comment, loading, error, onCommentAdded])
 
+   useEffect(() => {
+      if (ban) {
+         alert(ban.message)
+      }
+   }, [ban])
+
    const handleSubmit = async (e) => {
       e.preventDefault()
 
@@ -39,7 +45,6 @@ const CommentForm = ({ postId, parentId = null, onCommentAdded, onCancel }) => {
          setSubmitError('로그인이 필요합니다.')
          return
       }
-
       if (!content.trim()) {
          setSubmitError('댓글 내용을 입력해주세요.')
          return
@@ -88,11 +93,11 @@ const CommentForm = ({ postId, parentId = null, onCommentAdded, onCancel }) => {
          <Form onSubmit={handleSubmit}>
             <div className={styles.formHeader}>
                <img
-                  src={user.profile_img || '/vite.svg'}
+                  src={user.profile_img ? (user.profile_img.startsWith('http') ? user.profile_img : `${import.meta.env.VITE_API_URL}${user.profile_img}`) : '/vite.svg'}
                   alt={user.name || `사용자${user.id}`}
                   className={styles.userImage}
                   onError={(e) => {
-                     e.target.src = 'https://via.placeholder.com/32x32/5E94CA/ffffff?text=U'
+                     e.target.src = '/vite.svg'
                   }}
                />
                <span className={styles.userName}>{user.name || `사용자${user.id}`}</span>
@@ -110,6 +115,7 @@ const CommentForm = ({ postId, parentId = null, onCommentAdded, onCancel }) => {
                   className={styles.commentTextarea}
                   onKeyDown={(e) => {
                      if (e.key === 'Enter' && !e.shiftKey) {
+                        // 엔터키 눌러도 줄바꿈 반응 안되게 Shift + Enter로 줄바꿈
                         e.preventDefault()
                         handleSubmit(e)
                      }

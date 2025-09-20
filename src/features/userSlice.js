@@ -158,7 +158,10 @@ const userSlice = createSlice({
          })
          .addCase(getMeThunk.rejected, (state, action) => {
             state.loading = false
-            state.error = action.payload?.message || '서버 문제로 유저 정보를 가져오지 못했습니다.'
+            // 401 에러는 무시하고 다른 에러만 처리
+            if (action.payload?.status !== 401) {
+               state.error = action.payload?.message || '서버 문제로 유저 정보를 가져오지 못했습니다.'
+            }
          })
          //내정보 수정하기
          .addCase(updateMeThunk.pending, (state) => {

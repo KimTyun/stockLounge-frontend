@@ -1,6 +1,17 @@
 import axiosApi from './index'
 const env = import.meta.env.VITE_ENV
 
+// 사용자 상태 및 권한 확인
+export const getUserStatus = async () => {
+   try {
+      const response = await axiosApi.get('/admin/user-status')
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error('API Error:', error)
+      throw error
+   }
+}
+
 // 대시보드
 export const getDashboardData = async () => {
    try {
@@ -22,6 +33,7 @@ export const getUsers = async () => {
       throw error
    }
 }
+
 // 특정 사용자 관리
 export const getUserById = async (userId) => {
    try {
@@ -32,6 +44,7 @@ export const getUserById = async (userId) => {
       throw error
    }
 }
+
 // 사용자 제재 처리 관리
 export const updateUserBanStatus = async (userId, isBanned) => {
    try {
@@ -42,6 +55,7 @@ export const updateUserBanStatus = async (userId, isBanned) => {
       throw error
    }
 }
+
 // 사용자 보상 업데이트
 export const updateUserReward = async (userId, rewardAmount) => {
    try {
@@ -53,6 +67,7 @@ export const updateUserReward = async (userId, rewardAmount) => {
       throw error
    }
 }
+
 // 사용자 삭제
 export const deleteUser = async (userId) => {
    try {
@@ -74,6 +89,7 @@ export const getBoards = async () => {
       throw error
    }
 }
+
 // 게시판 삭제
 export const deleteBoard = async (boardId) => {
    try {
@@ -195,7 +211,7 @@ export const deleteProduct = async (ProductId) => {
 export const getProductLists = async () => {
    try {
       const response = await axiosApi.get('/admin/product-lists')
-      return response.data
+      return response.data.data
    } catch (error) {
       if (env === 'development') console.error(error)
       throw error

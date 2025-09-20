@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Container, Row, Col, Nav, Dropdown } from 'react-bootstrap'
 import CandleChart from '../../components/chart/CandleChart'
-import { Container, Row, Col, Nav, Tab, Dropdown, ButtonGroup } from 'react-bootstrap'
-import PostList from '../../components/board/PostList'
+import PostDetail from '../../components/board/PostDetail/PostDetail'
 import styles from '../../styles/pages/Board_fixed.module.css'
-
 import { useDispatch, useSelector } from 'react-redux'
 import { getMarketAllThunk, getTickerAllThunk } from '../../features/coinSlice'
 
-const Board = () => {
-   const [activeCategory, setActiveCategory] = useState('free')
+const PostDetailPage = () => {
+   const { id } = useParams()
+   const navigate = useNavigate()
    const dispatch = useDispatch()
    const { coins, coinList } = useSelector((s) => s.coin)
 
@@ -21,20 +22,8 @@ const Board = () => {
       volume24h: 0,
       rank: 1,
    })
-
    const [period, setPeriod] = useState('days')
    const [coinCategories, setCoinCategories] = useState([])
-
-   const categories = [
-      { key: 'free', label: '자유토론' },
-      { key: 'bitcoin', label: '비트코인' },
-      { key: 'ethereum', label: '이더리움' },
-      { key: 'ripple', label: '리플' },
-      { key: 'nft', label: 'NFT' },
-      { key: 'defi', label: 'DeFi' },
-      { key: 'news', label: '뉴스' },
-      { key: 'analysis', label: '분석' },
-   ]
 
    useEffect(() => {
       const fetchData = async () => {
@@ -81,9 +70,17 @@ const Board = () => {
       fetchData()
    }, [coins, coinList, dispatch, coinCategories.length])
 
+   const handleBackToBoard = () => {
+      navigate('/board')
+   }
+
+   const handleEdit = (postId) => {
+      navigate(`/board/${postId}/edit`)
+   }
+
    return (
       <div>
-         {/* 섹션1: 코인 차트 영역 */}
+         {/* 차트 섹션 */}
          <section>
             <Row>
                <Col>
@@ -130,34 +127,15 @@ const Board = () => {
                </Dropdown.Menu>
             </Dropdown>
          </section>
+
+         {/* 게시글 상세 섹션 */}
          <section className={styles.boardSection}>
             <Container>
-               <div className={styles.boardHeader}>
-                  <h1 className={styles.boardTitle}>커뮤니티</h1>
-                  <p className={styles.boardDescription}>다양한 투자 정보와 의견을 나누는 공간입니다.</p>
-               </div>
-
-               <Tab.Container id="board-categories" activeKey={activeCategory} onSelect={(k) => setActiveCategory(k)}>
-                  <Nav variant="pills" className={styles.categoryTabs}>
-                     {categories.map((category) => (
-                        <Nav.Item key={category.key}>
-                           <Nav.Link eventKey={category.key} className={styles.categoryTab}>
-                              {category.label}
-                           </Nav.Link>
-                        </Nav.Item>
-                     ))}
-                  </Nav>
-
-                  <Tab.Content className={styles.tabContent}>
-                     <Tab.Pane eventKey={activeCategory}>
-                        <PostList category={activeCategory} />
-                     </Tab.Pane>
-                  </Tab.Content>
-               </Tab.Container>
+               <PostDetail boardId={parseInt(id)} onBackToList={handleBackToBoard} onEdit={handleEdit} />
             </Container>
          </section>
       </div>
    )
 }
 
-export default Board
+export default PostDetailPage

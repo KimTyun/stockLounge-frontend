@@ -49,10 +49,19 @@ const coinSlice = createSlice({
       coins: [],
       //차트에 사용할 캔들 데이터
       data: {},
+      selectedCoin: null,
+      coinData: null,
       loading: false,
       error: null,
    },
-   reducers: {},
+   reducers: {
+      setSelectedCoin(state, action) {
+         state.selectedCoin = action.payload
+      },
+      setCoinData(state, action) {
+         state.coinData = action.payload
+      },
+   },
    extraReducers: (builder) => {
       builder
          .addCase(getMarketAllThunk.pending, (state) => {
@@ -78,7 +87,7 @@ const coinSlice = createSlice({
          })
          .addCase(getTickerAllThunk.fulfilled, (state, action) => {
             state.loading = false
-            state.coins = action.payload
+            state.coins = action.payload.data
             state.error = null
          })
          .addCase(getTickerAllThunk.rejected, (state, action) => {
@@ -103,3 +112,4 @@ const coinSlice = createSlice({
 })
 
 export default coinSlice.reducer
+export const { setSelectedCoin, setCoinData } = coinSlice.actions

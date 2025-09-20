@@ -6,7 +6,7 @@ import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const SiteManagement = () => {
    const dispatch = useDispatch()
-   const { settings, banWords, products, productLists = [], loading = {}, error = {} } = useSelector((state) => state.admin)
+   const { settings, banWords, products, productLists = [], loading = {} } = useSelector((state) => state.admin)
 
    const [newBanWord, setNewBanWord] = useState('')
    const [siteSettings, setSiteSettings] = useState(settings || {})
@@ -31,29 +31,13 @@ const SiteManagement = () => {
       dispatch(getBanWordsThunk())
       dispatch(getProductsThunk())
       dispatch(getProductListsThunk())
-   }, [])
+   }, [dispatch])
 
    useEffect(() => {
       if (settings) {
          setSiteSettings(settings)
       }
    }, [settings])
-
-   useEffect(() => {
-      // productLists가 로딩되지 않았고, 비어있을 때만 실행
-      if (productLists.length === 0 && !loading.productLists) {
-         const defaultLists = [{ name: '상품권' }, { name: '기프티콘' }, { name: '기타' }]
-
-         defaultLists.forEach((list) => {
-            dispatch(addProductListThunk(list))
-               .unwrap()
-               .then(() => {})
-               .catch((error) => {
-                  console.error(`기본 상품 분류 '${list.name}' 추가 실패: ${error.message}`)
-               })
-         })
-      }
-   }, [dispatch, productLists, loading.productLists])
 
    const showTimedAlert = (message, type) => {
       setAlertMessage(message)
@@ -83,8 +67,15 @@ const SiteManagement = () => {
    }
    const handleSettingChange = (e) => {
       const { name, value, type, checked } = e.target
+      let finalValue = value
       // 숫자 입력 필드의 경우 문자열을 숫자로 변환합니다.
-      const finalValue = type === 'number' ? parseInt(value, 10) || 0 : value
+      if (type === 'number') {
+         finalValue = parseInt(value, 10) || 0
+      } else if (type === 'checkbox' || type === 'switch') {
+         // 체크박스/스위치일 경우 checked 값을 사용합니다.
+         finalValue = checked
+      }
+
       setSiteSettings((prev) => ({
          ...prev,
          [name]: finalValue,
@@ -113,16 +104,15 @@ const SiteManagement = () => {
    }
 
    // 금지어 삭제
-   const handleRemoveBanWord = async (banWordId) => {
-      if (!window.confirm('정말로 이 금지어를 삭제하시겠습니까?')) {
-         return
-      }
-      try {
-         await dispatch(deleteBanWordThunk(banWordId)).unwrap()
-         showTimedAlert('금지어가 삭제되었습니다.', 'info')
-      } catch (error) {
-         showTimedAlert(error.message || '금지어 삭제에 실패했습니다.', 'danger')
-      }
+   const handleRemoveBanWord = (banWordId) => {
+      handleShowConfirm('정말로 이 금지어를 삭제하시겠습니까?', async () => {
+         try {
+            await dispatch(deleteBanWordThunk(banWordId)).unwrap()
+            showTimedAlert('금지어가 삭제되었습니다.', 'info')
+         } catch (error) {
+            showTimedAlert(error.message || '금지어 삭제에 실패했습니다.', 'danger')
+         }
+      })
    }
 
    // 상품 추가
@@ -371,11 +361,6 @@ const SiteManagement = () => {
                      </Form.Group>
                   </Col>
                </Row>
-               <div className="d-grid mt-3">
-                  <Button variant="success" type="submit" disabled={loading.settings}>
-                     {loading.settings ? <Spinner animation="border" size="sm" /> : '포인트 설정 저장'}
-                  </Button>
-               </div>
             </Card.Body>
          </Card>
 
@@ -475,6 +460,95 @@ const SiteManagement = () => {
             </Card.Body>
          </Card>
 
+         {/* 상품 분류 관리 */}
+
+         <Card className={styles.contentCard}>
+            <div className={styles.cardHeader}>
+               <h4 className={styles.cardTitle}>
+                  <i className="fas fa-list me-2"></i>
+                  상품 분류 관리
+               </h4>
+            </div>
+            <Card.Body>
+               {/* 상품 분류 추가 폼 */}
+               <Form className="mb-4" onSubmit={handleAddProductList}>
+                  <Row className="align-items-end">
+                     <Col md={6}>
+                        <Form.Label>분류명</Form.Label>
+                        <Form.Control type="text" placeholder="분류명 입력" value={newProductList.name} onChange={(e) => setNewProductList({ ...newProductList, name: e.target.value })} />
+                     </Col>
+                     <Col md={6} className="mt-3">
+                        <Button variant="success" type="submit" className="w-100">
+                           유형 추가
+                        </Button>
+                     </Col>
+                  </Row>
+               </Form>
+
+               {/* 상품 분류 테이블 */}
+               <div className="mb-3">
+                  <strong>상품 분류({productLists?.length || 0}개)</strong>
+               </div>
+
+               {loading.productLists ? (
+                  <div className="d-flex justify-content-center my-3">
+                     <Spinner animation="border" variant="primary" />
+                  </div>
+               ) : (
+                  <Table responsive className={styles.adminTable}>
+                     <thead>
+                        <tr>
+                           <th>ID</th>
+                           <th>분류명</th>
+                           <th>관리</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {Array.isArray(productLists) && productLists.length > 0 ? (
+                           productLists.map((item) => (
+                              <tr key={item.id}>
+                                 <td>{item.id}</td>
+                                 <td>{editingProductListId === item.id ? <Form.Control type="text" value={editedProductList.name} onChange={(e) => setEditedProductList({ ...editedProductList, name: e.target.value })} autoFocus /> : item.name}</td>
+                                 <td>
+                                    {editingProductListId === item.id ? (
+                                       <>
+                                          <Button variant="success" size="sm" className="me-2" onClick={handleUpdateProductList}>
+                                             <i className="fas fa-check"></i> 완료
+                                          </Button>
+                                          <Button variant="secondary" size="sm" onClick={() => setEditingProductListId(null)}>
+                                             <i className="fas fa-times"></i> 취소
+                                          </Button>
+                                       </>
+                                    ) : (
+                                       <>
+                                          <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditProductList(item)} disabled={loading.productLists}>
+                                             <i className="fas fa-edit"></i> 수정
+                                          </Button>
+                                          <Button variant="danger" size="sm" onClick={() => handleDeleteProductList(item.id)} disabled={loading.productLists}>
+                                             <i className="fas fa-trash"></i> 삭제
+                                          </Button>
+                                       </>
+                                    )}
+                                 </td>
+                              </tr>
+                           ))
+                        ) : (
+                           <tr>
+                              <td colSpan="3" className="text-center">
+                                 <i className="fas fa-list fa-3x text-muted mb-3"></i>
+                                 <p className="text-muted">등록된 상품 분류가 없습니다.</p>
+                              </td>
+                           </tr>
+                        )}
+                     </tbody>
+                  </Table>
+               )}
+            </Card.Body>
+         </Card>
+
+         <br />
+         <br />
+
          {/* 포인트 교환 상품 관리 */}
 
          <Card className={styles.contentCard}>
@@ -567,94 +641,6 @@ const SiteManagement = () => {
                               <td colSpan="6" className="text-center">
                                  <i className="fas fa-gift fa-3x text-muted mb-3"></i>
                                  <p className="text-muted">등록된 상품이 없습니다.</p>
-                              </td>
-                           </tr>
-                        )}
-                     </tbody>
-                  </Table>
-               )}
-            </Card.Body>
-         </Card>
-         <br />
-         <br />
-
-         {/* 상품 분류 관리 */}
-
-         <Card className={styles.contentCard}>
-            <div className={styles.cardHeader}>
-               <h4 className={styles.cardTitle}>
-                  <i className="fas fa-list me-2"></i>
-                  상품 분류 관리
-               </h4>
-            </div>
-            <Card.Body>
-               {/* 상품 분류 추가 폼 */}
-               <Form className="mb-4" onSubmit={handleAddProductList}>
-                  <Row className="align-items-end">
-                     <Col md={6}>
-                        <Form.Label>분류명</Form.Label>
-                        <Form.Control type="text" placeholder="분류명 입력" value={newProductList.name} onChange={(e) => setNewProductList({ ...newProductList, name: e.target.value })} />
-                     </Col>
-                     <Col md={6} className="mt-3">
-                        <Button variant="success" type="submit" className="w-100">
-                           유형 추가
-                        </Button>
-                     </Col>
-                  </Row>
-               </Form>
-
-               {/* 상품 분류 테이블 */}
-               <div className="mb-3">
-                  <strong>상품 분류({productLists?.length || 0}개)</strong>
-               </div>
-
-               {loading.productLists ? (
-                  <div className="d-flex justify-content-center my-3">
-                     <Spinner animation="border" variant="primary" />
-                  </div>
-               ) : (
-                  <Table responsive className={styles.adminTable}>
-                     <thead>
-                        <tr>
-                           <th>ID</th>
-                           <th>분류명</th>
-                           <th>관리</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        {productLists?.length > 0 ? (
-                           productLists.map((item) => (
-                              <tr key={item.id}>
-                                 <td>{item.id}</td>
-                                 <td>{editingProductListId === item.id ? <Form.Control type="text" value={editedProductList.name} onChange={(e) => setEditedProductList({ ...editedProductList, name: e.target.value })} autoFocus /> : item.name}</td>
-                                 <td>
-                                    {editingProductListId === item.id ? (
-                                       <>
-                                          <Button variant="success" size="sm" className="me-2" onClick={handleUpdateProductList}>
-                                             <i className="fas fa-check"></i> 완료
-                                          </Button>
-                                          <Button variant="secondary" size="sm" onClick={() => setEditingProductListId(null)}>
-                                             <i className="fas fa-times"></i> 취소
-                                          </Button>
-                                       </>
-                                    ) : (
-                                       <>
-                                          <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditProductList(item)} disabled={loading.productLists}>
-                                             <i className="fas fa-edit"></i> 수정
-                                          </Button>
-                                          <Button variant="danger" size="sm" onClick={() => handleDeleteProductList(item.id)} disabled={loading.productLists}>
-                                             <i className="fas fa-trash"></i> 삭제
-                                          </Button>
-                                       </>
-                                    )}
-                                 </td>
-                              </tr>
-                           ))
-                        ) : (
-                           <tr>
-                              <td colSpan="3" className="text-center">
-                                 <i className="fas fa-list fa-3x text-muted mb-3"></i>
-                                 <p className="text-muted">등록된 상품 분류이 없습니다.</p>
                               </td>
                            </tr>
                         )}
