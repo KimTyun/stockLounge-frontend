@@ -5,9 +5,9 @@ import * as adminApi from '../api/adminApi'
 export const fetchUserStatus = createAsyncThunk('admin/fetchUserStatus', async (_, { rejectWithValue }) => {
    try {
       const response = await adminApi.getUserStatus()
-      return response.data // 서버 응답의 data 필드에 사용자 정보가 있음
+      return response.data
    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message)
+      return rejectWithValue(error.response?.data)
    }
 })
 
@@ -557,7 +557,23 @@ const adminSlice = createSlice({
          })
          .addCase(getStatisticsThunk.fulfilled, (state, action) => {
             state.loading.allStats = false
-            state.statistics = action.payload
+            const data = action.payload
+
+            // 메인 통계
+            state.statistics = {
+               visitors: data.visitors,
+               pageViews: data.pageViews,
+               newUsers: data.newUsers,
+               posts: data.posts,
+               comments: data.comments,
+               reports: data.reports,
+            }
+
+            // 개별 상세 통계
+            state.popularPosts = data.popularPosts || []
+            state.activeUsers = data.activeUsers || []
+            state.categoryStats = data.categoryStats || []
+            state.hourlyStats = data.hourlyStats || []
          })
          .addCase(getStatisticsThunk.rejected, (state, action) => {
             state.loading.allStats = false

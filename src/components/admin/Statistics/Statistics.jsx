@@ -8,14 +8,14 @@ const Statistics = () => {
    const dispatch = useDispatch()
    const [selectedPeriod, setSelectedPeriod] = useState('week')
 
-   const { statistics, popularPosts, activeUsers, categoryStats, hourlyStats, loading, error } = useSelector((state) => state.admin)
+   const { statistics, loading, error } = useSelector((state) => state.admin)
 
    useEffect(() => {
       // 컴포넌트 마운트 시 전체 통계 데이터 로드
       dispatch(getStatisticsThunk(selectedPeriod))
    }, [dispatch, selectedPeriod])
 
-   // 기간 변경 시 데이터 다시 로드
+   // 기간 변경 시 데이터 재로드
    const handlePeriodChange = (period) => {
       setSelectedPeriod(period)
    }
@@ -52,21 +52,21 @@ const Statistics = () => {
       }
    }
 
-   if (loading) {
+   if (loading.allStats) {
       return (
          <div className="d-flex justify-content-center align-items-center" style={{ height: '500px' }}>
             <div className="spinner-border text-primary" role="status">
-               <span className="visually-hidden">Loading...</span>
+               <span className="visually-hidden">로딩 중...</span>
             </div>
          </div>
       )
    }
 
-   if (error) {
+   if (error.allStats) {
       return (
          <div className="alert alert-danger" role="alert">
             <h4 className="alert-heading">오류 발생!</h4>
-            <p>{error}</p>
+            <p>{error.allStats}</p>
             <button className="btn btn-outline-danger" onClick={() => dispatch(getStatisticsThunk(selectedPeriod))}>
                다시 시도
             </button>
@@ -97,7 +97,7 @@ const Statistics = () => {
             </Card.Body>
          </Card>
 
-         {/* 주요 통계 카드들 */}
+         {/* 주요 통계 */}
          <Row>
             {statistics && (
                <>
@@ -134,8 +134,8 @@ const Statistics = () => {
                            </tr>
                         </thead>
                         <tbody>
-                           {popularPosts?.length > 0 ? (
-                              popularPosts.map((post, index) => (
+                           {statistics?.popularPosts?.length > 0 ? (
+                              statistics.popularPosts.map((post, index) => (
                                  <tr key={post.id || index}>
                                     <td>
                                        <div className="d-flex align-items-center">
@@ -185,8 +185,8 @@ const Statistics = () => {
                            </tr>
                         </thead>
                         <tbody>
-                           {activeUsers?.length > 0 ? (
-                              activeUsers.map((user, index) => (
+                           {statistics?.activeUsers?.length > 0 ? (
+                              statistics.activeUsers.map((user, index) => (
                                  <tr key={user.id || index}>
                                     <td>
                                        <div className="d-flex align-items-center">
@@ -227,8 +227,8 @@ const Statistics = () => {
                      </h4>
                   </div>
                   <Card.Body>
-                     {categoryStats?.length > 0 ? (
-                        categoryStats.map((category, index) => (
+                     {statistics?.categoryStats?.length > 0 ? (
+                        statistics.categoryStats.map((category, index) => (
                            <div className="mb-3" key={category.id || index}>
                               <div className="d-flex justify-content-between align-items-center mb-2">
                                  <span>{category.name}</span>
@@ -257,8 +257,8 @@ const Statistics = () => {
                      </h4>
                   </div>
                   <Card.Body>
-                     {hourlyStats?.length > 0 ? (
-                        hourlyStats.map((timeSlot, index) => (
+                     {statistics?.hourlyStats?.length > 0 ? (
+                        statistics.hourlyStats.map((timeSlot, index) => (
                            <div className="mb-3" key={index}>
                               <div className="d-flex justify-content-between align-items-center mb-2">
                                  <span>{timeSlot.timeRange}</span>
