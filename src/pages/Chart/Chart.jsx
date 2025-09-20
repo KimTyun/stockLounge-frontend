@@ -8,14 +8,15 @@ import { getNewsThunk } from '../../features/newsSlice'
 import he from 'he'
 import { getMarketAllThunk, getTickerAllThunk } from '../../features/coinSlice'
 import DOMPurify from 'dompurify'
-
-// 임시 데이터: 실제로는 API 연동 예정
+import { Link } from 'react-router-dom'
 
 const Chart = () => {
    const dispatch = useDispatch()
    const { news } = useSelector((s) => s.news)
    const { coins, coinList } = useSelector((s) => s.coin)
    const [coinData, setCoinData] = useState(null)
+   // implicit로 가져온 데이터를 담을 변수
+   const [board, setBoard] = useState(null)
    // 첫 번째 세션: 선택된 코인 상태
    const [selectedCoin, setSelectedCoin] = useState(null)
    // 차트 기간(일간/주간/월간/년간)
@@ -55,6 +56,29 @@ const Chart = () => {
       fetchData()
    }, [coins, coinList, dispatch])
 
+   // 임시 데이터: implicit로 맞춤 게시글 연동 예정
+   const mockBoardData = [
+      {
+         id: 1,
+         title: '이더리움 ETF 승인 임박? 분위기 심상치 않다',
+      },
+      {
+         id: 2,
+         title: '도지코인 아직도 투자 가치 있다고 보시나요?',
+      },
+      {
+         id: 3,
+         title: '도지 어디까지 갈거라고 생각함?',
+      },
+      {
+         id: 4,
+         title: '[분석] 최근 온체인 데이터로 보는 고래들의 움직임',
+      },
+      {
+         id: 5,
+         title: '신규 상장 코인, 들어가도 괜찮을까 고민됨',
+      },
+   ]
    useEffect(() => {
       if (!selectedCoin && coinData?.length > 0) {
          setSelectedCoin({
@@ -153,16 +177,17 @@ const Chart = () => {
                         <Card.Body>
                            {/* TODO: 인기 게시글 연동 */}
                            <ul>
-                              <li>게시글 1</li>
-                              <li>게시글 2</li>
-                              <li>게시글 3</li>
-                              <li>게시글 4</li>
-                              <li>게시글 5</li>
-                              <li>게시글 6</li>
-                              <li>게시글 7</li>
-                              <li>게시글 8</li>
-                              <li>게시글 9</li>
-                              <li>게시글 10</li>
+                              {board
+                                 ? board.map((e) => (
+                                      <li className={styles.sidebarList} key={e.id}>
+                                         <Link to={`/board?id=${e.id}`}>{e.title}</Link>
+                                      </li>
+                                   ))
+                                 : mockBoardData.map((e) => (
+                                      <li className={styles.sidebarList} key={e.id}>
+                                         <Link to={`/board?id=${e.id}`}>{e.title}</Link>
+                                      </li>
+                                   ))}
                            </ul>
                         </Card.Body>
                      </Card>
