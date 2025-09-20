@@ -12,10 +12,6 @@ const LoginPage = () => {
    const { isLoggedIn } = useSelector((state) => state.auth)
    const navigate = useNavigate()
 
-   const handleLoginSuccess = () => {
-      dispatch(checkAuthStatusThunk())
-   }
-
    useEffect(() => {
       if (isLoggedIn) {
          navigate(ROUTES.MAIN)
@@ -30,8 +26,8 @@ const LoginPage = () => {
                <p className="text-center text-muted">소셜 계정으로 간편하게 로그인하세요.</p>
 
                <div className="d-grid gap-3 mt-4">
-                  <SocialLogin provider="google" onSuccess={handleLoginSuccess} />
-                  <SocialLogin provider="kakao" onSuccess={handleLoginSuccess} />
+                  <SocialLogin provider="google" />
+                  <SocialLogin provider="kakao" />
                </div>
 
                <hr className="my-4" />
