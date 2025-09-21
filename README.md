@@ -233,3 +233,69 @@ VITE_ENV=development
 -  **네이버 뉴스 API**: 경제/코인 뉴스
 -  **자체 백엔드 API**: 사용자, 게시판, 포인트 관리
 
+
+
+## 역할 분배 (features)
+<table>
+  <tbody>
+    <tr>
+        <td align="center"><strong>기능분류</strong></td>
+        <td align="center"><strong>주요기능</strong></td>
+        <td align="center"><strong>담당자</strong></td>
+    </tr>
+    <tr>
+        <td align="center"><strong>게시판</strong></td>
+        <td align="center"><p>게시판 디자인, 글쓰기/수정/삭제, 댓글기능, 신고, 리워드 지급 등</p></td>
+        <td align="center"><p>박태민</p></td>
+    </tr>
+    <tr>
+        <td align="center"><strong>운영자 웹 관리</strong></td>
+        <td align="center"><p>운영자 대시보드, 통계, 유저관리, 게시판관리, 사이트 설정 변경 등</p></td>
+        <td align="center"><p>김동빈</p></td>
+    </tr>
+      <tr>
+        <td align="center"><strong>디자인, 소셜 로그인</strong></td>
+        <td align="center"><p>랜딩페이지, 메인 디자인, 소셜 로그인 기능</p></td>
+        <td align="center"><p>박인덕</p></td>
+    </tr>
+    <tr>
+        <td align="center"><strong>기타 api기능, 회원 관리</strong></td>
+        <td align="center"><p>내정보 페이지, 암호화폐 차트, 뉴스 페이지, 리워드 교환 등</p></td>
+        <td align="center"><p>박태민</p></td>
+    </tr>
+  </tbody>
+</table>
+
+<br/>
+
+
+## 4. 시스템 아키텍처 / ERD (Architecture & DB), 산출물
+<br />
+
+### [ERD](https://www.erdcloud.com/d/sDG9yZHxNvYYbMa48)
+### [화면설계](https://www.figma.com/design/lIGw8rfO0DfGPhIUJi2gjC/%ED%95%80%ED%85%8C%ED%81%AC-stitch-%EC%B4%88%EC%95%88?t=Hbr4TBLltxqahRL7-0)
+### [요구사항 정의서](https://docs.google.com/spreadsheets/d/1e_F76oiL1_Tdma-PvRcwCAWJWitBQBNvcZhi82afE0s/edit?gid=0#gid=0)
+### [WBS](https://docs.google.com/spreadsheets/d/1KV-lESuDaVaKC-IZv6Gfa_RTRahPvCvf/edit?gid=543982498#gid=543982498)
+
+
+### ERD
+<img width="792" height="529" alt="erd" src="https://github.com/user-attachments/assets/f1d9b4f4-0e02-4903-975f-cc6c3f97f184" />
+
+### 프로젝트 아키텍쳐
+<img width="1990" height="1100" alt="image" 
+src="https://github.com/user-attachments/assets/55b03951-472b-4124-b3ee-108e4bac4e1d" />
+
+
+----
+
+### 프로젝트 협업용 git
+<br />
+<a href="https://github.com/KimTyun/stockLounge-api">API git 링크</a>
+<br />
+<br />
+<a href="https://github.com/KimTyun/stockLounge-frontend">Frontend git 링크</a>
+<br />
+<br />
+<a href="https://github.com/KimTyun/stockLounge-recommend">recommend git 링크</a>
+
+
