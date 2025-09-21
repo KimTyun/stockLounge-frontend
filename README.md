@@ -1,6 +1,8 @@
 # StockRounge - 코인 커뮤니티 플랫폼
 
 코인 종목토론 게시판 커뮤니티형 핀테크 반응형 웹사이트
+도메인 : https://stocklounge.store
+
 
 ## 팀원
 
@@ -107,14 +109,12 @@
 
 ### 메인 페이지
 
--  **GNB (고정 상단바)**: 로그인/회원가입, 주요 메뉴 [메인/게시판/차트/뉴스/내정보]
--  **코인 차트 영역**: 주요 3개 코인 (비트코인/이더리움/리플) 캔들 차트
--  **인기 게시글 영역**: 오늘의 인기글 3개 카드 형태
--  **뉴스 영역**: 코인뉴스/경제뉴스 2개 블록
+-  **GNB (고정 상단바)**: 로그인/내정보, 주요 메뉴 [메인/게시판/차트/뉴스/내정보]
+-  **Hero Section** : keyframes로 구현된 간단한 애니메이션, CTA 버튼
 
 ### 인증 시스템
 
--  **소셜 로그인**: 구글, OAuth 인증
+-  **소셜 로그인**: 구글, 카카오 인증
 -  **포인트 시스템**: 게시글/댓글 작성, 추천 시 포인트 지급
 -  **포인트 교환**: 1000포인트 = 1코인, 코인을 원치 않는 사용자는 실제 상품으로 교환 가능
 
@@ -128,6 +128,7 @@
 
 -  **실시간 차트**: Upbit API 연동
 -  **TOP 코인**: 상위 20개 코인 리스트
+-  **유저 맞춤 게시글**: implicit를 활용한 유저 맞춤 게시글 리스트
 
 ### 관리자
 
@@ -138,14 +139,15 @@
 
 ## 🛠 기술 스택
 
--  **Frontend**: React 19, Vite
--  **UI Framework**: Bootstrap 4, React-Bootstrap
+-  **Frontend**: React 18, Vite
+-  **UI Framework**: Bootstrap 5, React-Bootstrap
 -  **상태관리**: Redux Toolkit
 -  **라우팅**: React Router DOM
--  **차트**: Chart.js, React-ChartJS-2
+-  **차트**: ApexCharts, React-ApexCharts
 -  **에디터**: React-Quill
 -  **API**: Axios
--  **스타일링**: CSS Modules
+-  **스타일링**: Bootstrap, CSS
+-  **유틸리티**: dayjs, dompurify, he, lucide-react, react-icons, dotenv
 
 ## 🎨 디자인 시스템
 
@@ -160,21 +162,21 @@
 ```
 src/
 ├── components/           # 재사용 가능한 UI 컴포넌트
-│   ├── common/          # 공통 컴포넌트 (Header, Footer, Layout 등)
-│   ├── auth/            # 인증 관련 컴포넌트
-│   ├── chart/           # 차트 관련 컴포넌트
-│   ├── board/           # 게시판 관련 컴포넌트
-│   ├── news/            # 뉴스 관련 컴포넌트
-│   ├── user/            # 사용자 관련 컴포넌트
-│   └── admin/           # 관리자 관련 컴포넌트
-├── pages/               # 페이지 컴포넌트
-├── hooks/               # 커스텀 훅
-├── services/            # API 서비스
-├── features/            # Redux 상태 관리
-├── utils/               # 유틸리티 함수
-├── styles/              # 스타일 파일
-├── assets/              # 정적 자원
-└── config/              # 설정 파일
+│   ├── common/           # 공통 컴포넌트 (Header, Footer, Layout 등)
+│   ├── auth/             # 인증 관련 컴포넌트
+│   ├── chart/            # 차트 관련 컴포넌트
+│   ├── board/            # 게시판 관련 컴포넌트
+│   ├── news/             # 뉴스 관련 컴포넌트
+│   ├── user/             # 사용자 관련 컴포넌트
+│   └── admin/            # 관리자 관련 컴포넌트
+├── pages/                # 페이지 컴포넌트
+├── hooks/                # 커스텀 훅
+├── services/             # API 서비스
+├── features/             # Redux 상태 관리
+├── utils/                # 유틸리티 함수
+├── styles/               # 스타일 파일
+├── assets/               # 정적 자원 (이미지, 폰트 등)
+└── config/               # 설정 파일
 ```
 
 ## 🚀 시작하기
@@ -210,16 +212,13 @@ npm run preview
 `.env` 파일을 생성하고 다음 환경 변수들을 설정하세요:
 
 ```env
-# API 설정
-REACT_APP_API_BASE_URL=http://localhost:3001/api
+# frontend env
+VITE_API_URL=http://localhost:8000
 
-# Upbit API
-REACT_APP_UPBIT_ACCESS_KEY=your_access_key
-REACT_APP_UPBIT_SECRET_KEY=your_secret_key
+VITE_PYTHON_URL=http://localhost:8001
 
-# 소셜 로그인
-REACT_APP_GOOGLE_CLIENT_ID=your_google_client_id
-REACT_APP_KAKAO_CLIENT_ID=your_kakao_client_id
+# 개발환경(development/test/production)
+VITE_ENV=development
 ```
 
 ## 📱 반응형 지원
@@ -234,16 +233,3 @@ REACT_APP_KAKAO_CLIENT_ID=your_kakao_client_id
 -  **네이버 뉴스 API**: 경제/코인 뉴스
 -  **자체 백엔드 API**: 사용자, 게시판, 포인트 관리
 
-## 📋 개발 진행 상황
-
--  [x] 프로젝트 초기 설정
--  [x] 폴더 구조 생성
--  [x] 기본 컴포넌트 (Header, Footer, Layout)
--  [x] 홈페이지 기본 구조
--  [x] 로그인 모달 및 소셜 로그인 UI
--  [x] 차트 컴포넌트 기본 구조
--  [x] 게시글 카드 컴포넌트
--  [ ] API 연동
--  [ ] 상태관리 구현
--  [ ] 나머지 페이지 구현
--  [ ] 백엔드 연동
