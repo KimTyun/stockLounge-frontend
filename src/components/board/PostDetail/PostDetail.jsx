@@ -182,23 +182,37 @@ const PostDetail = ({ boardId, onBackToList, onEdit }) => {
                                        </div>
                                     </div>
                                     <div className={styles.postActions}>
-                                       <Dropdown>
-                                          <Dropdown.Toggle variant="outline-secondary" size="sm">
-                                             <i className="fas fa-ellipsis-v"></i>
-                                          </Dropdown.Toggle>
-                                          <Dropdown.Menu>
-                                             <Dropdown.Item onClick={handleEdit}>
-                                                <i className="fas fa-edit me-2"></i>수정
-                                             </Dropdown.Item>
-                                             <Dropdown.Item onClick={handleDelete} className="text-danger">
-                                                <i className="fas fa-trash me-2"></i>삭제
-                                             </Dropdown.Item>
-                                             <Dropdown.Divider />
-                                             <Dropdown.Item onClick={handleReport}>
-                                                <i className="fas fa-flag me-2"></i>신고
-                                             </Dropdown.Item>
-                                          </Dropdown.Menu>
-                                       </Dropdown>
+                                       {user && user.id === board.user_id ? (
+                                          <Dropdown>
+                                             <Dropdown.Toggle variant="outline-secondary" size="sm">
+                                                <i className="fas fa-ellipsis-v"></i>
+                                             </Dropdown.Toggle>
+                                             <Dropdown.Menu>
+                                                <Dropdown.Item onClick={handleEdit}>
+                                                   <i className="fas fa-edit me-2"></i>수정
+                                                </Dropdown.Item>
+                                                <Dropdown.Item onClick={handleDelete} className="text-danger">
+                                                   <i className="fas fa-trash me-2"></i>삭제
+                                                </Dropdown.Item>
+                                                <Dropdown.Divider />
+                                                <Dropdown.Item onClick={handleReport}>
+                                                   <i className="fas fa-flag me-2"></i>신고
+                                                </Dropdown.Item>
+                                             </Dropdown.Menu>
+                                          </Dropdown>
+                                       ) : (
+                                          <Dropdown>
+                                             <Dropdown.Toggle variant="outline-secondary" size="sm">
+                                                <i className="fas fa-ellipsis-v"></i>
+                                             </Dropdown.Toggle>
+                                             <Dropdown.Menu>
+                                                <Dropdown.Divider />
+                                                <Dropdown.Item onClick={handleReport}>
+                                                   <i className="fas fa-flag me-2"></i>신고
+                                                </Dropdown.Item>
+                                             </Dropdown.Menu>
+                                          </Dropdown>
+                                       )}
                                     </div>
                                  </div>
                               </div>
