@@ -51,23 +51,33 @@ const Header = () => {
 
    return (
       <>
-         <Navbar variant="dark" expand="lg" fixed="top" className={`${styles.navbar} ${styles.navbarGradient} ${styles.desktopNavWrapper}`}>
+         <Navbar variant="dark" expand="lg" fixed="top" className={`${styles.navbar} ${styles.navbarGradient}`}>
             <Container className={styles.navInner}>
+               {/* 로고 */}
                <Navbar.Brand as={NavLink} to={ROUTES.HOME} className={styles.brand}>
                   STOCKLOUNGE
                </Navbar.Brand>
 
+               {/* 햄버거 버튼 */}
                <button className={styles.hamburger} aria-label="메뉴" onClick={() => setMobileOpen((s) => !s)}>
                   <span className={styles.hamburgerBar} />
                   <span className={styles.hamburgerBar} />
                   <span className={styles.hamburgerBar} />
                </button>
+
+               {/* 데스크탑 메뉴 */}
                <div className={styles.desktopNav}>
-                  <Nav style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
+                  <Nav
+                     style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: '1rem',
+                     }}
+                  >
                      <Nav.Link as={NavLink} to={ROUTES.MAIN} className={styles.navItem}>
                         메인
                      </Nav.Link>
-
                      <Nav.Link as={NavLink} to={ROUTES.BOARD} className={styles.navItem}>
                         게시판
                      </Nav.Link>
@@ -82,30 +92,25 @@ const Header = () => {
                      </Nav.Link>
                   </Nav>
 
+                  {/* 로그인/회원가입 or 유저 메뉴 */}
                   <div className={styles.authArea}>
                      {!isLoggedIn ? (
                         <div className={styles.authButtons}>
                            <button className={`${styles.iconBtn} ${styles.loginIconBtn}`} onClick={handleLoginClick} aria-label="로그인">
-                              <i className="fa-solid fa-right-to-bracket" aria-hidden style={{ fontSize: 18 }}></i>
+                              <i className="fa-solid fa-right-to-bracket" style={{ fontSize: 18 }}></i>
                            </button>
 
                            <NavLink to={ROUTES.REGISTER} className={`${styles.iconBtn} ${styles.registerIconBtn}`} aria-label="회원가입">
-                              <i className="fa-solid fa-user-plus" aria-hidden style={{ fontSize: 18 }}></i>
+                              <i className="fa-solid fa-user-plus" style={{ fontSize: 18 }}></i>
                            </NavLink>
                         </div>
                      ) : (
                         <div className={styles.userInfo}>
                            <div className={styles.profileWrap}>
-                              <img 
-                                 src={
-                                    user?.profile_img
-                                       ? user.profile_img.startsWith('http')
-                                          ? user.profile_img
-                                          : `${import.meta.env.VITE_API_URL}${user.profile_img}`
-                                       : '/default-profile.png'
-                                 } 
-                                 alt="프로필" 
-                                 className={styles.profileImage} 
+                              <img
+                                 src={user?.profile_img ? (user.profile_img.startsWith('http') ? user.profile_img : `${import.meta.env.VITE_API_URL}${user.profile_img}`) : '/default-profile.png'}
+                                 alt="프로필"
+                                 className={styles.profileImage}
                                  onClick={() => setShowProfileMenu((s) => !s)}
                                  onError={(e) => {
                                     e.target.src = '/default-profile.png'
@@ -129,6 +134,7 @@ const Header = () => {
                </div>
             </Container>
 
+            {/* 모바일 메뉴 */}
             <div className={`${styles.mobileMenu} ${mobileOpen ? styles.open : ''}`}>
                <nav className={styles.mobileNav}>
                   <a
@@ -180,50 +186,37 @@ const Header = () => {
                   <div className={styles.mobileAuthArea}>
                      {!isLoggedIn ? (
                         <>
-                           <button
-                              className={`${styles.iconBtn} ${styles.loginIconBtn}`}
-                              onClick={() => {
-                                 handleLoginClick()
-                                 setMobileOpen(false)
-                              }}
-                              aria-label="로그인"
-                           >
-                              <i className="fa-solid fa-right-to-bracket" aria-hidden style={{ fontSize: 18 }}></i>
+                           <button className={`${styles.iconBtn} ${styles.loginIconBtn}`} onClick={handleLoginClick} aria-label="로그인">
+                              <i className="fa-solid fa-right-to-bracket" style={{ fontSize: 18 }}></i>
                            </button>
                            <NavLink to={ROUTES.REGISTER} className={`${styles.iconBtn} ${styles.registerIconBtn}`} onClick={() => setMobileOpen(false)} aria-label="회원가입">
-                              <i className="fa-solid fa-user-plus" aria-hidden style={{ fontSize: 18 }}></i>
+                              <i className="fa-solid fa-user-plus" style={{ fontSize: 18 }}></i>
                            </NavLink>
                         </>
                      ) : (
-                        <>
-                           <div className={styles.userInfoMobile}>
-                              <img 
-                                 src={
-                                    user?.profile_img
-                                       ? user.profile_img.startsWith('http')
-                                          ? user.profile_img
-                                          : `${import.meta.env.VITE_API_URL}${user.profile_img}`
-                                       : '/default-profile.png'
-                                 } 
-                                 alt="프로필" 
-                                 className={styles.profileImage}
-                                 onError={(e) => {
-                                    e.target.src = '/default-profile.png'
-                                 }}
-                              />
-                              <div>
-                                 <div className={styles.nickname}>{user?.nickname || '사용자'}</div>
-                                 <Button variant="link" className={styles.logoutBtn} onClick={handleLogout}>
-                                    로그아웃
-                                 </Button>
-                              </div>
+                        <div className={styles.userInfoMobile}>
+                           <img
+                              src={user?.profile_img ? (user.profile_img.startsWith('http') ? user.profile_img : `${import.meta.env.VITE_API_URL}${user.profile_img}`) : '/default-profile.png'}
+                              alt="프로필"
+                              className={styles.profileImage}
+                              onError={(e) => {
+                                 e.target.src = '/default-profile.png'
+                              }}
+                           />
+                           <div>
+                              <div className={styles.nickname}>{user?.nickname || '사용자'}</div>
+                              <Button variant="link" className={styles.logoutBtn} onClick={handleLogout}>
+                                 로그아웃
+                              </Button>
                            </div>
-                        </>
+                        </div>
                      )}
                   </div>
                </nav>
             </div>
          </Navbar>
+
+         {/* 로그인 토스트 */}
          <div className={styles.toastContainer} aria-live="polite" aria-atomic="true">
             <Toast onClose={() => setShowLoginToast(false)} show={showLoginToast} delay={3000} autohide>
                <Toast.Header>
