@@ -5,7 +5,7 @@ import { FaGoogle, FaComment } from 'react-icons/fa'
 const SocialLogin = ({ provider }) => {
    useEffect(() => {
       const handleMessage = (event) => {
-         if (event.origin !== 'APP_API_URL' && event.origin !== 'https://stocklounge.store/api') return
+         if (event.origin !== 'APP_API_URL' && event.origin !== 'FRONTEND_APP_URL') return
          if (event.data?.success) {
             if (event.data.redirectUrl) {
                window.location.href = event.data.redirectUrl
