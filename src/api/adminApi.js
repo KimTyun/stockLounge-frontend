@@ -56,18 +56,6 @@ export const updateUserBanStatus = async (userId, isBanned) => {
    }
 }
 
-// 사용자 보상 업데이트
-export const updateUserReward = async (userId, rewardAmount) => {
-   try {
-      // API 엔드포인트와 요청 바디를 프로젝트에 맞게 조정하세요.
-      const response = await axiosApi.put(`/admin/user/${userId}/reward`, { reward: rewardAmount })
-      return response.data
-   } catch (error) {
-      if (env === 'development') console.error(error)
-      throw error
-   }
-}
-
 // 사용자 삭제
 export const deleteUser = async (userId) => {
    try {
@@ -79,7 +67,53 @@ export const deleteUser = async (userId) => {
    }
 }
 
-// 게시판 관리
+// 게시판 조회
+export const getCategories = async () => {
+   try {
+      const response = await axiosApi.get('/admin/categories')
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+// 게시판 생성
+export const createCategory = async (categoryName) => {
+   try {
+      const payload = { category: categoryName }
+      const response = await axiosApi.post('/admin/categories', payload)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+// 게시판 삭제
+export const deleteCategory = async (categoryId) => {
+   try {
+      const response = await axiosApi.delete(`/admin/categories/${categoryId}`)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+// 게시판 수정
+export const updateCategory = async (categoryId, categoryData) => {
+   try {
+      const payload = { category: categoryData.name }
+      const response = await axiosApi.put(`/admin/categories/${categoryId}`, payload)
+      return response.data
+   } catch (error) {
+      if (env === 'development') console.error(error)
+      throw error
+   }
+}
+
+// 게시글 조회
 export const getBoards = async () => {
    try {
       const response = await axiosApi.get(`/admin/boards`)
@@ -90,7 +124,7 @@ export const getBoards = async () => {
    }
 }
 
-// 게시판 삭제
+// 게시글 삭제
 export const deleteBoard = async (boardId) => {
    try {
       const response = await axiosApi.delete(`/admin/boards/${boardId}`)

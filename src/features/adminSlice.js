@@ -22,7 +22,7 @@ export const getUsersThunk = createAsyncThunk('admin/getUsers', async (_, { reje
 })
 
 // 사용자 제재 갱신
-export const updateUserStatusThunk = createAsyncThunk('admin/updateUserBanStatus', async ({ userId, isBanned }, { rejectWithValue }) => {
+export const updateUserStatusThunk = createAsyncThunk('admin/updateUserStatus', async ({ userId, isBanned }, { rejectWithValue }) => {
    try {
       await adminApi.updateUserBanStatus(userId, isBanned)
       return { userId, isBanned }
@@ -41,17 +41,57 @@ export const deleteUserThunk = createAsyncThunk('admin/deleteUser', async (userI
    }
 })
 
-// 게시판 목록
-export const getBoardThunk = createAsyncThunk('admin/getBoards', async (_, { rejectWithValue }) => {
+// 게시판 조회
+export const getCategoriesThunk = createAsyncThunk('admin/getCategories', async (_, { rejectWithValue }) => {
    try {
-      const response = await adminApi.getBoards()
-      return response.data ?? response
+      const response = await adminApi.getCategories()
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
+// 게시판 생성
+export const createCategoryThunk = createAsyncThunk('admin/createCategory', async (categoryData, { rejectWithValue }) => {
+   try {
+      const response = await adminApi.createCategory(categoryData)
+      return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data)
    }
 })
 
 // 게시판 삭제
+export const deleteCategoryThunk = createAsyncThunk('admin/deleteCategory', async (categoryId, { rejectWithValue }) => {
+   try {
+      await adminApi.deleteCategory(categoryId)
+      return categoryId
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
+// 게시판 수정
+export const updateCategoryThunk = createAsyncThunk('admin/updateCategory', async ({ id, name }, { rejectWithValue }) => {
+   try {
+      const response = await adminApi.updateCategory(id, { name })
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data)
+   }
+})
+
+// 게시글 목록
+export const getBoardsThunk = createAsyncThunk('admin/getBoards', async ({ page = 1, limit = 10, search = '' }, { rejectWithValue }) => {
+   try {
+      const response = await adminApi.getBoards(page, limit, search)
+      return response.data
+   } catch (err) {
+      return rejectWithValue(err.response?.data)
+   }
+})
+
+// 게시글 삭제
 export const deleteBoardThunk = createAsyncThunk('admin/deleteBoard', async (boardId, { rejectWithValue }) => {
    try {
       await adminApi.deleteBoard(boardId)
@@ -208,7 +248,7 @@ const adminSlice = createSlice({
    name: 'admin',
    initialState: {
       users: [],
-      boards: [],
+      boards: null,
       settings: {},
       banWords: [],
       banWordsLoading: false,
@@ -218,6 +258,7 @@ const adminSlice = createSlice({
       user: null,
       userStatusLoading: false,
       userStatusError: null,
+      categories: [],
       loading: {
          users: false,
          boards: false,
@@ -226,14 +267,17 @@ const adminSlice = createSlice({
          products: false,
          productLists: false,
          allStats: false,
+         categories: false,
       },
       error: {
          users: null,
+         boards: null,
          settings: null,
          products: null,
          banWords: null,
          productLists: null,
          allStats: null,
+         categories: null,
       },
       // 통계 관련 상태들
       statistics: null,
@@ -267,7 +311,6 @@ const adminSlice = createSlice({
          // 사용자 목록
          .addCase(getUsersThunk.pending, (state) => {
             state.loading.users = true
-            state.error.users = null
          })
          .addCase(getUsersThunk.fulfilled, (state, action) => {
             state.loading.users = false
@@ -275,7 +318,7 @@ const adminSlice = createSlice({
          })
          .addCase(getUsersThunk.rejected, (state, action) => {
             state.loading.users = false
-            state.error = action.payload?.message || '사용자 목록을 불러오지 못했습니다.'
+            state.error = { users: action.payload?.message || '사용자 조회 실패' }
          })
 
          // 사용자 제재
@@ -286,49 +329,109 @@ const adminSlice = createSlice({
          .addCase(updateUserStatusThunk.fulfilled, (state, action) => {
             state.loading.users = false
             const { userId, isBanned } = action.payload
-            const userIndex = state.users.findIndex((user) => user.id === userId)
-            if (userIndex !== -1) {
-               state.users[userIndex].is_ban = isBanned
-            }
+            state.users = state.users.map((user) => (user.id === userId ? { ...user, is_ban: isBanned } : user))
          })
          .addCase(updateUserStatusThunk.rejected, (state, action) => {
             state.loading.users = false
             state.error = action.payload?.message || '사용자 제재 처리에 실패했습니다.'
          })
 
-         // 사용자 제재
+         // 사용자 삭제
          .addCase(deleteUserThunk.pending, (state) => {
             state.loading.users = true
             state.error = null
          })
          .addCase(deleteUserThunk.fulfilled, (state, action) => {
-            const deletedUserId = action.meta.arg
-            state.users = state.users.filter((user) => user.id !== deletedUserId)
-            state.loading.users = false
+            state.users = state.users.filter((u) => u.id !== action.payload)
          })
          .addCase(deleteUserThunk.rejected, (state, action) => {
             state.loading.users = false
             state.error = action.payload?.message || '사용자 삭제에 실패했습니다.'
          })
 
-         // 게시판 목록
-         .addCase(getBoardThunk.pending, (state) => {
-            state.loading.boards = true
-            state.error = null
+         // 게시판 목록 조회
+         .addCase(getCategoriesThunk.pending, (state) => {
+            state.loading.categories = true
+            state.error.categories = null
          })
-         .addCase(getBoardThunk.fulfilled, (state, action) => {
-            state.loading.boards = false
-            state.boards = action.payload || []
+         .addCase(getCategoriesThunk.fulfilled, (state, action) => {
+            state.loading.categories = false
+            state.categories = Array.isArray(action.payload) ? action.payload : []
          })
-         .addCase(getBoardThunk.rejected, (state, action) => {
-            state.loading.boards = false
-            state.error = action.payload?.message || '게시판 목록을 불러오지 못했습니다.'
+         .addCase(getCategoriesThunk.rejected, (state, action) => {
+            state.loading.categories = false
+            state.error.categories = action.payload || '카테고리 목록을 불러오지 못했습니다.'
+            state.categories = []
+         })
+
+         // 게시판 생성
+         .addCase(createCategoryThunk.pending, (state) => {
+            state.loading.categories = true
+            state.error.categories = null
+         })
+         .addCase(createCategoryThunk.fulfilled, (state, action) => {
+            state.loading.categories = false
+            if (action.payload) {
+               state.categories.push(action.payload)
+            }
+         })
+         .addCase(createCategoryThunk.rejected, (state, action) => {
+            state.loading.categories = false
+            state.error.categories = action.payload?.message || action.payload || '게시판을 생성하지 못했습니다.'
          })
 
          // 게시판 삭제
+         .addCase(deleteCategoryThunk.pending, (state) => {
+            state.loading.categories = true
+            state.error.categories = null
+         })
+         .addCase(deleteCategoryThunk.fulfilled, (state, action) => {
+            state.loading.categories = false
+            if (typeof action.payload === 'number') {
+               state.categories = state.categories.filter((c) => c.id !== action.payload)
+            }
+         })
+         .addCase(deleteCategoryThunk.rejected, (state, action) => {
+            state.loading.categories = false
+            state.error.categories = action.payload?.message || '게시판 삭제에 실패했습니다.'
+         })
+
+         // 게시판 수정
+         .addCase(updateCategoryThunk.pending, (state) => {
+            state.loading.categories = true
+            state.error.categories = null
+         })
+         .addCase(updateCategoryThunk.fulfilled, (state, action) => {
+            state.loading.categories = false
+            if (action.payload && typeof action.payload === 'object') {
+               const index = state.categories.findIndex((c) => c.id === action.payload.id)
+               if (index !== -1) state.categories[index] = action.payload
+            }
+         })
+         .addCase(updateCategoryThunk.rejected, (state, action) => {
+            state.loading.categories = false
+            state.error.categories = action.payload?.message || '게시판을 수정하지 못했습니다.'
+         })
+
+         // 게시글 목록
+         .addCase(getBoardsThunk.pending, (state) => {
+            state.loading.boards = true
+            state.error.boards = null
+         })
+         .addCase(getBoardsThunk.fulfilled, (state, action) => {
+            state.loading.boards = false
+            state.boards = Array.isArray(action.payload) ? action.payload : []
+         })
+         .addCase(getBoardsThunk.rejected, (state, action) => {
+            state.loading.boards = false
+            state.boards = []
+            state.error.boards = action.payload || '게시글 목록을 불러오지 못했습니다.'
+         })
+
+         // 게시글 삭제
          .addCase(deleteBoardThunk.pending, (state) => {
             state.loading.boards = true
-            state.error = null
+            state.error.boards = null
          })
          .addCase(deleteBoardThunk.fulfilled, (state, action) => {
             state.loading.boards = false
@@ -336,7 +439,7 @@ const adminSlice = createSlice({
          })
          .addCase(deleteBoardThunk.rejected, (state, action) => {
             state.loading.boards = false
-            state.error = action.payload?.message || '게시판을 삭제하지 못했습니다.'
+            state.error = action.payload?.message || '게시글을 삭제하지 못했습니다.'
          })
 
          // 사이트 설정

@@ -1,14 +1,25 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { getCategoriesThunk, createCategoryThunk, deleteCategoryThunk, getBoardsThunk, deleteBoardThunk } from '../../../features/adminSlice'
 import { Row, Col, Card, Table, Badge, Button, Form, InputGroup, Modal } from 'react-bootstrap'
-import styles from '../../../styles/components/admin/admin-common.module.css'
 
 const BoardManagement = () => {
+   const dispatch = useDispatch()
+   const { categories, boards } = useSelector((state) => state.admin)
+
    const [searchTerm, setSearchTerm] = useState('')
    const [selectedPost, setSelectedPost] = useState(null)
    const [showModal, setShowModal] = useState(false)
    const [filterStatus, setFilterStatus] = useState('all')
    const [sortBy, setSortBy] = useState('created')
-   const [posts, setPosts] = useState([])
+   const [newCategory, setNewCategory] = useState('')
+   const [selectedCategoryId, setSelectedCategoryId] = useState(null)
+
+   // 데이터 로드
+   useEffect(() => {
+      dispatch(getCategoriesThunk())
+      dispatch(getBoardsThunk())
+   }, [dispatch])
 
    const getStatusBadge = (status) => {
       const variants = {
@@ -17,70 +28,55 @@ const BoardManagement = () => {
          reported: 'warning',
          deleted: 'secondary',
       }
-
       const labels = {
          published: '게시됨',
          hidden: '숨김',
          reported: '신고됨',
          deleted: '삭제됨',
       }
-
-      return (
-         <Badge bg={variants[status]} className={styles.statusBadge}>
-            {labels[status]}
-         </Badge>
-      )
+      return <Badge bg={variants[status]}>{labels[status]}</Badge>
    }
 
    const getCategoryBadge = (category) => {
-      const colors = {
-         bitcoin: 'warning',
-         ethereum: 'info',
-         ripple: 'primary',
-         general: 'secondary',
-         nft: 'success',
-      }
-
-      const labels = {
-         bitcoin: '비트코인',
-         ethereum: '이더리움',
-         ripple: '리플',
-         general: '일반',
-         nft: 'NFT',
-      }
-
       return (
-         <Badge bg={colors[category]} className={styles.statusBadge}>
-            {labels[category]}
+         <Badge bg="secondary" className="me-1">
+            {category}
          </Badge>
       )
    }
 
+   // 게시판 추가
+   const handleAddCategory = () => {
+      if (!newCategory.trim()) return
+      dispatch(createCategoryThunk(newCategory))
+      setNewCategory('')
+   }
+
+   // 게시판 삭제
+   const handleDeleteCategory = (id) => {
+      if (window.confirm('해당 게시판를 삭제하시겠습니까?')) {
+         dispatch(deleteCategoryThunk(id))
+      }
+   }
+
+   // 게시글 액션
    const handlePostAction = (post, action) => {
       setSelectedPost(post)
       if (action === 'view') {
          setShowModal(true)
-      } else if (action === 'hide') {
-         if (window.confirm(`"${post.title}" 게시글을 숨김 처리하시겠습니까?`)) {
-            setPosts(posts.map((p) => (p.id === post.id ? { ...p, status: 'hidden' } : p)))
-         }
-      } else if (action === 'show') {
-         if (window.confirm(`"${post.title}" 게시글을 다시 게시하시겠습니까?`)) {
-            setPosts(posts.map((p) => (p.id === post.id ? { ...p, status: 'published' } : p)))
-         }
       } else if (action === 'delete') {
          if (window.confirm(`"${post.title}" 게시글을 삭제하시겠습니까?`)) {
-            setPosts(posts.filter((p) => p.id !== post.id))
+            dispatch(deleteBoardThunk(post.id))
          }
-      } else if (action === 'pin') {
-         setPosts(posts.map((p) => (p.id === post.id ? { ...p, isPinned: !p.isPinned } : p)))
-      } else if (action === 'notice') {
-         setPosts(posts.map((p) => (p.id === post.id ? { ...p, isNotice: !p.isNotice } : p)))
       }
    }
 
-   const filteredPosts = posts.filter((post) => {
-      const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) || post.author.toLowerCase().includes(searchTerm.toLowerCase())
+   const safeBoards = boards || []
+
+   const filteredBoards = selectedCategoryId ? safeBoards.filter((b) => b.categoryId === selectedCategoryId) : safeBoards
+
+   const filteredPosts = safeBoards.filter((post) => {
+      const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) || post.User?.name?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = filterStatus === 'all' || post.status === filterStatus
       return matchesSearch && matchesStatus
    })
@@ -90,87 +86,32 @@ const BoardManagement = () => {
          case 'title':
             return a.title.localeCompare(b.title)
          case 'author':
-            return a.author.localeCompare(b.author)
+            return a.User?.name.localeCompare(b.User?.name)
          case 'created':
-            return new Date(b.created) - new Date(a.created)
+            return new Date(b.created_at) - new Date(a.created_at)
          case 'views':
-            return b.views - a.views
-         case 'reports':
-            return b.reports - a.reports
+            return b.view_count - a.view_count
          default:
             return 0
       }
    })
 
    const PostDetailModal = () => (
-      <Modal show={showModal} onHide={() => setShowModal(false)} dialogClassName={styles.customModal}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
          <Modal.Header closeButton>
             <Modal.Title>게시글 상세 정보</Modal.Title>
          </Modal.Header>
          <Modal.Body>
             {selectedPost && (
-               <div>
-                  <Row className="mb-3">
-                     <Col>
-                        <h5>{selectedPost.title}</h5>
-                        <div className="mb-2">
-                           {getCategoryBadge(selectedPost.category)}
-                           {selectedPost.isNotice && (
-                              <Badge bg="primary" className="ms-2">
-                                 공지
-                              </Badge>
-                           )}
-                           {selectedPost.isPinned && (
-                              <Badge bg="info" className="ms-2">
-                                 고정
-                              </Badge>
-                           )}
-                        </div>
-                        <small className="text-muted">
-                           작성자: {selectedPost.author} | 작성일: {selectedPost.created}
-                        </small>
-                     </Col>
-                  </Row>
-
-                  <Row className="mb-3">
-                     <Col md={3}>
-                        <div className="text-center p-3 bg-light rounded">
-                           <div className="h4 mb-1">{selectedPost.views.toLocaleString()}</div>
-                           <small className="text-muted">조회수</small>
-                        </div>
-                     </Col>
-                     <Col md={3}>
-                        <div className="text-center p-3 bg-light rounded">
-                           <div className="h4 mb-1">{selectedPost.comments}</div>
-                           <small className="text-muted">댓글</small>
-                        </div>
-                     </Col>
-                     <Col md={3}>
-                        <div className="text-center p-3 bg-light rounded">
-                           <div className="h4 mb-1">{selectedPost.likes}</div>
-                           <small className="text-muted">추천</small>
-                        </div>
-                     </Col>
-                     <Col md={3}>
-                        <div className="text-center p-3 bg-light rounded">
-                           <div className={`h4 mb-1 ${selectedPost.reports > 0 ? 'text-danger' : ''}`}>{selectedPost.reports}</div>
-                           <small className="text-muted">신고</small>
-                        </div>
-                     </Col>
-                  </Row>
-
-                  <div className="border rounded p-3">
-                     <h6>게시글 내용</h6>
-                     <p>{selectedPost.content}</p>
-                  </div>
-
-                  {selectedPost.reports > 0 && (
-                     <div className="mt-3 p-3 bg-warning bg-opacity-10 border-warning border rounded">
-                        <i className="fas fa-exclamation-triangle text-warning me-2"></i>
-                        <strong>이 게시글은 {selectedPost.reports}건의 신고가 접수되었습니다.</strong>
-                     </div>
-                  )}
-               </div>
+               <>
+                  <h5>{selectedPost.title}</h5>
+                  <div className="mb-2">{getCategoryBadge(selectedPost.category)}</div>
+                  <small className="text-muted">
+                     작성자: {selectedPost.User?.name} | 작성일: {new Date(selectedPost.created_at).toLocaleString()}
+                  </small>
+                  <hr />
+                  <p>{selectedPost.content}</p>
+               </>
             )}
          </Modal.Body>
          <Modal.Footer>
@@ -178,47 +119,15 @@ const BoardManagement = () => {
                닫기
             </Button>
             {selectedPost && (
-               <>
-                  <Button
-                     variant={selectedPost.isNotice ? 'outline-primary' : 'primary'}
-                     onClick={() => {
-                        handlePostAction(selectedPost, 'notice')
-                        setShowModal(false)
-                     }}
-                  >
-                     {selectedPost.isNotice ? '공지 해제' : '공지 설정'}
-                  </Button>
-                  <Button
-                     variant={selectedPost.isPinned ? 'outline-info' : 'info'}
-                     onClick={() => {
-                        handlePostAction(selectedPost, 'pin')
-                        setShowModal(false)
-                     }}
-                  >
-                     {selectedPost.isPinned ? '고정 해제' : '고정 설정'}
-                  </Button>
-                  {selectedPost.status === 'published' ? (
-                     <Button
-                        variant="warning"
-                        onClick={() => {
-                           handlePostAction(selectedPost, 'hide')
-                           setShowModal(false)
-                        }}
-                     >
-                        숨김 처리
-                     </Button>
-                  ) : (
-                     <Button
-                        variant="success"
-                        onClick={() => {
-                           handlePostAction(selectedPost, 'show')
-                           setShowModal(false)
-                        }}
-                     >
-                        게시 복원
-                     </Button>
-                  )}
-               </>
+               <Button
+                  variant="danger"
+                  onClick={() => {
+                     handlePostAction(selectedPost, 'delete')
+                     setShowModal(false)
+                  }}
+               >
+                  삭제
+               </Button>
             )}
          </Modal.Footer>
       </Modal>
@@ -226,16 +135,67 @@ const BoardManagement = () => {
 
    return (
       <div>
-         <Card className={styles.contentCard}>
-            <div className={styles.cardHeader}>
-               <h4 className={styles.cardTitle}>
-                  <i className="fas fa-clipboard-list me-2"></i>
-                  게시판 관리
-               </h4>
-            </div>
+         {/* 게시판 관리 */}
+         <Card className="mb-4">
+            <Card.Header>
+               <h5 className="mb-0">게시판 관리</h5>
+            </Card.Header>
             <Card.Body>
-               {/* 검색 및 필터 */}
-               <Row className="mb-4">
+               <Row className="mb-3">
+                  <Col md={6}>
+                     <InputGroup>
+                        <Form.Control type="text" placeholder="새 게시판명 입력" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} />
+                        <Button onClick={handleAddCategory}>추가</Button>
+                     </InputGroup>
+                  </Col>
+               </Row>
+               <Table striped bordered hover>
+                  <thead>
+                     <tr>
+                        <th>ID</th>
+                        <th>게시판명</th>
+                        <th>관리</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {categories.map((cat, index) => (
+                        <tr key={cat.id ?? index} className={selectedCategoryId === cat.id ? 'table-active' : ''} style={{ cursor: 'pointer' }} onClick={() => setSelectedCategoryId(cat.id)}>
+                           <td>{cat.id}</td>
+                           <td>{cat.category}</td>
+                           <td>
+                              <Button
+                                 variant="outline-danger"
+                                 size="sm"
+                                 onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDeleteCategory(cat.id)
+                                 }}
+                              >
+                                 삭제
+                              </Button>
+                           </td>
+                        </tr>
+                     ))}
+                     {categories.length === 0 && (
+                        <tr>
+                           <td colSpan="3" className="text-center text-muted">
+                              등록된 게시판이 없습니다.
+                           </td>
+                        </tr>
+                     )}
+                  </tbody>
+               </Table>
+            </Card.Body>
+         </Card>
+
+         {/* 게시글 관리 */}
+         <Card>
+            <Card.Header>
+               <h5 className="mb-0">게시글 관리</h5>
+            </Card.Header>
+            <Card.Body>
+               {/* 검색 & 필터 */}
+               <Row className="mb-3">
                   <Col md={4}>
                      <InputGroup>
                         <InputGroup.Text>
@@ -259,78 +219,54 @@ const BoardManagement = () => {
                         <option value="title">제목순</option>
                         <option value="author">작성자순</option>
                         <option value="views">조회수순</option>
-                        <option value="reports">신고순</option>
                      </Form.Select>
                   </Col>
-                  <Col md={2}>
-                     <div className="text-muted">총 {filteredPosts.length}개</div>
+                  <Col md={2} className="text-end text-muted">
+                     총 {sortedPosts.length}개
                   </Col>
                </Row>
 
-               {/* 게시글 목록 테이블 */}
-               <div className={styles.tableContainer}>
-                  <Table responsive className={styles.adminTable}>
-                     <thead>
-                        <tr>
-                           <th>제목</th>
-                           <th>카테고리</th>
-                           <th>작성자</th>
-                           <th>작성일</th>
-                           <th>조회</th>
-                           <th>댓글</th>
-                           <th>신고</th>
-                           <th>상태</th>
-                           <th>관리</th>
+               {/* 게시글 테이블 */}
+               <Table responsive bordered hover>
+                  <thead>
+                     <tr>
+                        <th>제목</th>
+                        <th>게시판</th>
+                        <th>작성자</th>
+                        <th>작성일</th>
+                        <th>조회</th>
+                        <th>상태</th>
+                        <th>관리</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {sortedPosts.map((post, index) => (
+                        <tr key={post.id ?? index}>
+                           <td>{post.title}</td>
+                           <td>{getCategoryBadge(post.category)}</td>
+                           <td>{post.User?.name}</td>
+                           <td>{new Date(post.created_at).toLocaleDateString()}</td>
+                           <td>{post.view_count}</td>
+                           <td>{getStatusBadge(post.status)}</td>
+                           <td>
+                              <Button variant="outline-primary" size="sm" className="me-1" onClick={() => handlePostAction(post, 'view')}>
+                                 보기
+                              </Button>
+                              <Button variant="outline-danger" size="sm" onClick={() => handlePostAction(post, 'delete')}>
+                                 삭제
+                              </Button>
+                           </td>
                         </tr>
-                     </thead>
-                     <tbody>
-                        {sortedPosts.map((post) => (
-                           <tr key={post.id}>
-                              <td>
-                                 <div>
-                                    {post.isPinned && <i className="fas fa-thumbtack text-info me-2"></i>}
-                                    {post.isNotice && <i className="fas fa-bullhorn text-primary me-2"></i>}
-                                    <strong>{post.title.length > 40 ? `${post.title.substring(0, 40)}...` : post.title}</strong>
-                                 </div>
-                              </td>
-                              <td>{getCategoryBadge(post.category)}</td>
-                              <td>{post.author}</td>
-                              <td>{post.created.split(' ')[0]}</td>
-                              <td>{post.views.toLocaleString()}</td>
-                              <td>{post.comments}</td>
-                              <td>
-                                 <span className={post.reports > 0 ? 'text-danger fw-bold' : ''}>{post.reports}</span>
-                              </td>
-                              <td>{getStatusBadge(post.status)}</td>
-                              <td>
-                                 <Button variant="outline-primary" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handlePostAction(post, 'view')}>
-                                    <i className="fas fa-eye"></i>
-                                 </Button>
-                                 {post.status === 'published' ? (
-                                    <Button variant="outline-warning" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handlePostAction(post, 'hide')}>
-                                       <i className="fas fa-eye-slash"></i>
-                                    </Button>
-                                 ) : post.status === 'hidden' ? (
-                                    <Button variant="outline-success" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handlePostAction(post, 'show')}>
-                                       <i className="fas fa-eye"></i>
-                                    </Button>
-                                 ) : null}
-                                 <Button variant="outline-danger" size="sm" className={styles.actionButton} onClick={() => handlePostAction(post, 'delete')}>
-                                    <i className="fas fa-trash"></i>
-                                 </Button>
-                              </td>
-                           </tr>
-                        ))}
-                     </tbody>
-                  </Table>
-               </div>
-
-               {sortedPosts.length === 0 && (
-                  <div className="text-center py-4">
-                     <i className="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-                     <p className="text-muted">검색 조건에 맞는 게시글이 없습니다.</p>
-                  </div>
-               )}
+                     ))}
+                     {sortedPosts.length === 0 && (
+                        <tr>
+                           <td colSpan="7" className="text-center text-muted">
+                              검색 조건에 맞는 게시글이 없습니다.
+                           </td>
+                        </tr>
+                     )}
+                  </tbody>
+               </Table>
             </Card.Body>
          </Card>
 

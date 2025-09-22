@@ -7,7 +7,6 @@ import { getUsersThunk } from '../../../features/userSlice'
 
 const Dashboard = () => {
    const dispatch = useDispatch()
-   // Redux 상태를 `adminState`가 아닌 `user`와 `boards`에서 직접 가져오도록 수정
    const { users, loading: userLoading, error: userError } = useSelector((state) => state.user)
    const { boards, loading: boardLoading, error: boardError } = useSelector((state) => state.board)
 
@@ -162,8 +161,8 @@ const Dashboard = () => {
                                  boards.slice(0, 10).map((board) => (
                                     <tr key={board.id}>
                                        <td>{board.title}</td>
-                                       <td>{board.author}</td>
-                                       <td>{board.created}</td>
+                                       <td>{board.User?.name || '알 수 없음'}</td>
+                                       <td>{new Date(board.created_at).toLocaleString()}</td>
                                     </tr>
                                  ))
                               ) : (

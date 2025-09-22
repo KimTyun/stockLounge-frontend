@@ -15,9 +15,12 @@ const UserManagement = () => {
    const [searchTerm, setSearchTerm] = useState('')
    const [selectedUser, setSelectedUser] = useState(null)
    const [showModal, setShowModal] = useState(false)
+   const [showConfirmModal, setShowConfirmModal] = useState(false)
+   const [confirmAction, setConfirmAction] = useState(null)
+
    const [filterStatus, setFilterStatus] = useState('all')
    const [sortBy, setSortBy] = useState('joinDate')
-   const [currentPage, _setCurrentPage] = useState(1)
+   const [currentPage, setCurrentPage] = useState(1)
    const itemsPerPage = 10
 
    // 알림 상태
@@ -66,19 +69,23 @@ const UserManagement = () => {
       setSelectedUser(user)
       if (action === 'view') {
          setShowModal(true)
-      } else if (action === 'ban') {
-         if (window.confirm(`사용자 ${user.nickname}님을 정지하시겠습니까?`)) {
-            dispatch(updateUserStatusThunk({ userId: user.id, isBanned: true }))
-         }
-      } else if (action === 'activate') {
-         if (window.confirm(`사용자 ${user.nickname}님의 정지를 해제하시겠습니까?`)) {
-            dispatch(updateUserStatusThunk({ userId: user.id, isBanned: false }))
-         }
-      } else if (action === 'delete') {
-         if (window.confirm(`사용자 ${user.nickname}님을 삭제하시겠습니까?`)) {
-            dispatch(deleteUserThunk(user.id))
-         }
+      } else {
+         setConfirmAction(action)
+         setShowConfirmModal(true)
       }
+   }
+
+   const handleConfirmAction = () => {
+      if (!selectedUser || !confirmAction) return
+
+      if (confirmAction === 'ban') {
+         dispatch(updateUserStatusThunk({ userId: selectedUser.id, isBanned: true }))
+      } else if (confirmAction === 'activate') {
+         dispatch(updateUserStatusThunk({ userId: selectedUser.id, isBanned: false }))
+      } else if (confirmAction === 'delete') {
+         dispatch(deleteUserThunk(selectedUser.id))
+      }
+      setShowConfirmModal(false)
    }
 
    const filteredUsers = (users || []).filter((user) => {
@@ -167,7 +174,7 @@ const UserManagement = () => {
                               <td>
                                  <strong>보유 포인트</strong>
                               </td>
-                              <td>{selectedUser.Reward?.point.toLocaleString() || '0'}P</td>
+                              <td>{selectedUser.Reward?.point?.toLocaleString() || '0'}P</td>
                            </tr>
                            <tr>
                               <td>
@@ -217,6 +224,38 @@ const UserManagement = () => {
          </Modal.Footer>
       </Modal>
    )
+
+   const UserConfirmModal = () => {
+      if (!selectedUser || !confirmAction) return null
+
+      const actionText = {
+         ban: `정지`,
+         activate: `활성화`,
+         delete: `삭제`,
+      }
+
+      return (
+         <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+            <Modal.Header closeButton>
+               <Modal.Title>사용자 {actionText[confirmAction]}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+               <p>
+                  정말로 사용자 **{selectedUser.nickname}**님을 {actionText[confirmAction]}하시겠습니까?
+               </p>
+               <p className="text-muted">이 작업은 되돌릴 수 없습니다.</p>
+            </Modal.Body>
+            <Modal.Footer>
+               <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+                  취소
+               </Button>
+               <Button variant={confirmAction === 'delete' ? 'danger' : 'primary'} onClick={handleConfirmAction}>
+                  확인
+               </Button>
+            </Modal.Footer>
+         </Modal>
+      )
+   }
 
    return (
       <div>
@@ -296,7 +335,7 @@ const UserManagement = () => {
                                  <td>{user.email}</td>
                                  <td>{user.joinDate}</td>
                                  <td>{user.lastLogin}</td>
-                                 <td>{user.Reward?.point.toLocaleString() || '0'}P</td>
+                                 <td>{user.Reward?.point?.toLocaleString() || '0'}P</td>
                                  <td>{getStatusBadge(user)}</td>
                                  <td>
                                     <Button variant="outline-primary" size="sm" className={`${styles.actionButton} me-1`} onClick={() => handleUserAction(user, 'view')}>
@@ -324,6 +363,7 @@ const UserManagement = () => {
             </Card.Body>
          </Card>
          {showModal && <UserDetailModal />}
+         {showConfirmModal && <UserConfirmModal />}
       </div>
    )
 }
