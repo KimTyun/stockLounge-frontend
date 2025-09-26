@@ -1,29 +1,13 @@
-import { useEffect } from 'react'
 import { Button } from 'react-bootstrap'
 import { FaGoogle, FaComment } from 'react-icons/fa'
 
 const SocialLogin = ({ provider }) => {
-   useEffect(() => {
-      const handleMessage = (event) => {
-         if (event.origin !== 'http://localhost:8000' && event.origin !== 'http://localhost:5173') return
-         if (event.data?.success) {
-            if (event.data.redirectUrl) {
-               window.location.href = event.data.redirectUrl
-            } else {
-               window.location.reload()
-            }
-         }
-      }
-      window.addEventListener('message', handleMessage)
-      return () => window.removeEventListener('message', handleMessage)
-   }, [])
-
    const handleLogin = () => {
       const apiBase = import.meta.env.VITE_API_URL
       let authUrl = ''
 
       if (!apiBase) {
-         console.error('VITE_API_BASE_URL 환경 변수가 .env에 설정되지 않았습니다.')
+         console.error('VITE_API_URL 환경 변수가 .env에 설정되지 않았습니다.')
          alert('로그인 설정에 오류가 발생했습니다. 관리자에게 문의하세요.')
          return
       }
@@ -35,7 +19,8 @@ const SocialLogin = ({ provider }) => {
       }
 
       if (authUrl) {
-         window.open(authUrl, 'oauth_popup', 'width=600,height=700')
+         // 🔽 팝업 대신 현재 창에서 리다이렉트
+         window.location.href = authUrl
       }
    }
 
