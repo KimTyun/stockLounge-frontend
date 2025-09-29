@@ -73,8 +73,6 @@ const BoardManagement = () => {
 
    const safeBoards = boards || []
 
-   const filteredBoards = selectedCategoryId ? safeBoards.filter((b) => b.categoryId === selectedCategoryId) : safeBoards
-
    const filteredPosts = safeBoards.filter((post) => {
       const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) || post.User?.name?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = filterStatus === 'all' || post.status === filterStatus

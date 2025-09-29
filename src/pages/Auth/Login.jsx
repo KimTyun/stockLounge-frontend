@@ -2,13 +2,11 @@ import { Container, Card } from 'react-bootstrap'
 import SocialLogin from '../../components/auth/SocialLogin/SocialLogin'
 import styles from '../../styles/components/auth/LoginPage.module.css'
 import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { checkAuthStatusThunk } from '../../features/authSlice'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../../config/routes'
 
 const LoginPage = () => {
-   const dispatch = useDispatch()
    const { isLoggedIn } = useSelector((state) => state.auth)
    const navigate = useNavigate()
 

@@ -1,14 +1,9 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { TrendingUp, BarChart3, Newspaper, Users, ArrowRight, Zap } from 'lucide-react'
 import styles from '../../styles/pages/LandingPage.module.css' // CSS Modules import
 import { ROUTES } from '../../config/routes'
 
 const LandingPage = () => {
-   const [popularCoins, _setPopularCoins] = useState([])
-   const [latestNews, _setLatestNews] = useState([])
-   const [isLoading, _setIsLoading] = useState(true)
-
    const features = [
       { icon: <BarChart3 size={32} />, title: '실시간 차트', description: '업비트 API를 통한 실시간 코인 차트와 시세 정보를 확인하세요.' },
       { icon: <Newspaper size={32} />, title: '최신 뉴스', description: '암호화폐와 주식 관련 최신 뉴스를 빠르게 접할 수 있습니다.' },
