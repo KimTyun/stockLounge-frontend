@@ -87,7 +87,7 @@ const coinSlice = createSlice({
          })
          .addCase(getTickerAllThunk.fulfilled, (state, action) => {
             state.loading = false
-            state.coins = action.payload.data
+            state.coins = action.payload?.data ?? action.payload
             state.error = null
          })
          .addCase(getTickerAllThunk.rejected, (state, action) => {

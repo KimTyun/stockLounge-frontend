@@ -15,7 +15,11 @@ import { setSelectedCoin, setCoinData } from '../../features/coinSlice'
 const Chart = () => {
    const dispatch = useDispatch()
    const { news } = useSelector((s) => s.news)
-   const { coins, coinList, selectedCoin, coinData } = useSelector((s) => s.coin)
+   const coinState = useSelector((s) => s.coin)
+   const coins = coinState.coins ?? []
+   const coinList = coinState.coinList ?? []
+   const selectedCoin = coinState.selectedCoin
+   const coinData = coinState.coinData
    const { user } = useSelector((s) => s.user)
    const { recommend } = useSelector((s) => s.board)
 
@@ -36,11 +40,13 @@ const Chart = () => {
 
    useEffect(() => {
       const fetchData = async () => {
-         if (!selectedCoin && !coins.length && !coinList.length) {
+         if (!selectedCoin && coins.length === 0 && coinList.length === 0) {
             const conlist = await dispatch(getMarketAllThunk()).unwrap()
             const result = await dispatch(getTickerAllThunk(30)).unwrap()
 
-            const mapped = result.data.map((coin, index) => ({
+            const tickerData = result?.data ?? result ?? []
+
+            const mapped = tickerData.map((coin, index) => ({
                id: coin.market,
                symbol: coin.market.split('-')[1],
                name: conlist.find((e) => e.market === coin.market)?.korean_name ?? '',
@@ -51,7 +57,7 @@ const Chart = () => {
             }))
 
             dispatch(setCoinData(mapped))
-            if (!selectedCoin) {
+            if (!selectedCoin && mapped.length > 0) {
                dispatch(setSelectedCoin(mapped[0]))
             }
          }
